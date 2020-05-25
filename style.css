@@ -1,0 +1,12 @@
+html, head, body {
+ margin: 0;
+}
+body {
+ font-family: 'Source Sans Pro', sans-serif;
+ color: #35374A;
+}
+
+h1 {
+ font-size: 24px;
+ font-weight: normal;
+}
