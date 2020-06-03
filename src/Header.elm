@@ -1,14 +1,16 @@
-module Header exposing (home, package, view)
+module Header exposing (home, navHeight, package, view)
 
 import Api as Api
-import Author
 import Css as Css
 import Html.Styled as Styled exposing (div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs
-import Repo
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
-import Version
+
+
+navHeight : Float
+navHeight =
+    64
 
 
 type Config
@@ -72,7 +74,7 @@ nav config =
         [ StyledAttribs.css
             [ Css.color (Css.hex "#FFFFFF")
             , Css.maxWidth (Css.px 920)
-            , Css.height (Css.px 64)
+            , Css.height (Css.px navHeight)
             , Css.margin2 (Css.px 0) Css.auto
             , Css.displayFlex
             , Css.alignItems Css.center

@@ -4,7 +4,8 @@ import Api as Api
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Header as Header
-import Html.Styled as Styled exposing (text)
+import Html.Styled as Styled exposing (div, text)
+import Stage
 import Url
 
 
@@ -20,7 +21,7 @@ init _ _ _ =
 view : {} -> Document Msg
 view _ =
     { title = "Elm Exhibit"
-    , body = [ header ] |> List.map Styled.toUnstyled
+    , body = [ header, Stage.view (text "HELLO") ] |> List.map Styled.toUnstyled
     }
 
 
