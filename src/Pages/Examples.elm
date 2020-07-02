@@ -59,10 +59,13 @@ init =
     }
 
 
-view : Styled.Html Msg
+view : { title : String, content : Styled.Html Msg }
 view =
-    stageWrapper
-        [ sliderLeft, sliderCenter, sliderRight ]
+    { title = "examples"
+    , content =
+        stageWrapper
+            [ sliderLeft, sliderCenter, sliderRight ]
+    }
 
 
 commonSliderStyles : List Css.Style

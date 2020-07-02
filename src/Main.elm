@@ -6,14 +6,16 @@ import Browser.Navigation as Navigation
 import Header as Header
 import Html.Styled as Styled
 import Json.Encode as Encode
+import Page
 import Pages.Examples as ExamplesPage
+import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
 import Url
 
 
 type Msg
     = Noop
-    | Example ExamplesPage.Msg
+    | GotExampleMsg ExamplesPage.Msg
 
 
 type Model
@@ -37,10 +39,23 @@ changeRouteTo maybeRoute =
 
 
 view : Model -> Document Msg
-view _ =
-    { title = "Elm Exhibit"
-    , body = [ header, Styled.map Example ExamplesPage.view ] |> List.map Styled.toUnstyled
-    }
+view model =
+    let
+        viewPage toMsg config =
+            let
+                { title, body } =
+                    Page.view config
+            in
+            { title = title
+            , body = List.map (Styled.map toMsg) body |> List.map Styled.toUnstyled
+            }
+    in
+    case model of
+        Home examples ->
+            viewPage GotExampleMsg ExamplesPage.view
+
+        NotFound ->
+            NotFoundPage.view
 
 
 header : Styled.Html msg
@@ -51,7 +66,7 @@ header =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Example packageMsg ->
+        GotExampleMsg packageMsg ->
             ( model, Cmd.none )
 
         _ ->
