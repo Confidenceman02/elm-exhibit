@@ -78,6 +78,7 @@ nav config =
             , Css.margin2 (Css.px 0) Css.auto
             , Css.displayFlex
             , Css.alignItems Css.center
+            , Css.justifyContent Css.center
             ]
         ]
         [ homeLink
@@ -96,7 +97,7 @@ homeLink =
 
 packageTitle : Configuration -> Styled.Html msg
 packageTitle config =
-    h1 []
+    h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
         [ text "Confidenceman02"
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
         , text "elm-animate-height"

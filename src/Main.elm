@@ -4,13 +4,14 @@ import Api as Api
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Header as Header
-import Html.Styled as Styled exposing (div, text)
-import Stage
+import Html.Styled as Styled
+import Pages.Examples as ExamplesPage
 import Url
 
 
 type Msg
     = Noop
+    | Example ExamplesPage.Msg
 
 
 init : {} -> Url.Url -> Navigation.Key -> ( {}, Cmd Msg )
@@ -21,7 +22,7 @@ init _ _ _ =
 view : {} -> Document Msg
 view _ =
     { title = "Elm Exhibit"
-    , body = [ header, Stage.view (text "HELLO") ] |> List.map Styled.toUnstyled
+    , body = [ header, Styled.map Example ExamplesPage.view ] |> List.map Styled.toUnstyled
     }
 
 
@@ -31,8 +32,13 @@ header =
 
 
 update : Msg -> {} -> ( {}, Cmd Msg )
-update _ _ =
-    ( {}, Cmd.none )
+update msg _ =
+    case msg of
+        Example packageMsg ->
+            ( {}, Cmd.none )
+
+        _ ->
+            ( {}, Cmd.none )
 
 
 subscriptions : {} -> Sub Msg

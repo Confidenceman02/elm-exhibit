@@ -8,5 +8,17 @@ body {
 
 h1 {
  font-size: 24px;
- font-weight: normal;
+ font-weight: 700;
+}
+
+h2 {
+ font-weight: 700;
+}
+
+p {
+ font-weight: 400;
+}
+
+.js-focus-visible :focus:not(.focus-visible) {
+ outline: none;
 }

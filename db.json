@@ -1,0 +1,16 @@
+{
+  "repo": [
+    {
+      "id": 1,
+      "author": "Confidenceman02",
+      "avatar": "https://github.com/Confidenceman02.png",
+      "stories": [
+        {
+          "name": "dynamicList",
+          "description": "Animates height when adding and removing items from the list.",
+          "endPoint": ""
+        }
+      ]
+    }
+  ]
+}

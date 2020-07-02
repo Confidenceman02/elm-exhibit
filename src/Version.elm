@@ -12,4 +12,4 @@ toString (Version v) =
 
 hardCodedVersion_ : Version
 hardCodedVersion_ =
-    Version "2.0.1"
+    Version "2.0.2"
