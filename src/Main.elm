@@ -5,7 +5,9 @@ import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Header as Header
 import Html.Styled as Styled
+import Json.Encode as Encode
 import Pages.Examples as ExamplesPage
+import Route as Route exposing (Route)
 import Url
 
 
@@ -14,12 +16,27 @@ type Msg
     | Example ExamplesPage.Msg
 
 
-init : {} -> Url.Url -> Navigation.Key -> ( {}, Cmd Msg )
-init _ _ _ =
-    ( {}, Cmd.none )
+type Model
+    = Home ExamplesPage.Model
+    | NotFound
 
 
-view : {} -> Document Msg
+init : Encode.Value -> Url.Url -> Navigation.Key -> ( Model, Cmd Msg )
+init entryData url navKey =
+    changeRouteTo (Route.fromUrl url)
+
+
+changeRouteTo : Maybe Route -> ( Model, Cmd Msg )
+changeRouteTo maybeRoute =
+    case maybeRoute of
+        Nothing ->
+            ( NotFound, Cmd.none )
+
+        Just Route.Examples ->
+            ( Home ExamplesPage.init, Cmd.none )
+
+
+view : Model -> Document Msg
 view _ =
     { title = "Elm Exhibit"
     , body = [ header, Styled.map Example ExamplesPage.view ] |> List.map Styled.toUnstyled
@@ -31,22 +48,22 @@ header =
     Header.view <| Header.package Api.hardCodedPackage
 
 
-update : Msg -> {} -> ( {}, Cmd Msg )
-update msg _ =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
         Example packageMsg ->
-            ( {}, Cmd.none )
+            ( model, Cmd.none )
 
         _ ->
-            ( {}, Cmd.none )
+            ( model, Cmd.none )
 
 
-subscriptions : {} -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
 
 
-main : Program {} {} Msg
+main : Program Encode.Value Model Msg
 main =
     Browser.application
         { init = init

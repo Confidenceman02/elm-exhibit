@@ -1,19 +1,18 @@
-module Pages.Examples exposing (Msg, view)
+module Pages.Examples exposing (Model, Msg, init, view)
 
 import Author exposing (Author)
 import Components.Button as Button
 import Css as Css
 import Header as Header
-import Html.Styled as Styled exposing (button, div, h2, li, p, span, text, ul)
+import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
-import Html.Styled.Events exposing (onClick)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
 
-type alias State =
+type alias Model =
     { repo : Status Repo
     , descriptionPanel : DescriptionPanel
     , selectedExample : SelectedExample
@@ -52,7 +51,7 @@ type Status a
     | Failed
 
 
-init : State
+init : Model
 init =
     { repo = Loading
     , descriptionPanel = Open
@@ -152,6 +151,10 @@ sliderLeft =
 
 sliderRight : Styled.Html Msg
 sliderRight =
+    let
+        resolveRight =
+            0
+    in
     div
         [ StyledAttribs.css
             ([ Css.width (Css.pct sliderRightWidth)
@@ -251,7 +254,7 @@ type Msg
     | SelectExample
 
 
-update : Msg -> State -> ( State, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ToggleDescriptionPanel ->
