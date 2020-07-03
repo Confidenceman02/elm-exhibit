@@ -101,8 +101,6 @@ packageTitle config =
         [ text "Confidenceman02"
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
         , text "elm-animate-height"
-        , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
-        , text "2.0.1"
         ]
 
 

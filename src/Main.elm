@@ -1,9 +1,7 @@
 module Main exposing (..)
 
-import Api as Api
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
-import Header as Header
 import Html exposing (text)
 import Html.Styled as Styled
 import Json.Encode as Encode
