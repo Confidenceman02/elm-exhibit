@@ -1,11 +1,28 @@
-module Page exposing (view)
+module Page exposing (Page(..), view)
 
+import Api
 import Browser exposing (Document)
+import Header as Header
 import Html.Styled as Styled
 
 
-view : { title : String, content : Styled.Html msg } -> { title : String, body : List (Styled.Html msg) }
-view { title, content } =
+type Page
+    = Home
+    | Example
+
+
+view : Page -> { title : String, content : Styled.Html msg } -> { title : String, body : List (Styled.Html msg) }
+view page { title, content } =
     { title = title
-    , body = [ content ]
+    , body = viewHeader page :: [ content ]
     }
+
+
+viewHeader : Page -> Styled.Html msg
+viewHeader page =
+    case page of
+        Example ->
+            Header.view (Header.example Api.hardCodedExamples)
+
+        Home ->
+            Header.view (Header.example Api.hardCodedExamples)

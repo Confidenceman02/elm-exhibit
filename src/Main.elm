@@ -4,6 +4,7 @@ import Api as Api
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Header as Header
+import Html exposing (text)
 import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
@@ -19,7 +20,8 @@ type Msg
 
 
 type Model
-    = Home ExamplesPage.Model
+    = Examples ExamplesPage.Model
+    | Home
     | NotFound
 
 
@@ -34,33 +36,35 @@ changeRouteTo maybeRoute =
         Nothing ->
             ( NotFound, Cmd.none )
 
-        Just Route.Examples ->
-            ( Home ExamplesPage.init, Cmd.none )
+        Just (Route.Examples package) ->
+            ( Examples ExamplesPage.init, Cmd.none )
+
+        -- TODO: Create home page
+        Just Route.Home ->
+            ( Home, Cmd.none )
 
 
 view : Model -> Document Msg
 view model =
     let
-        viewPage toMsg config =
+        viewPage page toMsg config =
             let
                 { title, body } =
-                    Page.view config
+                    Page.view page config
             in
             { title = title
             , body = List.map (Styled.map toMsg) body |> List.map Styled.toUnstyled
             }
     in
     case model of
-        Home examples ->
-            viewPage GotExampleMsg ExamplesPage.view
+        Examples examplesModal ->
+            viewPage Page.Home GotExampleMsg ExamplesPage.view
+
+        Home ->
+            { title = "Home", body = [ text "This is home page" ] }
 
         NotFound ->
             NotFoundPage.view
-
-
-header : Styled.Html msg
-header =
-    Header.view <| Header.package Api.hardCodedPackage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

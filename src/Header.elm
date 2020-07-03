@@ -1,4 +1,4 @@
-module Header exposing (home, navHeight, package, view)
+module Header exposing (example, home, navHeight, view)
 
 import Api as Api
 import Css as Css
@@ -18,7 +18,7 @@ type Config
 
 
 type Variant
-    = Package Api.Package
+    = Example Api.Examples
     | Home
 
 
@@ -44,9 +44,9 @@ defaultConfig =
 -- CONFIG BUILDERS
 
 
-package : Api.Package -> Config
-package pConfig =
-    Config { defaultConfig | variant = Package pConfig }
+example : Api.Examples -> Config
+example pConfig =
+    Config { defaultConfig | variant = Example pConfig }
 
 
 home : Config
@@ -134,7 +134,7 @@ elmLogo =
 isPackage : Variant -> Bool
 isPackage v =
     case v of
-        Package _ ->
+        Example _ ->
             True
 
         _ ->
