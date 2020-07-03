@@ -1,8 +1,9 @@
-module Pages.Examples exposing (Model, Msg, init, view)
+module Pages.Examples exposing (Model, Msg, init, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
 import Css as Css
+import Css.Transitions as Transitions
 import Header as Header
 import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
@@ -59,12 +60,12 @@ init =
     }
 
 
-view : { title : String, content : Styled.Html Msg }
-view =
+view : Model -> { title : String, content : Styled.Html Msg }
+view model =
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft, sliderCenter, sliderRight ]
+            [ sliderLeft, sliderCenter, sliderRight model.descriptionPanel ]
     }
 
 
@@ -109,7 +110,7 @@ centerWrapper content =
             [ Css.position Css.absolute
             , Css.left (Css.pct 46)
             , Css.transform (Css.translate2 (Css.pct -50) (Css.pct 0))
-            , Css.marginTop Grid.grid
+            , Css.marginTop (Grid.calc Grid.grid Grid.multiply 1.5)
             ]
         ]
         content
@@ -152,11 +153,15 @@ sliderLeft =
         [ exampleList ]
 
 
-sliderRight : Styled.Html Msg
-sliderRight =
+sliderRight : DescriptionPanel -> Styled.Html Msg
+sliderRight descriptionPanel =
     let
-        resolveRight =
-            0
+        resolveTransform =
+            if descriptionPanel == Open then
+                0
+
+            else
+                100
     in
     div
         [ StyledAttribs.css
@@ -167,6 +172,8 @@ sliderRight =
              , Css.paddingLeft Grid.halfGrid
              , Css.paddingRight Grid.halfGrid
              , Css.boxSizing Css.borderBox
+             , Css.transform (Css.translateX <| Css.pct resolveTransform)
+             , Transitions.transition [ Transitions.transform3 300 0 (Transitions.cubicBezier 0.16 0.68 0.43 0.99) ]
              ]
                 ++ commonSliderStyles
             )

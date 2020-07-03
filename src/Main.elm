@@ -16,7 +16,7 @@ import Url
 
 type Msg
     = Noop
-    | GotExampleMsg ExamplesPage.Msg
+    | GotExamplesMsg ExamplesPage.Msg
 
 
 type Model
@@ -58,7 +58,7 @@ view model =
     in
     case model of
         Examples examplesModal ->
-            viewPage Page.Home GotExampleMsg ExamplesPage.view
+            viewPage Page.Examples GotExamplesMsg (ExamplesPage.view examplesModal)
 
         Home ->
             { title = "Home", body = [ text "This is home page" ] }
@@ -69,12 +69,18 @@ view model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        GotExampleMsg packageMsg ->
-            ( model, Cmd.none )
+    case ( msg, model ) of
+        ( GotExamplesMsg examplesMsg, Examples examples ) ->
+            ExamplesPage.update examplesMsg examples
+                |> updateWith Examples GotExamplesMsg
 
         _ ->
             ( model, Cmd.none )
+
+
+updateWith : (subModel -> Model) -> (subMsg -> Msg) -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+updateWith toModel toMsg ( subModel, subCmd ) =
+    ( toModel subModel, Cmd.map toMsg subCmd )
 
 
 subscriptions : Model -> Sub Msg
