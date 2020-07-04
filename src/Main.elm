@@ -34,7 +34,7 @@ changeRouteTo maybeRoute =
         Nothing ->
             ( NotFound, Cmd.none )
 
-        Just (Route.Examples package) ->
+        Just (Route.Examples author package) ->
             ( Examples ExamplesPage.init, Cmd.none )
 
         -- TODO: Create home page

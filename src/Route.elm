@@ -1,23 +1,21 @@
 module Route exposing (Route(..), fromUrl)
 
+import Author as Author exposing (Author)
+import Package as Package exposing (Package)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), oneOf, s)
 
 
 type Route
-    = Examples Package
+    = Examples Author Package
     | Home
-
-
-type Package
-    = Package String
 
 
 parser : Parser.Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home Parser.top
-        , Parser.map Examples (s "examples" </> Parser.map Package Parser.string)
+        , Parser.map Examples (s "examples" </> Author.parser </> Package.parser)
         ]
 
 
