@@ -2,3 +2,4 @@ elm.js
 node_modules
 *.cache
 dist
+built-lambda
