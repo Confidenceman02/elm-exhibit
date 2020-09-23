@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "ntl": {
+    "runner": "yarn"
+  },
   "scripts": {
     "dev": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html",
+    "watch": "parcel watch index.html"
   },
   "repository": {
     "type": "git",
@@ -20,6 +24,11 @@
   "dependencies": {
     "elm-analyse": "^0.16.5",
     "elm-json": "^0.2.8",
-    "focus-visible": "^5.1.0"
+    "focus-visible": "^5.1.0",
+    "netlify-lambda": "^2.0.1",
+    "parcel-bundler": "^1.12.4"
+  },
+  "devDependencies": {
+    "cssnano": "^4.1.10"
   }
 }
