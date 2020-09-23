@@ -7,6 +7,7 @@ import Css.Transitions as Transitions
 import Header as Header
 import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
+import Package exposing (Package)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Svg.Styled exposing (polygon, svg)
@@ -14,7 +15,9 @@ import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
 
 type alias Model =
-    { repo : Status Repo
+    { author : Author
+    , package : Package
+    , repo : Status Repo
     , descriptionPanel : DescriptionPanel
     , selectedExample : SelectedExample
     }
@@ -26,8 +29,7 @@ type DescriptionPanel
 
 
 type alias Repo =
-    { author : Author
-    , avatar : String
+    { avatar : String
     , examples : List Example
     }
 
@@ -52,9 +54,11 @@ type Status a
     | Failed
 
 
-init : Model
-init =
-    { repo = Loading
+init : Author -> Package -> Model
+init author package =
+    { author = author
+    , package = package
+    , repo = Loading
     , descriptionPanel = Open
     , selectedExample = Idle
     }

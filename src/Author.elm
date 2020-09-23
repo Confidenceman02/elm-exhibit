@@ -1,4 +1,4 @@
-module Author exposing (Author, hardCodedAuthor_, parser, toString)
+module Author exposing (Author, toString, urlParser)
 
 import Url.Parser as Parser exposing (Parser)
 
@@ -12,11 +12,6 @@ toString (Author a) =
     a
 
 
-hardCodedAuthor_ : Author
-hardCodedAuthor_ =
-    Author "Confidenceman02"
-
-
-parser : Parser (Author -> a) a
-parser =
+urlParser : Parser (Author -> a) a
+urlParser =
     Parser.map Author Parser.string

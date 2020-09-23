@@ -1,9 +1,10 @@
 module Header exposing (example, home, navHeight, view)
 
-import Api as Api
+import Author exposing (Author)
 import Css as Css
 import Html.Styled as Styled exposing (div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs
+import Package exposing (Package)
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
@@ -18,7 +19,7 @@ type Config
 
 
 type Variant
-    = Example Api.Examples
+    = Example Author Package
     | Home
 
 
@@ -44,9 +45,9 @@ defaultConfig =
 -- CONFIG BUILDERS
 
 
-example : Api.Examples -> Config
-example pConfig =
-    Config { defaultConfig | variant = Example pConfig }
+example : Author -> Package -> Config
+example author package =
+    Config { defaultConfig | variant = Example author package }
 
 
 home : Config
@@ -82,11 +83,12 @@ nav config =
             ]
         ]
         [ homeLink
-        , if isPackage config.variant then
-            packageTitle config
+        , case config.variant of
+            Example author package ->
+                exampleTitle author package
 
-          else
-            text ""
+            _ ->
+                text ""
         ]
 
 
@@ -95,12 +97,12 @@ homeLink =
     div [ StyledAttribs.css [ Css.textDecoration Css.none, Css.marginRight (Css.px 32), Css.displayFlex, Css.alignItems Css.center ] ] [ elmLogo, appTitle ]
 
 
-packageTitle : Configuration -> Styled.Html msg
-packageTitle config =
+exampleTitle : Author -> Package -> Styled.Html msg
+exampleTitle author package =
     h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
-        [ text "Confidenceman02"
+        [ text (Author.toString author)
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
-        , text "elm-animate-height"
+        , text (Package.toString package)
         ]
 
 
@@ -129,10 +131,10 @@ elmLogo =
 -- HELPERS
 
 
-isPackage : Variant -> Bool
-isPackage v =
+isExample : Variant -> Bool
+isExample v =
     case v of
-        Example _ ->
+        Example _ _ ->
             True
 
         _ ->
