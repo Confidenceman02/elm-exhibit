@@ -3,7 +3,6 @@ module Pages.Examples exposing (Model, Msg, init, update, view)
 import Author exposing (Author)
 import Components.Button as Button
 import Css as Css
-import Css.Transitions as Transitions
 import Header as Header
 import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
@@ -11,6 +10,7 @@ import Package exposing (Package)
 import Pages.ExamplesStyles as ExamplesStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
+import Styles.Transition as Transition
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
@@ -174,10 +174,9 @@ sliderRight descriptionOpen =
              , Css.paddingLeft Grid.halfGrid
              , Css.paddingRight Grid.halfGrid
              , Css.boxSizing Css.borderBox
-             , Css.transform (Css.translateX <| Css.pct resolveTransform)
-             , Transitions.transition [ Transitions.transform3 300 0 (Transitions.cubicBezier 0.16 0.68 0.43 0.99) ]
              ]
                 ++ commonSliderStyles
+                ++ Transition.transform (Css.translateX <| Css.pct resolveTransform)
             )
         ]
         [ exampleDescription, sliderToggle descriptionOpen ]

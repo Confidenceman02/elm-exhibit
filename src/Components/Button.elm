@@ -1,11 +1,11 @@
 module Components.Button exposing (Icon(..), Orientation(..), icon, onClick, secondary, view)
 
 import Css exposing (Style)
-import Css.Transitions as Transitions
 import Html.Styled as Styled exposing (button, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Styles.Grid as Grid
+import Styles.Transition as Transition
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes as SvgAttribs exposing (fill, height, points, viewBox)
 
@@ -107,10 +107,8 @@ triangle orientation =
     svg
         [ height "32"
         , viewBox "0 0 150 300"
-        , SvgAttribs.css
-            [ Css.transform (Css.rotate <| Css.deg resolveDeg)
-            , Transitions.transition [ Transitions.transform3 300 0 (Transitions.cubicBezier 0.16 0.68 0.43 0.99) ]
-            ]
+        , SvgAttribs.css <|
+            Transition.transform (Css.rotate <| Css.deg resolveDeg)
         ]
         [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
 
