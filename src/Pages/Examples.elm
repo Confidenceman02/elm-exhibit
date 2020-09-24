@@ -8,6 +8,7 @@ import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
 import Pages.ExamplesStyles as ExamplesStyles
+import Styles.Color exposing (exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
@@ -170,7 +171,7 @@ sliderRight descriptionOpen =
             ([ Css.width (Css.pct sliderRightWidth)
              , Css.right (Css.pct 0)
              , Css.top (Css.px 0)
-             , Css.backgroundColor (Css.hex "#FFFFFF")
+             , Css.backgroundColor exColorWhite
              , Css.paddingLeft Grid.halfGrid
              , Css.paddingRight Grid.halfGrid
              , Css.boxSizing Css.borderBox

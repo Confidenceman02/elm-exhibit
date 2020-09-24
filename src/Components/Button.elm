@@ -4,10 +4,11 @@ import Css exposing (Style)
 import Html.Styled as Styled exposing (button, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
+import Styles.Color exposing (exColorBurn500, exColorBurn600)
 import Styles.Grid as Grid
 import Styles.Transition as Transition
 import Svg.Styled exposing (polygon, svg)
-import Svg.Styled.Attributes as SvgAttribs exposing (fill, height, points, viewBox)
+import Svg.Styled.Attributes as SvgAttribs exposing (height, points, viewBox)
 
 
 type Variant
@@ -108,9 +109,13 @@ triangle orientation =
         [ height "32"
         , viewBox "0 0 150 300"
         , SvgAttribs.css <|
-            Transition.transform (Css.rotate <| Css.deg resolveDeg)
+            ([ Css.fill exColorBurn500
+             , Css.hover [ Css.fill exColorBurn600 ]
+             ]
+                ++ Transition.transform (Css.rotate <| Css.deg resolveDeg)
+            )
         ]
-        [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
+        [ polygon [ points "0, 150 150, 0 150,300" ] [] ]
 
 
 
