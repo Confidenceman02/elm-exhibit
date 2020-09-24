@@ -8,6 +8,7 @@ import Header as Header
 import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
+import Pages.ExamplesStyles as ExamplesStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Svg.Styled exposing (polygon, svg)
@@ -66,10 +67,14 @@ init author package =
 
 view : Model -> { title : String, content : Styled.Html Msg }
 view model =
+    let
+        descriptionOpen =
+            model.descriptionPanel == Open
+    in
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft, sliderCenter, sliderRight model.descriptionPanel ]
+            [ sliderLeft, sliderCenter (not <| descriptionOpen), sliderRight descriptionOpen ]
     }
 
 
@@ -92,11 +97,11 @@ sliderRightWidth =
 
 centerContentWidth : Float
 centerContentWidth =
-    430
+    460
 
 
-sliderCenter : Styled.Html msg
-sliderCenter =
+sliderCenter : Bool -> Styled.Html msg
+sliderCenter center =
     div
         [ StyledAttribs.css
             [ Css.width (Css.pct 100)
@@ -104,18 +109,13 @@ sliderCenter =
             , Css.backgroundColor (Css.hex "#FBFBFB")
             ]
         ]
-        [ centerWrapper [ centerContent ] ]
+        [ centerWrapper center [ centerContent ] ]
 
 
-centerWrapper : List (Styled.Html msg) -> Styled.Html msg
-centerWrapper content =
+centerWrapper : Bool -> List (Styled.Html msg) -> Styled.Html msg
+centerWrapper center content =
     div
-        [ StyledAttribs.css
-            [ Css.position Css.absolute
-            , Css.left (Css.pct 46)
-            , Css.transform (Css.translate2 (Css.pct -50) (Css.pct 0))
-            , Css.marginTop (Grid.calc Grid.grid Grid.multiply 1.5)
-            ]
+        [ ExamplesStyles.centerWrapper center
         ]
         content
 
@@ -124,9 +124,7 @@ centerContent : Styled.Html msg
 centerContent =
     div
         [ StyledAttribs.css
-            [ Css.width (Css.px centerContentWidth)
-            , Css.height (Css.px 540)
-            , Css.alignSelf Css.center
+            [ Css.alignSelf Css.center
             , Css.position Css.relative
             ]
         ]
@@ -134,7 +132,7 @@ centerContent =
             [ StyledAttribs.css
                 [ Css.display Css.block
                 , Css.width (Css.px centerContentWidth)
-                , Css.height (Css.px 540)
+                , Css.height (Css.px 590)
                 , Css.overflow Css.hidden
                 , Css.backgroundColor (Css.hex "#FFFFFF")
                 , Css.borderRadius (Css.px 12)
@@ -149,7 +147,7 @@ sliderLeft =
     div
         [ StyledAttribs.css
             ([ Css.width (Css.pct sliderLeftWidth)
-             , Css.left (Css.px 0)
+             , Css.left (Css.pct 0)
              ]
                 ++ commonSliderStyles
             )
@@ -157,11 +155,11 @@ sliderLeft =
         [ exampleList ]
 
 
-sliderRight : DescriptionPanel -> Styled.Html Msg
-sliderRight descriptionPanel =
+sliderRight : Bool -> Styled.Html Msg
+sliderRight descriptionOpen =
     let
         resolveTransform =
-            if descriptionPanel == Open then
+            if descriptionOpen then
                 0
 
             else
@@ -182,7 +180,7 @@ sliderRight descriptionPanel =
                 ++ commonSliderStyles
             )
         ]
-        [ exampleDescription, sliderToggle ]
+        [ exampleDescription, sliderToggle descriptionOpen ]
 
 
 stageWrapper : List (Styled.Html msg) -> Styled.Html msg
@@ -245,10 +243,18 @@ exampleSelector name =
         ]
 
 
-sliderToggle : Styled.Html Msg
-sliderToggle =
+sliderToggle : Bool -> Styled.Html Msg
+sliderToggle open =
+    let
+        orientation =
+            if open then
+                Button.Open
+
+            else
+                Button.Closed
+    in
     Button.view
-        (Button.icon Button.Triangle
+        (Button.icon (Button.Triangle orientation)
             |> Button.onClick ToggleDescriptionPanel
         )
         "open slider"

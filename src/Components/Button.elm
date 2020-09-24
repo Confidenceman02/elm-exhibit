@@ -1,11 +1,13 @@
-module Components.Button exposing (Icon(..), icon, onClick, secondary, view)
+module Components.Button exposing (Icon(..), Orientation(..), icon, onClick, secondary, view)
 
 import Css exposing (Style)
+import Css.Transitions as Transitions
 import Html.Styled as Styled exposing (button, span, text)
+import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Styles.Grid as Grid
 import Svg.Styled exposing (polygon, svg)
-import Svg.Styled.Attributes as StyledAttribs exposing (fill, height, points, viewBox)
+import Svg.Styled.Attributes as SvgAttribs exposing (fill, height, points, viewBox)
 
 
 type Variant
@@ -14,7 +16,7 @@ type Variant
 
 
 type Icon
-    = Triangle
+    = Triangle Orientation
 
 
 type Config msg
@@ -25,6 +27,11 @@ type alias Configuration msg =
     { variant : Variant
     , onClick : Maybe msg
     }
+
+
+type Orientation
+    = Closed
+    | Open
 
 
 defaults : Configuration msg
@@ -78,17 +85,34 @@ view (Config config) label =
                         [ text label ]
                     ]
 
-                IconButton Triangle ->
-                    [ triangle ]
+                IconButton (Triangle orientation) ->
+                    [ triangle orientation ]
     in
     button
         ([ StyledAttribs.css resolveStyles ] ++ eventAttribs)
         resolveButtonBody
 
 
-triangle : Styled.Html msg
-triangle =
-    svg [ height "32", viewBox "0 0 150 300" ] [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
+triangle : Orientation -> Styled.Html msg
+triangle orientation =
+    let
+        resolveDeg =
+            case orientation of
+                Open ->
+                    180
+
+                _ ->
+                    0
+    in
+    svg
+        [ height "32"
+        , viewBox "0 0 150 300"
+        , SvgAttribs.css
+            [ Css.transform (Css.rotate <| Css.deg resolveDeg)
+            , Transitions.transition [ Transitions.transform3 300 0 (Transitions.cubicBezier 0.16 0.68 0.43 0.99) ]
+            ]
+        ]
+        [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
 
 
 

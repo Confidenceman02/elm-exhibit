@@ -7,6 +7,7 @@ import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
 import Pages.Examples as ExamplesPage
+import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
 import Url
@@ -15,6 +16,7 @@ import Url
 type Msg
     = Noop
     | GotExamplesMsg ExamplesPage.Msg
+    | GotHomeMsg HomePage.Msg
 
 
 type Model
@@ -59,7 +61,7 @@ view model =
             viewPage (Page.Examples examplesModel.author examplesModel.package) GotExamplesMsg (ExamplesPage.view examplesModel)
 
         Home ->
-            { title = "Home", body = [ text "This is home page" ] }
+            viewPage Page.Home GotHomeMsg HomePage.view
 
         NotFound ->
             NotFoundPage.view
