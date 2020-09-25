@@ -8,7 +8,7 @@ import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
 import Pages.ExamplesStyles as ExamplesStyles
-import Styles.Color exposing (exColorWhite)
+import Styles.Color exposing (exColorColt100, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
@@ -107,7 +107,7 @@ sliderCenter center =
         [ StyledAttribs.css
             [ Css.width (Css.pct 100)
             , Css.height (Css.pct 100)
-            , Css.backgroundColor (Css.hex "#FBFBFB")
+            , Css.backgroundColor exColorColt100
             ]
         ]
         [ centerWrapper center [ centerContent ] ]
@@ -135,7 +135,7 @@ centerContent =
                 , Css.width (Css.px centerContentWidth)
                 , Css.height (Css.px 590)
                 , Css.overflow Css.hidden
-                , Css.backgroundColor (Css.hex "#FFFFFF")
+                , Css.backgroundColor exColorWhite
                 , Css.borderRadius (Css.px 12)
                 ]
             ]
