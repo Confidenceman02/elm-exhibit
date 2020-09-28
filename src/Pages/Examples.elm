@@ -132,7 +132,7 @@ centerContentShadow center =
         [ filter [ id "shadowBlur" ] [ feGaussianBlur [ in_ "sourceGraphics", stdDeviation "7" ] [] ]
         , rect
             [ x "14.855576"
-            , y "8.587036"
+            , y "16.587036"
             , rx "12"
             , height (String.fromFloat centerContentHeight)
             , width (String.fromFloat centerContentWidth)
@@ -320,7 +320,7 @@ centerShadowStyles center =
     in
     SvgStyledAttribs.css
         ([ Css.position Css.absolute
-         , Css.top (Css.pct 0)
+         , Css.top (Css.pct -1.5)
          ]
             ++ Transition.left (Css.pct resolveLeft)
         )
