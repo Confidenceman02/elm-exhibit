@@ -1,4 +1,4 @@
-module Styles.Transition exposing (left, transform)
+module Styles.Transition exposing (left, right, transform)
 
 import Css exposing (Pct, Style, Transform)
 import Css.Transitions as Transitions exposing (Transition)
@@ -22,6 +22,13 @@ left : Pct -> List Style
 left current =
     [ Css.left current
     , Transitions.transition [ Transitions.left3 defaultDuration defaultDelay defaultTiming ]
+    ]
+
+
+right : Pct -> List Style
+right current =
+    [ Css.right current
+    , Transitions.transition [ Transitions.right3 defaultDuration defaultDelay defaultTiming ]
     ]
 
 

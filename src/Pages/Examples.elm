@@ -4,16 +4,15 @@ import Author exposing (Author)
 import Components.Button as Button
 import Css as Css
 import Header as Header
-import Html.Styled as Styled exposing (div, h2, li, p, span, text, ul)
+import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
-import Pages.ExamplesStyles as ExamplesStyles
 import Styles.Color exposing (exColorColt100, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
-import Svg.Styled exposing (polygon, svg)
-import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
+import Svg.Styled exposing (polygon, rect, svg)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, points, rx, viewBox, width, x, y)
 
 
 type alias Model =
@@ -86,21 +85,6 @@ commonSliderStyles =
     ]
 
 
-sliderLeftWidth : Float
-sliderLeftWidth =
-    25
-
-
-sliderRightWidth : Float
-sliderRightWidth =
-    32
-
-
-centerContentWidth : Float
-centerContentWidth =
-    460
-
-
 sliderCenter : Bool -> Styled.Html msg
 sliderCenter center =
     div
@@ -110,13 +94,13 @@ sliderCenter center =
             , Css.backgroundColor exColorColt100
             ]
         ]
-        [ centerWrapper center [ centerContent ] ]
+        [ centerWrapper center [ centerContentShadow center, centerContent ] ]
 
 
 centerWrapper : Bool -> List (Styled.Html msg) -> Styled.Html msg
 centerWrapper center content =
     div
-        [ ExamplesStyles.centerWrapper center
+        [ centerWrapperStyles center
         ]
         content
 
@@ -125,19 +109,33 @@ centerContent : Styled.Html msg
 centerContent =
     div
         [ StyledAttribs.css
-            [ Css.alignSelf Css.center
+            [ Css.display Css.block
             , Css.position Css.relative
+            , Css.width (Css.px centerContentWidth)
+            , Css.height (Css.px centerContentHeight)
+            , Css.overflow Css.hidden
+            , Css.backgroundColor exColorWhite
+            , Css.borderRadius (Css.px 12)
             ]
         ]
-        [ div
-            [ StyledAttribs.css
-                [ Css.display Css.block
-                , Css.width (Css.px centerContentWidth)
-                , Css.height (Css.px 590)
-                , Css.overflow Css.hidden
-                , Css.backgroundColor exColorWhite
-                , Css.borderRadius (Css.px 12)
-                ]
+        []
+
+
+centerContentShadow : Bool -> Styled.Html msg
+centerContentShadow center =
+    svg
+        [ width "461"
+        , height "591"
+        , viewBox "0 0 461 591"
+        , centerShadowStyles center
+        ]
+        [ rect
+            [ x "0.855576"
+            , y "0.587036"
+            , rx "12"
+            , height (String.fromFloat centerContentHeight)
+            , width (String.fromFloat centerContentWidth)
+            , fill "grey"
             ]
             []
         ]
@@ -263,6 +261,68 @@ sliderToggle open =
 triangle : Styled.Html msg
 triangle =
     svg [ height "32", viewBox "0 0 150 300" ] [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
+
+
+
+-- STYLES
+
+
+sliderLeftWidth : Float
+sliderLeftWidth =
+    25
+
+
+sliderRightWidth : Float
+sliderRightWidth =
+    32
+
+
+centerContentWidth : Float
+centerContentWidth =
+    460
+
+
+centerContentHeight : Float
+centerContentHeight =
+    590
+
+
+centerWrapperStyles : Bool -> Attribute msg
+centerWrapperStyles center =
+    let
+        resolveLeft =
+            if center then
+                50
+
+            else
+                46
+    in
+    StyledAttribs.css
+        ([ Css.position Css.absolute
+         , Css.transform (Css.translate2 (Css.pct -50) (Css.pct 0))
+         , Css.marginTop (Grid.calc Grid.grid Grid.multiply 1.5)
+         ]
+            ++ Transition.left (Css.pct resolveLeft)
+        )
+
+
+centerShadowStyles : Bool -> Attribute msg
+centerShadowStyles center =
+    let
+        resolveRight =
+            if center then
+                0
+
+            else
+                2
+    in
+    SvgStyledAttribs.css
+        ([ Css.position Css.absolute
+         , Css.top (Css.pct 2)
+         , Css.right (Css.pct 2)
+         ]
+            ++ Transition.right (Css.pct resolveRight)
+        )
 
 
 
