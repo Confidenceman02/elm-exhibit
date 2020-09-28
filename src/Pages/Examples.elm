@@ -7,12 +7,12 @@ import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
-import Styles.Color exposing (exColorColt100, exColorWhite)
+import Styles.Color exposing (exColorColt100, exColorColt200, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
-import Svg.Styled exposing (polygon, rect, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, points, rx, viewBox, width, x, y)
+import Svg.Styled exposing (feGaussianBlur, filter, polygon, rect, svg)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, id, in_, points, rx, stdDeviation, viewBox, width, x, y)
 
 
 type alias Model =
@@ -124,18 +124,20 @@ centerContent =
 centerContentShadow : Bool -> Styled.Html msg
 centerContentShadow center =
     svg
-        [ width "461"
-        , height "591"
-        , viewBox "0 0 461 591"
+        [ width "761"
+        , height "691"
+        , viewBox "0 0 761 691"
         , centerShadowStyles center
         ]
-        [ rect
-            [ x "0.855576"
-            , y "0.587036"
+        [ filter [ id "shadowBlur" ] [ feGaussianBlur [ in_ "sourceGraphics", stdDeviation "7" ] [] ]
+        , rect
+            [ x "14.855576"
+            , y "8.587036"
             , rx "12"
             , height (String.fromFloat centerContentHeight)
             , width (String.fromFloat centerContentWidth)
-            , fill "grey"
+            , fill exColorColt200.value
+            , SvgStyledAttribs.filter "url(#shadowBlur)"
             ]
             []
         ]
@@ -309,19 +311,18 @@ centerWrapperStyles center =
 centerShadowStyles : Bool -> Attribute msg
 centerShadowStyles center =
     let
-        resolveRight =
+        resolveLeft =
             if center then
-                0
+                -3
 
             else
-                2
+                -4
     in
     SvgStyledAttribs.css
         ([ Css.position Css.absolute
-         , Css.top (Css.pct 2)
-         , Css.right (Css.pct 2)
+         , Css.top (Css.pct 0)
          ]
-            ++ Transition.right (Css.pct resolveRight)
+            ++ Transition.left (Css.pct resolveLeft)
         )
 
 
