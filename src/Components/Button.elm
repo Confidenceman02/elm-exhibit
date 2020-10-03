@@ -125,6 +125,7 @@ triangle orientation =
 secondaryStyles : List Style
 secondaryStyles =
     [ Css.displayFlex
+    , Css.position Css.relative
     , Css.color (Css.hex "#859900")
     , Css.fontWeight (Css.int 700)
     , Css.boxSizing Css.borderBox
@@ -133,6 +134,7 @@ secondaryStyles =
     , Css.hover [ Css.backgroundColor (Css.hex "#f0f1f4") ] -- $kz-color-wisteria-100
     , Css.border (Css.px 2)
     , Css.padding (Css.px 0)
+    , Css.borderRadius (Css.px 6)
     ]
 
 

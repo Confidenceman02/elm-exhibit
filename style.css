@@ -22,3 +22,18 @@ p {
 .js-focus-visible :focus:not(.focus-visible) {
  outline: none;
 }
+
+.focus-visible::after {
+ content: "";
+ border-radius: 6px;
+ border-width: 2px;
+ border-style: solid;
+ border-color: #5599C6;
+ outline-width: 2px;
+ position: absolute;
+ background: transparent;
+ top: -2px;
+ left: -2px;
+ right: -2px;
+ bottom: -2px;
+}
