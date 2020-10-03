@@ -1,4 +1,4 @@
-module Styles.Transition exposing (left, right, transform)
+module Styles.Transition exposing (left, opacity, right, transform)
 
 import Css exposing (Pct, Style, Transform)
 import Css.Transitions as Transitions exposing (Transition)
@@ -36,4 +36,11 @@ transform : Transform compatible -> List Style
 transform t =
     [ Css.transform t
     , Transitions.transition [ Transitions.transform3 defaultDuration defaultDelay defaultTiming ]
+    ]
+
+
+opacity : Float -> List Style
+opacity current =
+    [ Css.opacity (Css.num current)
+    , Transitions.transition [ Transitions.opacity3 defaultDuration defaultDelay defaultTiming ]
     ]
