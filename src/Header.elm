@@ -1,10 +1,11 @@
-module Header exposing (example, home, navHeight, view)
+module Header exposing (example, home, navBottomBorder, navHeight, view)
 
 import Author exposing (Author)
 import Css as Css
 import Html.Styled as Styled exposing (div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
+import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
@@ -12,6 +13,11 @@ import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 navHeight : Float
 navHeight =
     64
+
+
+navBottomBorder : Float
+navBottomBorder =
+    2
 
 
 type Config
@@ -62,8 +68,9 @@ view (Config config) =
             [ Css.width <| Css.calc (Css.pct 100) Css.minus (Css.px 40)
             , Css.paddingLeft (Css.px 20)
             , Css.paddingRight (Css.px 20)
-            , Css.backgroundColor (Css.hex "#5FABDC")
+            , Css.backgroundColor exColorSky600
             , Css.overflowX Css.hidden
+            , Css.borderBottom3 (Css.px navBottomBorder) Css.solid exColorSky700
             ]
         ]
         [ nav config ]
@@ -73,7 +80,7 @@ nav : Configuration -> Styled.Html msg
 nav config =
     div
         [ StyledAttribs.css
-            [ Css.color (Css.hex "#FFFFFF")
+            [ Css.color exColorWhite
             , Css.maxWidth (Css.px 920)
             , Css.height (Css.px navHeight)
             , Css.margin2 (Css.px 0) Css.auto
