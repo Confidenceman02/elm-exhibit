@@ -141,6 +141,7 @@ secondaryStyles =
 iconStyles : List Style
 iconStyles =
     [ Css.position Css.absolute
+    , Css.displayFlex
     , Css.backgroundColor Css.transparent
     , Css.padding (Css.px 0)
     , Css.borderColor (Css.rgba 0 0 0 0)
