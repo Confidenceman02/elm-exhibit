@@ -7,7 +7,7 @@ import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Package exposing (Package)
-import Styles.Color exposing (exColorColt100, exColorColt200, exColorWhite)
+import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
@@ -124,9 +124,9 @@ centerContent =
 centerContentShadow : Bool -> Styled.Html msg
 centerContentShadow center =
     svg
-        [ width "761"
+        [ width "510"
         , height "691"
-        , viewBox "0 0 761 691"
+        , viewBox "0 0 510 691"
         , centerShadowStyles center
         ]
         [ filter [ id "shadowBlur" ] [ feGaussianBlur [ in_ "sourceGraphics", stdDeviation "7" ] [] ]
@@ -165,6 +165,13 @@ sliderRight descriptionOpen =
 
             else
                 100
+
+        resolveOpacity =
+            if descriptionOpen then
+                1
+
+            else
+                0
     in
     div
         [ StyledAttribs.css
@@ -175,6 +182,21 @@ sliderRight descriptionOpen =
              , Css.paddingLeft Grid.halfGrid
              , Css.paddingRight Grid.halfGrid
              , Css.boxSizing Css.borderBox
+             , Css.before
+                ([ Css.property "content" "''"
+                 , Css.paddingRight Grid.grid
+                 , Css.width <|
+                    Css.calc
+                        (Css.pct 100)
+                        Css.minus
+                        Grid.grid
+                 , Css.height (Css.pct 100)
+                 , Css.boxShadow4 (Css.px -7) (Css.px 10) (Css.px 14) exColorBorder
+                 , Css.position Css.absolute
+                 , Css.right (Css.pct 0)
+                 ]
+                    ++ Transition.opacity resolveOpacity
+                )
              ]
                 ++ commonSliderStyles
                 ++ Transition.transform (Css.translateX <| Css.pct resolveTransform)
@@ -187,10 +209,11 @@ stageWrapper : List (Styled.Html msg) -> Styled.Html msg
 stageWrapper content =
     div
         [ StyledAttribs.css
-            [ Css.top (Css.px Header.navHeight)
+            [ Css.top (Css.px 0)
             , Css.bottom (Css.px 0)
             , Css.position Css.fixed
             , Css.width (Css.pct 100)
+            , Css.marginTop (Css.px (Header.navHeight + Header.navBottomBorder))
             ]
         ]
         content
