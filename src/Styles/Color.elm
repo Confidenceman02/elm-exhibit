@@ -1,4 +1,4 @@
-module Styles.Color exposing (exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorSky600, exColorWhite)
+module Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorSky600, exColorSky700, exColorWhite)
 
 import Css exposing (Color)
 
@@ -6,6 +6,11 @@ import Css exposing (Color)
 exColorWhite : Color
 exColorWhite =
     Css.hex "#FFFFFF"
+
+
+exColorBorder : Color
+exColorBorder =
+    Css.hex "#E6E6E6"
 
 
 exColorColt100 : Color
