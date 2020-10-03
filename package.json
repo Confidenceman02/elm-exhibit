@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "netlify-lambda build functions && parcel index.html",
     "build": "parcel build index.html",
     "watch": "parcel watch index.html"
   },
