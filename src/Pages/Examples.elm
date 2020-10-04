@@ -17,8 +17,8 @@ import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, id, in_
 
 type alias Model =
     { author : Author
-    , package : Package
-    , repo : Status Repo
+    , packageName : Package
+    , examples : Status (List Example)
     , descriptionPanel : DescriptionPanel
     , selectedExample : SelectedExample
     }
@@ -29,14 +29,9 @@ type DescriptionPanel
     | Closed
 
 
-type alias Repo =
-    { avatar : String
-    , examples : List Example
-    }
-
-
 type alias Example =
-    { name : String
+    { id : String
+    , name : String
     , description : String
     }
 
@@ -55,14 +50,16 @@ type Status a
     | Failed
 
 
-init : Author -> Package -> Model
+init : Author -> Package -> ( Model, Cmd Msg )
 init author package =
-    { author = author
-    , package = package
-    , repo = Loading
-    , descriptionPanel = Open
-    , selectedExample = Idle
-    }
+    ( { author = author
+      , packageName = package
+      , examples = Loading
+      , descriptionPanel = Closed
+      , selectedExample = Idle
+      }
+    , Cmd.none
+    )
 
 
 view : Model -> { title : String, content : Styled.Html Msg }

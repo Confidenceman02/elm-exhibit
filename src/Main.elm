@@ -37,7 +37,11 @@ changeRouteTo maybeRoute =
             ( NotFound, Cmd.none )
 
         Just (Route.Examples author package) ->
-            ( Examples (ExamplesPage.init author package), Cmd.none )
+            let
+                ( model, cmds ) =
+                    ExamplesPage.init author package
+            in
+            ( Examples model, Cmd.map GotExamplesMsg cmds )
 
         -- TODO: Create home page
         Just Route.Home ->
@@ -58,7 +62,7 @@ view model =
     in
     case model of
         Examples examplesModel ->
-            viewPage (Page.Examples examplesModel.author examplesModel.package) GotExamplesMsg (ExamplesPage.view examplesModel)
+            viewPage (Page.Examples examplesModel.author examplesModel.packageName) GotExamplesMsg (ExamplesPage.view examplesModel)
 
         Home ->
             viewPage Page.Home GotHomeMsg HomePage.view
