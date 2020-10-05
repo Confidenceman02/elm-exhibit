@@ -23,11 +23,15 @@ import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, 
 type alias Model =
     { author : Author
     , packageName : Package
-    , examples : Status ( Example.Id, List Example.Example )
+    , examples : Status ( SelectedExample, List Example.Example )
     , descriptionPanel : DescriptionPanel
     , viewPanel : ViewPanel
     , context : Context
     }
+
+
+type SelectedExample
+    = SelectedExample Example
 
 
 type DescriptionPanel
@@ -73,7 +77,7 @@ view model =
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft model, sliderCenter (not <| descriptionOpen), sliderRight descriptionOpen ]
+            [ sliderLeft model, sliderCenter (not <| descriptionOpen), sliderRight model ]
     }
 
 
@@ -164,8 +168,12 @@ sliderLeft model =
         [ viewMaybe exampleList maybeExamples ]
 
 
-sliderRight : Bool -> Styled.Html Msg
-sliderRight descriptionOpen =
+sliderRight : Model -> Styled.Html Msg
+sliderRight model =
+    let
+        descriptionOpen =
+            model.descriptionPanel == Open
+    in
     let
         resolveTransform =
             if descriptionOpen then
@@ -210,7 +218,7 @@ sliderRight descriptionOpen =
                 ++ Transition.transform (Css.translateX <| Css.pct resolveTransform)
             )
         ]
-        [ exampleDescription, sliderToggle descriptionOpen ]
+        [ exampleDescription model, sliderToggle descriptionOpen ]
 
 
 stageWrapper : List (Styled.Html msg) -> Styled.Html msg
@@ -227,7 +235,7 @@ stageWrapper content =
         content
 
 
-exampleList : ( Example.Id, List Example ) -> Styled.Html Msg
+exampleList : ( SelectedExample, List Example ) -> Styled.Html Msg
 exampleList ( selectedExample, examples ) =
     let
         paddingCalc =
@@ -250,21 +258,30 @@ exampleList ( selectedExample, examples ) =
         ]
 
 
-exampleDescription : Styled.Html msg
-exampleDescription =
+exampleDescription : Model -> Styled.Html msg
+exampleDescription model =
+    let
+        resolveDescription =
+            case model.examples of
+                Loaded ( SelectedExample selectedExample, _ ) ->
+                    selectedExample.description
+
+                _ ->
+                    ""
+    in
     Styled.fromUnstyled <| Markdown.toHtml [] "## Example Description \nSome text goes here about the component and what it can do."
 
 
-exampleSelector : Example.Id -> Example -> Styled.Html Msg
-exampleSelector selectedExample example =
+exampleSelector : SelectedExample -> Example -> Styled.Html Msg
+exampleSelector (SelectedExample selectedExample) example =
     li [ StyledAttribs.css [ Css.listStyleType Css.none, Css.marginBottom (Grid.calc Grid.grid Grid.divide 2.5) ] ]
         [ span [ StyledAttribs.css [ Css.display Css.inlineBlock, Css.position Css.relative ] ]
             [ Button.view
                 (Button.secondary
-                    |> Button.onClick (SelectExample example.id)
+                    |> Button.onClick (SelectExample example)
                 )
                 example.name
-            , viewIf (selectedExample == example.id) selectedTriangle
+            , viewIf (selectedExample.id == example.id) selectedTriangle
             ]
         ]
 
@@ -368,7 +385,7 @@ centerShadowStyles center =
 
 type Msg
     = ToggleDescriptionPanel
-    | SelectExample Example.Id
+    | SelectExample Example
     | CompletedLoadExamples (Result Http.Error (List Example))
 
 
@@ -387,12 +404,12 @@ update msg model =
             in
             ( { model | descriptionPanel = panel }, Cmd.none )
 
-        SelectExample id ->
+        SelectExample example ->
             let
                 ( resolvedExamples, resolvedViewPanel ) =
                     case model.examples of
                         Loaded ( _, examples ) ->
-                            ( Loaded ( id, examples ), Building )
+                            ( Loaded ( SelectedExample example, examples ), Building )
 
                         _ ->
                             ( StatusIdle, Idle )
@@ -405,7 +422,7 @@ update msg model =
                     case examples of
                         -- preselect the first example by default
                         head :: _ ->
-                            Loaded ( head.id, examples )
+                            Loaded ( SelectedExample head, examples )
 
                         [] ->
                             StatusIdle
