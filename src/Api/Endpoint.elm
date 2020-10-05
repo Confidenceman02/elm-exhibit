@@ -19,5 +19,5 @@ lambdaEndpoint =
 
 lambdaUrl : List String -> List QueryParameter -> Endpoint
 lambdaUrl path params =
-    Url.Builder.absolute (lambdaEndpoint :: path) params
+    Url.Builder.relative (lambdaEndpoint :: path) params
         |> Endpoint

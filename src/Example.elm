@@ -24,9 +24,9 @@ decoder =
     Decode.succeed Example
         |> required "id" (Decode.map Id Decode.string)
         |> required "name" Decode.string
-        |> required "descriptions" Decode.string
+        |> required "description" Decode.string
 
 
 fetch : (Result Http.Error (List Example) -> msg) -> Cmd msg
 fetch toMsg =
-    Api.get (Endpoint.lambdaUrl [ "examples" ] []) toMsg (Decode.list decoder)
+    Api.get (Endpoint.lambdaUrl [ "examples" ] []) toMsg (Decode.field "examples" <| Decode.list decoder)
