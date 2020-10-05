@@ -2,11 +2,13 @@ module Pages.Example exposing (Model, Msg, init, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
+import Context exposing (Context)
 import Css as Css
-import Example as Example
+import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
+import Http
 import Package exposing (Package)
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
 import Styles.Font as Font
@@ -22,6 +24,7 @@ type alias Model =
     , packageExamples : Status (List Example.Example)
     , descriptionPanel : DescriptionPanel
     , selectedExample : SelectedExample
+    , context : Context
     }
 
 
@@ -44,16 +47,17 @@ type Status a
     | Failed
 
 
-init : Author -> Package -> ( Model, Cmd Msg )
-init author package =
+init : Author -> Package -> Context -> ( Model, Cmd Msg )
+init author package context =
     ( { author = author
       , packageName = package
       , packageExamples = Loading
       , descriptionPanel = Closed
       , selectedExample = Idle
+      , context = context
       }
       --  fetch examples
-    , Cmd.none
+    , Example.fetch CompletedLoadExamples
     )
 
 
@@ -348,6 +352,7 @@ centerShadowStyles center =
 type Msg
     = ToggleDescriptionPanel
     | SelectExample
+    | CompletedLoadExamples (Result Http.Error (List Example))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -366,4 +371,10 @@ update msg model =
             ( { model | descriptionPanel = panel }, Cmd.none )
 
         SelectExample ->
+            ( model, Cmd.none )
+
+        CompletedLoadExamples (Ok examples) ->
+            ( model, Cmd.none ) |> Debug.log "GOT IT"
+
+        CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )

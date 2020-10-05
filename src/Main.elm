@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
+import Context exposing (Context)
 import Html exposing (text)
 import Html.Styled as Styled
 import Json.Encode as Encode
@@ -27,11 +28,11 @@ type Model
 
 init : Encode.Value -> Url.Url -> Navigation.Key -> ( Model, Cmd Msg )
 init entryData url navKey =
-    changeRouteTo (Route.fromUrl url)
+    changeRouteTo (Route.fromUrl url) (Context.toContext url)
 
 
-changeRouteTo : Maybe Route -> ( Model, Cmd Msg )
-changeRouteTo maybeRoute =
+changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
+changeRouteTo maybeRoute context =
     case maybeRoute of
         Nothing ->
             ( NotFound, Cmd.none )
@@ -39,7 +40,7 @@ changeRouteTo maybeRoute =
         Just (Route.Examples author package) ->
             let
                 ( model, cmds ) =
-                    ExamplesPage.init author package
+                    ExamplesPage.init author package context
             in
             ( Examples model, Cmd.map GotExamplesMsg cmds )
 
