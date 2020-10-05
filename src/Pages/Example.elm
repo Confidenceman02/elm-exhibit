@@ -10,13 +10,14 @@ import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Http
+import Markdown as Markdown
 import Package exposing (Package)
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
 import Svg.Styled exposing (feGaussianBlur, filter, path, rect, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, points, rx, stdDeviation, viewBox, width, x, y)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, rx, stdDeviation, viewBox, width, x, y)
 
 
 type alias Model =
@@ -251,11 +252,7 @@ exampleList ( selectedExample, examples ) =
 
 exampleDescription : Styled.Html msg
 exampleDescription =
-    div []
-        [ h2 [ StyledAttribs.css [ Css.fontSize Font.fontSizeH2, Css.marginTop Grid.grid ] ]
-            [ text "Example Description" ]
-        , p [] [ text "Some text goes here about the component and what it can do." ]
-        ]
+    Styled.fromUnstyled <| Markdown.toHtml [] "## Example Description \nSome text goes here about the component and what it can do."
 
 
 exampleSelector : Example.Id -> Example -> Styled.Html Msg
@@ -298,6 +295,7 @@ selectedTriangle =
             [ Css.transform <| Css.translate2 (Css.pct 0) (Css.pct -50)
             , Css.top (Css.pct 50)
             , Css.position Css.absolute
+            , Css.marginLeft Grid.halfGrid
             ]
         ]
         [ path [ d "M0.402038 4.01184L7.15204 0.114727L7.15204 7.90895L0.402038 4.01184Z", fill "#5A6378" ] [] ]
@@ -412,7 +410,7 @@ update msg model =
                         [] ->
                             StatusIdle
             in
-            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none ) |> Debug.log "Howdy"
+            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none )
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )
