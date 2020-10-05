@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "netlify-lambda build functions && parcel index.html",
+    "dev": "parcel index.html",
     "build": "parcel build index.html",
+    "build:lambda": "yarn netlify-lambda build functions",
     "watch": "parcel watch index.html"
   },
   "repository": {
