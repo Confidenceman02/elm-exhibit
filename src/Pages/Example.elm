@@ -264,7 +264,7 @@ exampleSelector selectedExample example =
         [ span [ StyledAttribs.css [ Css.display Css.inlineBlock, Css.position Css.relative ] ]
             [ Button.view
                 (Button.secondary
-                    |> Button.onClick SelectExample
+                    |> Button.onClick (SelectExample example.id)
                 )
                 example.name
             , viewIf (selectedExample == example.id) selectedTriangle
@@ -370,7 +370,7 @@ centerShadowStyles center =
 
 type Msg
     = ToggleDescriptionPanel
-    | SelectExample
+    | SelectExample Example.Id
     | CompletedLoadExamples (Result Http.Error (List Example))
 
 
@@ -389,8 +389,17 @@ update msg model =
             in
             ( { model | descriptionPanel = panel }, Cmd.none )
 
-        SelectExample ->
-            ( model, Cmd.none )
+        SelectExample id ->
+            let
+                ( resolvedExamples, resolvedViewPanel ) =
+                    case model.examples of
+                        Loaded ( _, examples ) ->
+                            ( Loaded ( id, examples ), Building )
+
+                        _ ->
+                            ( StatusIdle, Idle )
+            in
+            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none )
 
         CompletedLoadExamples (Ok examples) ->
             let
@@ -403,7 +412,7 @@ update msg model =
                         [] ->
                             StatusIdle
             in
-            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none )
+            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none ) |> Debug.log "Howdy"
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )
