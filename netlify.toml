@@ -4,5 +4,5 @@
 
 [dev]
   publish = "dist"
-  command = "npm run dev"
+  command = "yarn dev"
   functions = "built-lambda"
