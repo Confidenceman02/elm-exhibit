@@ -269,7 +269,7 @@ exampleDescription model =
                 _ ->
                     ""
     in
-    Styled.fromUnstyled <| Markdown.toHtml [] "## Example Description \nSome text goes here about the component and what it can do."
+    Styled.fromUnstyled <| Markdown.toHtml [] resolveDescription
 
 
 exampleSelector : SelectedExample -> Example -> Styled.Html Msg
