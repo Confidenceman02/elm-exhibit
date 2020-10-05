@@ -3,6 +3,7 @@ module Pages.Examples exposing (Model, Msg, init, update, view)
 import Author exposing (Author)
 import Components.Button as Button
 import Css as Css
+import Example as Example
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
@@ -18,7 +19,7 @@ import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, id, in_
 type alias Model =
     { author : Author
     , packageName : Package
-    , examples : Status (List Example)
+    , packageExamples : Status (List Example.Example)
     , descriptionPanel : DescriptionPanel
     , selectedExample : SelectedExample
     }
@@ -27,13 +28,6 @@ type alias Model =
 type DescriptionPanel
     = Open
     | Closed
-
-
-type alias Example =
-    { id : String
-    , name : String
-    , description : String
-    }
 
 
 type SelectedExample
@@ -54,10 +48,11 @@ init : Author -> Package -> ( Model, Cmd Msg )
 init author package =
     ( { author = author
       , packageName = package
-      , examples = Loading
+      , packageExamples = Loading
       , descriptionPanel = Closed
       , selectedExample = Idle
       }
+      --  fetch examples
     , Cmd.none
     )
 
