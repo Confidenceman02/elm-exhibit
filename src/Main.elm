@@ -3,7 +3,6 @@ module Main exposing (..)
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Context exposing (Context)
-import Html exposing (text)
 import Html.Styled as Styled
 import Json.Encode as Encode
 import Page

@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Confidenceman02/elm-exhibit#readme",
   "dependencies": {
+    "@types/node": "^14.11.2",
     "elm-analyse": "^0.16.5",
     "elm-json": "^0.2.8",
     "focus-visible": "^5.1.0",
