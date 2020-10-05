@@ -8,23 +8,23 @@ import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
-import Html.Styled.Extra exposing (viewMaybe)
+import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Http
 import Package exposing (Package)
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
-import Svg.Styled exposing (feGaussianBlur, filter, polygon, rect, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, id, in_, points, rx, stdDeviation, viewBox, width, x, y)
+import Svg.Styled exposing (feGaussianBlur, filter, path, rect, svg)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, points, rx, stdDeviation, viewBox, width, x, y)
 
 
 type alias Model =
     { author : Author
     , packageName : Package
-    , packageExamples : Status (List Example.Example)
+    , examples : Status ( Example.Id, List Example.Example )
     , descriptionPanel : DescriptionPanel
-    , selectedExample : SelectedExample
+    , viewPanel : ViewPanel
     , context : Context
     }
 
@@ -34,15 +34,16 @@ type DescriptionPanel
     | Closed
 
 
-type SelectedExample
+type ViewPanel
     = Idle
     | Building
-    | Built String
+    | Built Example.Id
     | BuildError
 
 
 type Status a
-    = Loading
+    = StatusIdle
+    | Loading
     | LoadingSlowly
     | Loaded a
     | Failed
@@ -52,9 +53,9 @@ init : Author -> Package -> Context -> ( Model, Cmd Msg )
 init author package context =
     ( { author = author
       , packageName = package
-      , packageExamples = Loading
+      , examples = Loading
       , descriptionPanel = Closed
-      , selectedExample = Idle
+      , viewPanel = Idle
       , context = context
       }
       --  fetch examples
@@ -144,7 +145,7 @@ sliderLeft : Model -> Styled.Html Msg
 sliderLeft model =
     let
         maybeExamples =
-            case model.packageExamples of
+            case model.examples of
                 Loaded examples ->
                     Just examples
 
@@ -225,8 +226,8 @@ stageWrapper content =
         content
 
 
-exampleList : List Example -> Styled.Html Msg
-exampleList examples =
+exampleList : ( Example.Id, List Example ) -> Styled.Html Msg
+exampleList ( selectedExample, examples ) =
     let
         paddingCalc =
             (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
@@ -242,7 +243,7 @@ exampleList examples =
             [ text "Examples" ]
         , ul []
             (List.map
-                exampleSelector
+                (exampleSelector selectedExample)
                 examples
             )
         ]
@@ -257,15 +258,16 @@ exampleDescription =
         ]
 
 
-exampleSelector : Example -> Styled.Html Msg
-exampleSelector example =
+exampleSelector : Example.Id -> Example -> Styled.Html Msg
+exampleSelector selectedExample example =
     li [ StyledAttribs.css [ Css.listStyleType Css.none, Css.marginBottom (Grid.calc Grid.grid Grid.divide 2.5) ] ]
-        [ span [ StyledAttribs.css [ Css.display Css.inlineBlock ] ]
+        [ span [ StyledAttribs.css [ Css.display Css.inlineBlock, Css.position Css.relative ] ]
             [ Button.view
                 (Button.secondary
                     |> Button.onClick SelectExample
                 )
                 example.name
+            , viewIf (selectedExample == example.id) selectedTriangle
             ]
         ]
 
@@ -287,9 +289,18 @@ sliderToggle open =
         "open slider"
 
 
-triangle : Styled.Html msg
-triangle =
-    svg [ height "32", viewBox "0 0 150 300" ] [ polygon [ fill "orange", points "0, 150 150, 0 150,300" ] [] ]
+selectedTriangle : Styled.Html msg
+selectedTriangle =
+    svg
+        [ height "8"
+        , viewBox "0 0 8 8"
+        , SvgStyledAttribs.css
+            [ Css.transform <| Css.translate2 (Css.pct 0) (Css.pct -50)
+            , Css.top (Css.pct 50)
+            , Css.position Css.absolute
+            ]
+        ]
+        [ path [ d "M0.402038 4.01184L7.15204 0.114727L7.15204 7.90895L0.402038 4.01184Z", fill "#5A6378" ] [] ]
 
 
 
@@ -382,7 +393,17 @@ update msg model =
             ( model, Cmd.none )
 
         CompletedLoadExamples (Ok examples) ->
-            ( { model | packageExamples = Loaded examples }, Cmd.none )
+            let
+                resolveExamples =
+                    case examples of
+                        -- preselect the first example by default
+                        head :: _ ->
+                            Loaded ( head.id, examples )
+
+                        [] ->
+                            StatusIdle
+            in
+            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none )
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )
