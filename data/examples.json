@@ -2,26 +2,26 @@
     {
       "id": "e8cfb99a-740a-4251-b14a-e55a5324a9dc",
       "name": "Example 1",
-      "description": "This is a description of Example 1"
+      "description": "## Example description\n This is a description of Example 1"
     },
     {
       "id": "9ee06806-239a-4e51-a7a5-dcfc29584620",
       "name": "Example 2",
-      "description": "This is a description of Example 2"
+      "description": "## Example description\n This is a description of Example 2"
     },
     {
       "id": "64d20e65-9fbd-4a33-9948-1f95d66754f7",
       "name": "Example 3",
-      "description": "This is a description of Example 3"
+      "description": "## Example description\n This is a description of Example 3"
     },
     {
       "id": "adbc5ac8-240e-451f-a63b-306578c9edb1",
       "name": "Example 4",
-      "description": "This is a description of Example 4"
+      "description": "## Example description\n This is a description of Example 4"
     },
     {
       "id": "e2a8b105-fd66-4113-bace-11032e190dc0",
       "name": "Example 5",
-      "description": "This is a description of Example 5"
+      "description": "## Example description\n This is a description of Example 5"
     }
   ]
