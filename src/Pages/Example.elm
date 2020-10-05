@@ -1,4 +1,4 @@
-module Pages.Examples exposing (Model, Msg, init, update, view)
+module Pages.Example exposing (Model, Msg, init, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button

@@ -15,7 +15,7 @@ parser : Parser.Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home Parser.top
-        , Parser.map Examples (s "examples" </> Author.urlParser </> Package.urlParser)
+        , Parser.map Examples (s "example" </> Author.urlParser </> Package.urlParser)
         ]
 
 

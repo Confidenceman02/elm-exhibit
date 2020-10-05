@@ -6,7 +6,7 @@ import Html exposing (text)
 import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
-import Pages.Examples as ExamplesPage
+import Pages.Example as ExamplesPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
