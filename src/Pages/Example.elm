@@ -8,6 +8,7 @@ import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Extra exposing (viewMaybe)
 import Http
 import Package exposing (Package)
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
@@ -70,7 +71,7 @@ view model =
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft, sliderCenter (not <| descriptionOpen), sliderRight descriptionOpen ]
+            [ sliderLeft model, sliderCenter (not <| descriptionOpen), sliderRight descriptionOpen ]
     }
 
 
@@ -139,8 +140,17 @@ centerContentShadow center =
         ]
 
 
-sliderLeft : Styled.Html Msg
-sliderLeft =
+sliderLeft : Model -> Styled.Html Msg
+sliderLeft model =
+    let
+        maybeExamples =
+            case model.packageExamples of
+                Loaded examples ->
+                    Just examples
+
+                _ ->
+                    Nothing
+    in
     div
         [ StyledAttribs.css
             ([ Css.width (Css.pct sliderLeftWidth)
@@ -149,7 +159,7 @@ sliderLeft =
                 ++ commonSliderStyles
             )
         ]
-        [ exampleList ]
+        [ viewMaybe exampleList maybeExamples ]
 
 
 sliderRight : Bool -> Styled.Html Msg
@@ -215,8 +225,8 @@ stageWrapper content =
         content
 
 
-exampleList : Styled.Html Msg
-exampleList =
+exampleList : List Example -> Styled.Html Msg
+exampleList examples =
     let
         paddingCalc =
             (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
@@ -231,12 +241,10 @@ exampleList =
             ]
             [ text "Examples" ]
         , ul []
-            [ exampleSelector "exampleSelector 1"
-            , exampleSelector "exampleSelector 2"
-            , exampleSelector "exampleSelector 3"
-            , exampleSelector "exampleSelector 4"
-            , exampleSelector "exampleSelector 5"
-            ]
+            (List.map
+                exampleSelector
+                examples
+            )
         ]
 
 
@@ -249,15 +257,15 @@ exampleDescription =
         ]
 
 
-exampleSelector : String -> Styled.Html Msg
-exampleSelector name =
+exampleSelector : Example -> Styled.Html Msg
+exampleSelector example =
     li [ StyledAttribs.css [ Css.listStyleType Css.none, Css.marginBottom (Grid.calc Grid.grid Grid.divide 2.5) ] ]
         [ span [ StyledAttribs.css [ Css.display Css.inlineBlock ] ]
             [ Button.view
                 (Button.secondary
                     |> Button.onClick SelectExample
                 )
-                name
+                example.name
             ]
         ]
 
@@ -374,7 +382,7 @@ update msg model =
             ( model, Cmd.none )
 
         CompletedLoadExamples (Ok examples) ->
-            ( model, Cmd.none ) |> Debug.log "GOT IT"
+            ( { model | packageExamples = Loaded examples }, Cmd.none )
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )
