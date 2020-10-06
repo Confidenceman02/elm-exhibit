@@ -1,13 +1,12 @@
 module Header exposing (example, home, navBottomBorder, navHeight, view)
 
 import Author exposing (Author)
+import Components.ElmLogo as ElmLogo
 import Css as Css
 import Html.Styled as Styled exposing (a, div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs exposing (href)
 import Package exposing (Package)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
-import Svg.Styled exposing (polygon, svg)
-import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
 
 
 navHeight : Float
@@ -102,7 +101,20 @@ nav config =
 homeLink : Styled.Html msg
 homeLink =
     div [ StyledAttribs.css [ Css.displayFlex ] ]
-        [ a [ href "/", StyledAttribs.css [ Css.textDecoration Css.none, Css.marginRight (Css.px 32), Css.displayFlex, Css.alignItems Css.center, Css.color Css.inherit ] ] [ elmLogo, appTitle ] ]
+        [ a
+            [ href "/"
+            , StyledAttribs.css
+                [ Css.textDecoration Css.none
+                , Css.marginRight (Css.px 32)
+                , Css.displayFlex
+                , Css.alignItems Css.center
+                , Css.color Css.inherit
+                ]
+            ]
+            [ ElmLogo.view <| ElmLogo.medium
+            , appTitle
+            ]
+        ]
 
 
 exampleTitle : Author -> Package -> Styled.Html msg
@@ -119,19 +131,6 @@ appTitle =
     div [ StyledAttribs.css [ Css.paddingLeft (Css.px 8) ] ]
         [ div [ StyledAttribs.css [ Css.lineHeight (Css.px 24), Css.fontSize (Css.px 28) ] ] [ text "elm" ]
         , div [ StyledAttribs.css [ Css.fontSize (Css.px 16) ] ] [ text "exhibit" ]
-        ]
-
-
-elmLogo : Styled.Html msg
-elmLogo =
-    svg [ height "32", viewBox "0 0 600 600" ]
-        [ polygon [ fill "currentColor", points "0, 20 280, 300 0,580" ] []
-        , polygon [ fill "currentColor", points "20,600 300,320 580,600" ] []
-        , polygon [ fill "currentColor", points "320,0 600,0 600,280" ] []
-        , polygon [ fill "currentColor", points "20,0 280,0 402,122 142,122" ] []
-        , polygon [ fill "currentColor", points "170,150 430,150 300,280" ] []
-        , polygon [ fill "currentColor", points "320,300 450,170 580,300 450,430" ] []
-        , polygon [ fill "currentColor", points "470,450 600,320 600,580" ] []
         ]
 
 
