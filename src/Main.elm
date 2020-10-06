@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser as Browser exposing (Document)
-import Browser.Navigation as Navigation
+import Browser.Navigation as Nav
 import Context exposing (Context)
 import Html.Styled as Styled
 import Json.Encode as Encode
@@ -10,12 +10,13 @@ import Pages.Example as ExamplesPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
-import Url
+import Url exposing (Url)
 
 
 type Msg
     = Noop
     | ClickedLink Browser.UrlRequest
+    | ChangedUrl Url
     | GotExamplesMsg ExamplesPage.Msg
     | GotHomeMsg HomePage.Msg
 
@@ -26,9 +27,9 @@ type Model
     | NotFound Context
 
 
-init : Encode.Value -> Url.Url -> Navigation.Key -> ( Model, Cmd Msg )
+init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init entryData url navKey =
-    changeRouteTo (Route.fromUrl url) (Context.toContext url)
+    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey)
 
 
 changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
@@ -96,8 +97,16 @@ update msg model =
             ExamplesPage.update examplesMsg examples
                 |> updateWith Examples GotExamplesMsg
 
-        ( ClickedLink url, _ ) ->
-            ( model, Cmd.none ) |> Debug.log "Clicked link"
+        ( ClickedLink urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl (Context.navKey <| toContext model) (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        ( ChangedUrl url, _ ) ->
+            changeRouteTo (Route.fromUrl url) (toContext model)
 
         _ ->
             ( model, Cmd.none )
@@ -121,5 +130,5 @@ main =
         , update = update
         , subscriptions = subscriptions
         , onUrlRequest = ClickedLink
-        , onUrlChange = \_ -> Noop
+        , onUrlChange = ChangedUrl
         }
