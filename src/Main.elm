@@ -15,14 +15,15 @@ import Url
 
 type Msg
     = Noop
+    | ClickedLink Browser.UrlRequest
     | GotExamplesMsg ExamplesPage.Msg
     | GotHomeMsg HomePage.Msg
 
 
 type Model
     = Examples ExamplesPage.Model
-    | Home
-    | NotFound
+    | Home HomePage.Model
+    | NotFound Context
 
 
 init : Encode.Value -> Url.Url -> Navigation.Key -> ( Model, Cmd Msg )
@@ -34,7 +35,7 @@ changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute context =
     case maybeRoute of
         Nothing ->
-            ( NotFound, Cmd.none )
+            ( NotFound context, Cmd.none )
 
         Just (Route.Examples author package) ->
             let
@@ -45,7 +46,24 @@ changeRouteTo maybeRoute context =
 
         -- TODO: Create home page
         Just Route.Home ->
-            ( Home, Cmd.none )
+            let
+                model =
+                    HomePage.init context
+            in
+            ( Home model, Cmd.none )
+
+
+toContext : Model -> Context
+toContext model =
+    case model of
+        Examples m ->
+            ExamplesPage.toContext m
+
+        Home m ->
+            HomePage.toContext m
+
+        NotFound context ->
+            context
 
 
 view : Model -> Document Msg
@@ -64,10 +82,10 @@ view model =
         Examples examplesModel ->
             viewPage (Page.Examples examplesModel.author examplesModel.packageName) GotExamplesMsg (ExamplesPage.view examplesModel)
 
-        Home ->
+        Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
 
-        NotFound ->
+        NotFound _ ->
             NotFoundPage.view
 
 
@@ -77,6 +95,9 @@ update msg model =
         ( GotExamplesMsg examplesMsg, Examples examples ) ->
             ExamplesPage.update examplesMsg examples
                 |> updateWith Examples GotExamplesMsg
+
+        ( ClickedLink url, _ ) ->
+            ( model, Cmd.none ) |> Debug.log "Clicked link"
 
         _ ->
             ( model, Cmd.none )
@@ -99,6 +120,6 @@ main =
         , view = view
         , update = update
         , subscriptions = subscriptions
-        , onUrlRequest = \_ -> Noop
+        , onUrlRequest = ClickedLink
         , onUrlChange = \_ -> Noop
         }

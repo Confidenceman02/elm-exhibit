@@ -1,4 +1,4 @@
-module Pages.Example exposing (Model, Msg, init, update, view)
+module Pages.Example exposing (Model, Msg, init, toContext, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -18,6 +18,11 @@ import Styles.Grid as Grid
 import Styles.Transition as Transition
 import Svg.Styled exposing (feGaussianBlur, filter, path, rect, svg)
 import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, rx, stdDeviation, viewBox, width, x, y)
+
+
+toContext : Model -> Context
+toContext model =
+    model.context
 
 
 type alias Model =
