@@ -2,8 +2,8 @@ module Header exposing (example, home, navBottomBorder, navHeight, view)
 
 import Author exposing (Author)
 import Css as Css
-import Html.Styled as Styled exposing (div, h1, span, text)
-import Html.Styled.Attributes as StyledAttribs
+import Html.Styled as Styled exposing (a, div, h1, span, text)
+import Html.Styled.Attributes as StyledAttribs exposing (href)
 import Package exposing (Package)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Svg.Styled exposing (polygon, svg)
@@ -101,7 +101,8 @@ nav config =
 
 homeLink : Styled.Html msg
 homeLink =
-    div [ StyledAttribs.css [ Css.textDecoration Css.none, Css.marginRight (Css.px 32), Css.displayFlex, Css.alignItems Css.center ] ] [ elmLogo, appTitle ]
+    div [ StyledAttribs.css [ Css.displayFlex ] ]
+        [ a [ href "/", StyledAttribs.css [ Css.textDecoration Css.none, Css.marginRight (Css.px 32), Css.displayFlex, Css.alignItems Css.center, Css.color Css.inherit ] ] [ elmLogo, appTitle ] ]
 
 
 exampleTitle : Author -> Package -> Styled.Html msg
