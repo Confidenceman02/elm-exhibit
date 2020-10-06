@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "bin/dev.sh",
     "build": "parcel build index.html",
     "build:lambda": "yarn netlify-lambda build functions",
     "watch": "parcel watch index.html"

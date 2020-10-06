@@ -4,5 +4,5 @@
 
 [dev]
   publish = "dist"
-  command = "yarn dev"
+  command = "yarn parcel index.html"
   functions = "built-lambda"
