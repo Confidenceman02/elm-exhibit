@@ -111,7 +111,7 @@ homeLink =
                 , Css.color Css.inherit
                 ]
             ]
-            [ ElmLogo.view <| ElmLogo.medium
+            [ ElmLogo.view <| ElmLogo.static
             , appTitle
             ]
         ]

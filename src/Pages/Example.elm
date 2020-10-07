@@ -144,7 +144,12 @@ animatedBuildingView =
             [ Css.top (Css.pct 10) ]
                 ++ CommonStyles.absoluteCenterHorizontal
         ]
-        [ ElmLogo.view <| (ElmLogo.large |> ElmLogo.color ElmLogo.Official) ]
+        [ ElmLogo.view <|
+            (ElmLogo.animated ElmLogo.BasicBlink
+                |> ElmLogo.color ElmLogo.Official
+                |> ElmLogo.size ElmLogo.Large
+            )
+        ]
 
 
 centerContentShadow : Bool -> Styled.Html msg
