@@ -180,7 +180,7 @@ sizeToFloat size =
             32
 
         Large ->
-            132
+            169
 
         Custom s ->
             s
