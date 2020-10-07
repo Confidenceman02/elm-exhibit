@@ -1,5 +1,8 @@
-module Components.ElmLogo exposing (Color(..), color, custom, large, medium, view)
+module Components.ElmLogo exposing (Animation(..), Color(..), Size(..), animated, color, size, static, view)
 
+import Array
+import Css
+import Css.Animations
 import Html.Styled as Styled
 import Styles.Color exposing (exColorOfficialDarkBlue, exColorOfficialGreen, exColorOfficialLightBlue, exColorOfficialYellow)
 import Svg.Styled exposing (Svg, polygon, svg)
@@ -11,9 +14,15 @@ type Config
 
 
 type alias Configuration =
-    { size : Size
+    { variant : Variant
+    , size : Size
     , color : Color
     }
+
+
+type Variant
+    = Static
+    | Animated Animation
 
 
 type Size
@@ -27,26 +36,35 @@ type Color
     | Official
 
 
+type Animation
+    = BasicBlink
+
+
 defaults : Configuration
 defaults =
-    { size = Medium
+    { variant = Static
+    , size = Medium
     , color = Current
     }
 
 
-medium : Config
-medium =
-    Config { defaults | size = Medium }
+size : Size -> Config -> Config
+size s (Config config) =
+    Config { config | size = s }
 
 
-large : Config
-large =
-    Config { defaults | size = Large }
+
+--VARIANTS
 
 
-custom : Float -> Config
-custom customSize =
-    Config { defaults | size = Custom customSize }
+static : Config
+static =
+    Config { defaults | variant = Static }
+
+
+animated : Animation -> Config
+animated animationType =
+    Config { defaults | variant = Animated animationType }
 
 
 
@@ -59,20 +77,24 @@ color c (Config config) =
 
 
 view : Config -> Styled.Html msg
-view (Config config) =
-    svg [ height <| String.fromFloat (sizeToFloat config.size), viewBox "0 0 600 600" ]
-        [ logoPiece01 config.color
-        , logoPiece02 config.color
-        , logoPiece03 config.color
-        , logoPiece04 config.color
-        , logoPiece05 config.color
-        , logoPiece06 config.color
-        , logoPiece07 config.color
-        ]
+view ((Config config) as con) =
+    svg [ height <| String.fromFloat (sizeToFloat config.size), viewBox "0 0 600 600" ] (logoShapes con)
 
 
-logoPiece01 : Color -> Svg msg
-logoPiece01 clr =
+logoShapes : Config -> List (Svg msg)
+logoShapes (Config config) =
+    [ logoShape01 config.color
+    , logoShape02 config.color
+    , logoShape03 config.color
+    , logoShape04 config.color
+    , logoShape05 config.color
+    , logoShape06 config.color
+    , logoShape07 config.color
+    ]
+
+
+logoShape01 : Color -> Svg msg
+logoShape01 clr =
     let
         resolveColor =
             case clr of
@@ -85,8 +107,8 @@ logoPiece01 clr =
     polygon [ fill resolveColor, points "0, 20 280, 300 0,580" ] []
 
 
-logoPiece02 : Color -> Svg msg
-logoPiece02 clr =
+logoShape02 : Color -> Svg msg
+logoShape02 clr =
     let
         resolveColor =
             case clr of
@@ -99,8 +121,8 @@ logoPiece02 clr =
     polygon [ fill resolveColor, points "20,600 300,320 580,600" ] []
 
 
-logoPiece03 : Color -> Svg msg
-logoPiece03 clr =
+logoShape03 : Color -> Svg msg
+logoShape03 clr =
     let
         resolveColor =
             case clr of
@@ -113,8 +135,8 @@ logoPiece03 clr =
     polygon [ fill resolveColor, points "320,0 600,0 600,280" ] []
 
 
-logoPiece04 : Color -> Svg msg
-logoPiece04 clr =
+logoShape04 : Color -> Svg msg
+logoShape04 clr =
     let
         resolveColor =
             case clr of
@@ -127,8 +149,8 @@ logoPiece04 clr =
     polygon [ fill resolveColor, points "20,0 280,0 402,122 142,122" ] []
 
 
-logoPiece05 : Color -> Svg msg
-logoPiece05 clr =
+logoShape05 : Color -> Svg msg
+logoShape05 clr =
     let
         resolveColor =
             case clr of
@@ -141,8 +163,8 @@ logoPiece05 clr =
     polygon [ fill resolveColor, points "170,150 430,150 300,280" ] []
 
 
-logoPiece06 : Color -> Svg msg
-logoPiece06 clr =
+logoShape06 : Color -> Svg msg
+logoShape06 clr =
     let
         resolveColor =
             case clr of
@@ -155,8 +177,8 @@ logoPiece06 clr =
     polygon [ fill resolveColor, points "320,300 450,170 580,300 450,430" ] []
 
 
-logoPiece07 : Color -> Svg msg
-logoPiece07 clr =
+logoShape07 : Color -> Svg msg
+logoShape07 clr =
     let
         resolveColor =
             case clr of
@@ -174,13 +196,13 @@ logoPiece07 clr =
 
 
 sizeToFloat : Size -> Float
-sizeToFloat size =
-    case size of
+sizeToFloat s =
+    case s of
         Medium ->
             32
 
         Large ->
             169
 
-        Custom s ->
-            s
+        Custom cs ->
+            cs
