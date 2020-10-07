@@ -1,6 +1,39 @@
-module Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorSky600, exColorSky700, exColorWhite)
+module Styles.Color exposing
+    ( exColorBorder
+    , exColorBurn500
+    , exColorBurn600
+    , exColorColt100
+    , exColorColt200
+    , exColorOfficialDarkBlue
+    , exColorOfficialGreen
+    , exColorOfficialLightBlue
+    , exColorOfficialYellow
+    , exColorSky600
+    , exColorSky700
+    , exColorWhite
+    )
 
 import Css exposing (Color)
+
+
+exColorOfficialDarkBlue : Color
+exColorOfficialDarkBlue =
+    Css.hex "#5A6378"
+
+
+exColorOfficialLightBlue : Color
+exColorOfficialLightBlue =
+    Css.hex "#60B5CC"
+
+
+exColorOfficialGreen : Color
+exColorOfficialGreen =
+    Css.hex "#7FD13B"
+
+
+exColorOfficialYellow : Color
+exColorOfficialYellow =
+    Css.hex "#F0AD00"
 
 
 exColorWhite : Color
@@ -25,7 +58,7 @@ exColorColt200 =
 
 exColorBurn500 : Color
 exColorBurn500 =
-    Css.hex "#F0AD00"
+    exColorOfficialYellow
 
 
 exColorBurn600 : Color

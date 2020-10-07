@@ -13,7 +13,7 @@ import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Http
 import Markdown as Markdown
 import Package exposing (Package)
-import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
+import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
@@ -144,7 +144,7 @@ animatedBuildingView =
             [ Css.top (Css.pct 10) ]
                 ++ CommonStyles.absoluteCenterHorizontal
         ]
-        [ ElmLogo.view <| ElmLogo.large ]
+        [ ElmLogo.view <| (ElmLogo.large |> ElmLogo.color ElmLogo.Official) ]
 
 
 centerContentShadow : Bool -> Styled.Html msg
@@ -338,7 +338,7 @@ selectedTriangle =
             , Css.marginLeft Grid.halfGrid
             ]
         ]
-        [ path [ d "M0.402038 4.01184L7.15204 0.114727L7.15204 7.90895L0.402038 4.01184Z", fill "#5A6378" ] [] ]
+        [ path [ d "M0.402038 4.01184L7.15204 0.114727L7.15204 7.90895L0.402038 4.01184Z", fill exColorOfficialDarkBlue.value ] [] ]
 
 
 
