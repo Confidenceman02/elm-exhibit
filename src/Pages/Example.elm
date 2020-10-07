@@ -2,6 +2,7 @@ module Pages.Example exposing (Model, Msg, init, toContext, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
+import Components.ElmLogo as ElmLogo
 import Context exposing (Context)
 import Css as Css
 import Example as Example exposing (Example)
@@ -13,6 +14,7 @@ import Http
 import Markdown as Markdown
 import Package exposing (Package)
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorWhite)
+import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
@@ -82,7 +84,7 @@ view model =
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft model, sliderCenter (not <| descriptionOpen), sliderRight model ]
+            [ sliderLeft model, sliderCenter (not <| descriptionOpen) model.viewPanel, sliderRight model ]
     }
 
 
@@ -93,8 +95,8 @@ commonSliderStyles =
     ]
 
 
-sliderCenter : Bool -> Styled.Html msg
-sliderCenter center =
+sliderCenter : Bool -> ViewPanel -> Styled.Html msg
+sliderCenter center viewPanel =
     div
         [ StyledAttribs.css
             [ Css.width (Css.pct 100)
@@ -102,7 +104,7 @@ sliderCenter center =
             , Css.backgroundColor exColorColt100
             ]
         ]
-        [ centerWrapper center [ centerContentShadow center, centerContent ] ]
+        [ centerWrapper center [ centerContentShadow center, centerContent viewPanel ] ]
 
 
 centerWrapper : Bool -> List (Styled.Html msg) -> Styled.Html msg
@@ -113,8 +115,8 @@ centerWrapper center content =
         content
 
 
-centerContent : Styled.Html msg
-centerContent =
+centerContent : ViewPanel -> Styled.Html msg
+centerContent viewPanel =
     div
         [ StyledAttribs.css
             [ Css.display Css.block
@@ -126,7 +128,23 @@ centerContent =
             , Css.borderRadius (Css.px 12)
             ]
         ]
-        []
+        [ case viewPanel of
+            Building ->
+                animatedBuildingView
+
+            _ ->
+                text ""
+        ]
+
+
+animatedBuildingView : Styled.Html msg
+animatedBuildingView =
+    div
+        [ StyledAttribs.css <|
+            [ Css.top (Css.pct 10) ]
+                ++ CommonStyles.absoluteCenterHorizontal
+        ]
+        [ ElmLogo.view <| ElmLogo.large ]
 
 
 centerContentShadow : Bool -> Styled.Html msg
