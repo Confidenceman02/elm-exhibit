@@ -1,22 +1,31 @@
 module Components.ElmLogo exposing (Animation(..), Color(..), Size(..), animated, color, size, static, view)
 
-import Array
-import Css
-import Css.Animations
+import Css exposing (Style)
+import Css.Animations as CssAnimation
 import Html.Styled as Styled
 import Styles.Color exposing (exColorOfficialDarkBlue, exColorOfficialGreen, exColorOfficialLightBlue, exColorOfficialYellow)
-import Svg.Styled exposing (Svg, polygon, svg)
-import Svg.Styled.Attributes exposing (fill, height, points, viewBox)
+import Svg.Styled as SvgStyled exposing (Svg, polygon, svg)
+import Svg.Styled.Attributes as SvgAttributes exposing (fill, height, points, viewBox)
 
 
 type Config
     = Config Configuration
 
 
+type State
+    = State InternalState
+
+
+type alias InternalState =
+    { keyframesForShapes : LogoShapeCompatible (List Style)
+    }
+
+
 type alias Configuration =
     { variant : Variant
     , size : Size
     , color : Color
+    , state : State
     }
 
 
@@ -37,7 +46,7 @@ type Color
 
 
 type Animation
-    = BasicBlink
+    = BasicShapeBlink
 
 
 defaults : Configuration
@@ -45,6 +54,7 @@ defaults =
     { variant = Static
     , size = Medium
     , color = Current
+    , state = init
     }
 
 
@@ -76,6 +86,10 @@ color c (Config config) =
     Config { config | color = c }
 
 
+
+-- VIEW
+
+
 view : Config -> Styled.Html msg
 view ((Config config) as con) =
     svg [ height <| String.fromFloat (sizeToFloat config.size), viewBox "0 0 600 600" ] (logoShapes con)
@@ -83,18 +97,36 @@ view ((Config config) as con) =
 
 logoShapes : Config -> List (Svg msg)
 logoShapes (Config config) =
-    [ logoShape01 config.color
-    , logoShape02 config.color
-    , logoShape03 config.color
-    , logoShape04 config.color
-    , logoShape05 config.color
-    , logoShape06 config.color
-    , logoShape07 config.color
+    let
+        (State state) =
+            config.state
+
+        resolveAnimationF f =
+            case config.variant of
+                Animated _ ->
+                    Just f
+
+                _ ->
+                    Nothing
+    in
+    [ buildShape (resolveAnimationF .logoShape01) .logoShape01 .logoShape01 config.color state
+    , buildShape (resolveAnimationF .logoShape02) .logoShape02 .logoShape02 config.color state
+    , buildShape (resolveAnimationF .logoShape03) .logoShape03 .logoShape03 config.color state
+    , buildShape (resolveAnimationF .logoShape04) .logoShape04 .logoShape04 config.color state
+    , buildShape (resolveAnimationF .logoShape05) .logoShape05 .logoShape05 config.color state
+    , buildShape (resolveAnimationF .logoShape06) .logoShape06 .logoShape06 config.color state
+    , buildShape (resolveAnimationF .logoShape07) .logoShape07 .logoShape07 config.color state
     ]
 
 
-logoShape01 : Color -> Svg msg
-logoShape01 clr =
+buildShape :
+    Maybe (LogoShapeCompatible (List Style) -> List Style)
+    -> (LogoShapeCompatible (SvgStyled.Attribute msg) -> SvgStyled.Attribute msg)
+    -> (LogoShapeCompatible Css.Color -> Css.Color)
+    -> Color
+    -> InternalState
+    -> Svg msg
+buildShape maybeKeyFrameF pointF colorF clr state =
     let
         resolveColor =
             case clr of
@@ -102,93 +134,120 @@ logoShape01 clr =
                     "currentColor"
 
                 Official ->
-                    exColorOfficialDarkBlue.value
+                    colorF logoShapeColors |> .value
+
+        resolveKeyFrames =
+            case maybeKeyFrameF of
+                Just keyFrameF ->
+                    keyFrameF state.keyframesForShapes
+
+                _ ->
+                    []
     in
-    polygon [ fill resolveColor, points "0, 20 280, 300 0,580" ] []
+    polygon [ SvgAttributes.css resolveKeyFrames, fill resolveColor, pointF logoShapePoint ] []
 
 
-logoShape02 : Color -> Svg msg
-logoShape02 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
-
-                Official ->
-                    exColorOfficialLightBlue.value
-    in
-    polygon [ fill resolveColor, points "20,600 300,320 580,600" ] []
-
-
-logoShape03 : Color -> Svg msg
-logoShape03 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
-
-                Official ->
-                    exColorOfficialLightBlue.value
-    in
-    polygon [ fill resolveColor, points "320,0 600,0 600,280" ] []
-
-
-logoShape04 : Color -> Svg msg
-logoShape04 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
-
-                Official ->
-                    exColorOfficialGreen.value
-    in
-    polygon [ fill resolveColor, points "20,0 280,0 402,122 142,122" ] []
-
-
-logoShape05 : Color -> Svg msg
-logoShape05 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
-
-                Official ->
-                    exColorOfficialYellow.value
-    in
-    polygon [ fill resolveColor, points "170,150 430,150 300,280" ] []
-
-
-logoShape06 : Color -> Svg msg
-logoShape06 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
-
-                Official ->
-                    exColorOfficialGreen.value
-    in
-    polygon [ fill resolveColor, points "320,300 450,170 580,300 450,430" ] []
+logoShapeKeyFrame : LogoShapeCompatible (List Style)
+logoShapeKeyFrame =
+    { logoShape01 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 0)
+        ]
+    , logoShape02 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 0.5)
+        ]
+    , logoShape03 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 1)
+        ]
+    , logoShape04 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 1.5)
+        ]
+    , logoShape05 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 2)
+        ]
+    , logoShape06 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 2.5)
+        ]
+    , logoShape07 =
+        [ Css.opacity <| Css.num 0
+        , Css.animationName <|
+            CssAnimation.keyframes
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 0.5)
+        , Css.animationIterationCount <| Css.int 1
+        , Css.animationDelay (Css.sec 3)
+        ]
+    }
 
 
-logoShape07 : Color -> Svg msg
-logoShape07 clr =
-    let
-        resolveColor =
-            case clr of
-                Current ->
-                    "currentColor"
+logoShapeColors : LogoShapeCompatible Css.Color
+logoShapeColors =
+    { logoShape01 = exColorOfficialDarkBlue
+    , logoShape02 = exColorOfficialLightBlue
+    , logoShape03 = exColorOfficialLightBlue
+    , logoShape04 = exColorOfficialGreen
+    , logoShape05 = exColorOfficialYellow
+    , logoShape06 = exColorOfficialGreen
+    , logoShape07 = exColorOfficialYellow
+    }
 
-                Official ->
-                    exColorOfficialYellow.value
-    in
-    polygon [ fill resolveColor, points "470,450 600,320 600,580" ] []
+
+logoShapePoint : LogoShapeCompatible (SvgStyled.Attribute msg)
+logoShapePoint =
+    { logoShape01 = points "0, 20 280, 300 0,580"
+    , logoShape02 = points "20,600 300,320 580,600"
+    , logoShape03 = points "320,0 600,0 600,280"
+    , logoShape04 = points "20,0 280,0 402,122 142,122"
+    , logoShape05 = points "170,150 430,150 300,280"
+    , logoShape06 = points "320,300 450,170 580,300 450,430"
+    , logoShape07 = points "470,450 600,320 600,580"
+    }
+
+
+type alias LogoShapeCompatible compatible =
+    { logoShape01 : compatible
+    , logoShape02 : compatible
+    , logoShape03 : compatible
+    , logoShape04 : compatible
+    , logoShape05 : compatible
+    , logoShape06 : compatible
+    , logoShape07 : compatible
+    }
 
 
 
@@ -206,3 +265,18 @@ sizeToFloat s =
 
         Custom cs ->
             cs
+
+
+
+-- STATE
+
+
+initialState : InternalState
+initialState =
+    { keyframesForShapes = logoShapeKeyFrame
+    }
+
+
+init : State
+init =
+    State initialState

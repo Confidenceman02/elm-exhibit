@@ -145,7 +145,7 @@ animatedBuildingView =
                 ++ CommonStyles.absoluteCenterHorizontal
         ]
         [ ElmLogo.view <|
-            (ElmLogo.animated ElmLogo.BasicBlink
+            (ElmLogo.animated ElmLogo.BasicShapeBlink
                 |> ElmLogo.color ElmLogo.Official
                 |> ElmLogo.size ElmLogo.Large
             )
