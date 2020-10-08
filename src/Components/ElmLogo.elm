@@ -153,64 +153,63 @@ logoShapeKeyFrame =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
-        , Css.animationDelay (Css.sec 0)
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         ]
     , logoShape02 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         , Css.animationDelay (Css.sec 0.5)
         ]
     , logoShape03 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         , Css.animationDelay (Css.sec 1)
         ]
     , logoShape04 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         , Css.animationDelay (Css.sec 1.5)
         ]
     , logoShape05 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         , Css.animationDelay (Css.sec 2)
         ]
     , logoShape06 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
         , Css.animationDelay (Css.sec 2.5)
         ]
     , logoShape07 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
-                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 0.5)
-        , Css.animationIterationCount <| Css.int 1
-        , Css.animationDelay (Css.sec 3)
+                [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
+        , Css.animationDuration (Css.sec 3.5)
+        , Css.property "animation-iteration-count" "infinite"
+        , Css.animationDelay (Css.sec 3.0)
         ]
     }
 
