@@ -48,8 +48,8 @@ type DescriptionPanel
 
 type ViewPanel
     = Idle
-    | Building
-    | Built Example.Id
+    | Building Example
+    | Built Example
     | BuildError
 
 
@@ -129,26 +129,29 @@ centerContent viewPanel =
             ]
         ]
         [ case viewPanel of
-            Building ->
-                animatedBuildingView
+            Building example ->
+                animatedBuildingView example
 
             _ ->
                 text ""
         ]
 
 
-animatedBuildingView : Styled.Html msg
-animatedBuildingView =
-    div
-        [ StyledAttribs.css <|
-            [ Css.top (Css.pct 10) ]
-                ++ CommonStyles.absoluteCenterHorizontal
-        ]
-        [ ElmLogo.view <|
-            (ElmLogo.animated ElmLogo.BasicShapeBlink
-                |> ElmLogo.color ElmLogo.Official
-                |> ElmLogo.size ElmLogo.Large
-            )
+animatedBuildingView : Example -> Styled.Html msg
+animatedBuildingView example =
+    div []
+        [ div
+            [ StyledAttribs.css <|
+                [ Css.top (Css.pct 10) ]
+                    ++ CommonStyles.absoluteCenterHorizontal
+            ]
+            [ ElmLogo.view <|
+                (ElmLogo.animated ElmLogo.BasicShapeBlink
+                    |> ElmLogo.color ElmLogo.Official
+                    |> ElmLogo.size ElmLogo.Large
+                )
+            ]
+        , div [ StyledAttribs.css ([ Css.top (Css.pct 35) ] ++ CommonStyles.absoluteCenterHorizontal) ] [ p [] [ text ("Building example " ++ example.name) ] ]
         ]
 
 
@@ -437,7 +440,7 @@ update msg model =
                 ( resolvedExamples, resolvedViewPanel ) =
                     case model.examples of
                         Loaded ( _, examples ) ->
-                            ( Loaded ( SelectedExample example, examples ), Building )
+                            ( Loaded ( SelectedExample example, examples ), Building example )
 
                         _ ->
                             ( StatusIdle, Idle )
@@ -446,16 +449,16 @@ update msg model =
 
         CompletedLoadExamples (Ok examples) ->
             let
-                resolveExamples =
+                ( resolvedExamples, resolvedViewPanel ) =
                     case examples of
                         -- preselect the first example by default
                         head :: _ ->
-                            Loaded ( SelectedExample head, examples )
+                            ( Loaded ( SelectedExample head, examples ), Building head )
 
                         [] ->
-                            StatusIdle
+                            ( StatusIdle, Idle )
             in
-            ( { model | examples = resolveExamples, viewPanel = Building }, Cmd.none )
+            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none )
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )

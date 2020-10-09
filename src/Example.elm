@@ -5,7 +5,6 @@ import Api.Endpoint as Endpoint
 import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
-import Url.Builder
 
 
 type Id

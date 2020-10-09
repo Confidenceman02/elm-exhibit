@@ -1,4 +1,4 @@
-module Api.Api exposing (..)
+module Api.Api exposing (get)
 
 import Api.Endpoint exposing (Endpoint, unwrap)
 import Http
