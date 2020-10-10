@@ -1,5 +1,6 @@
-module Package exposing (Package, toString, urlParser)
+module Package exposing (Package, toQueryParam, toString, urlParser)
 
+import Url.Builder as UrlBuilder exposing (QueryParameter)
 import Url.Parser as Parser exposing (Parser)
 
 
@@ -15,3 +16,8 @@ urlParser =
 toString : Package -> String
 toString (Package a) =
     a
+
+
+toQueryParam : Package -> QueryParameter
+toQueryParam =
+    toString >> UrlBuilder.string "package"

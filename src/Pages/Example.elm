@@ -85,7 +85,7 @@ init author package context =
       , context = context
       }
       --  fetch examples
-    , Example.fetch CompletedLoadExamples
+    , Example.fetch CompletedLoadExamples author package
     )
 
 
@@ -169,17 +169,17 @@ animatedBuildingView example viewPanelOptions =
             ]
             [ ElmLogo.view <|
                 (ElmLogo.animated ElmLogo.BasicShapeBlink
-                    |> ElmLogo.color resolvedColor
+                    |> ElmLogo.color (ElmLogo.CustomColor exColorColt200)
                     |> ElmLogo.size ElmLogo.Large
                 )
             ]
         , div
-            [ StyledAttribs.css ([ Css.top (Css.pct 35) ] ++ CommonStyles.absoluteCenterHorizontal) ]
+            [ StyledAttribs.css ([ Css.top (Css.pct 30) ] ++ CommonStyles.absoluteCenterHorizontal) ]
             [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center, Css.flexDirection Css.column ] ]
-                [ Button.view (Button.secondary |> Button.onClick resolvedColorMsg) resolvedColorButtonText
-                , div
+                [ --Button.view (Button.secondary |> Button.onClick resolvedColorMsg) resolvedColorButtonText
+                  div
                     [ StyledAttribs.css [ Css.minWidth (Css.px centerContentWidth), Css.displayFlex, Css.justifyContent Css.center ] ]
-                    [ Heading.view Heading.h4 ("Building example " ++ example.name) ]
+                    [ span [] [ Heading.view Heading.h4 ("Building example " ++ example.name) ] ]
                 ]
             ]
         ]

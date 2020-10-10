@@ -158,7 +158,7 @@ logoShapeKeyFrame =
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
         ]
     , logoShape02 =
@@ -166,54 +166,54 @@ logoShapeKeyFrame =
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 0.5)
+        , Css.animationDelay (Css.sec logoAnimationDelay)
         ]
     , logoShape03 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 1)
+        , Css.animationDelay (Css.sec (logoAnimationDelay * 2))
         ]
     , logoShape04 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 1.5)
+        , Css.animationDelay (Css.sec (logoAnimationDelay * 3))
         ]
     , logoShape05 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 2)
+        , Css.animationDelay (Css.sec (logoAnimationDelay * 4))
         ]
     , logoShape06 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 2.5)
+        , Css.animationDelay (Css.sec (logoAnimationDelay * 5))
         ]
     , logoShape07 =
         [ Css.opacity <| Css.num 0
         , Css.animationName <|
             CssAnimation.keyframes
                 [ ( 0, [ CssAnimation.opacity (Css.num 0) ] ), ( 7, [ CssAnimation.opacity (Css.num 1) ] ), ( 14, [ CssAnimation.opacity (Css.num 0) ] ), ( 100, [ CssAnimation.opacity (Css.num 0) ] ) ]
-        , Css.animationDuration (Css.sec 3.5)
+        , Css.animationDuration (Css.sec logoAnimationDuration)
         , Css.property "animation-iteration-count" "infinite"
-        , Css.animationDelay (Css.sec 3.0)
+        , Css.animationDelay (Css.sec (logoAnimationDelay * 6))
         ]
     }
 
@@ -254,6 +254,20 @@ type alias LogoShapeCompatible compatible =
 
 
 
+-- CONSTANTS
+
+
+logoAnimationDuration : Float
+logoAnimationDuration =
+    2.5
+
+
+logoAnimationDelay : Float
+logoAnimationDelay =
+    logoAnimationDuration / 7
+
+
+
 -- HELPERS
 
 
@@ -264,7 +278,7 @@ sizeToFloat s =
             32
 
         Large ->
-            100
+            70
 
         Custom cs ->
             cs
