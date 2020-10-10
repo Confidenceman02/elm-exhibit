@@ -3,6 +3,7 @@ module Pages.Example exposing (Model, Msg, init, toContext, update, view)
 import Author exposing (Author)
 import Components.Button as Button
 import Components.ElmLogo as ElmLogo
+import Components.Heading as Heading
 import Context exposing (Context)
 import Css as Css
 import Example as Example exposing (Example)
@@ -176,7 +177,9 @@ animatedBuildingView example viewPanelOptions =
             [ StyledAttribs.css ([ Css.top (Css.pct 35) ] ++ CommonStyles.absoluteCenterHorizontal) ]
             [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center, Css.flexDirection Css.column ] ]
                 [ Button.view (Button.secondary |> Button.onClick resolvedColorMsg) resolvedColorButtonText
-                , p [] [ text ("Building example " ++ example.name) ]
+                , div
+                    [ StyledAttribs.css [ Css.minWidth (Css.px centerContentWidth), Css.displayFlex, Css.justifyContent Css.center ] ]
+                    [ Heading.view Heading.h4 ("Building example " ++ example.name) ]
                 ]
             ]
         ]
