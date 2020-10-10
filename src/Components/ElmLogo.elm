@@ -43,6 +43,7 @@ type Size
 type Color
     = Current
     | Official
+    | CustomColor Css.Color
 
 
 type Animation
@@ -135,6 +136,9 @@ buildShape maybeKeyFrameF pointF colorF clr state =
 
                 Official ->
                     colorF logoShapeColors |> .value
+
+                CustomColor cc ->
+                    cc.value
 
         resolveKeyFrames =
             case maybeKeyFrameF of

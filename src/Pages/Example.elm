@@ -7,7 +7,7 @@ import Context exposing (Context)
 import Css as Css
 import Example as Example exposing (Example)
 import Header as Header
-import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
+import Html.Styled as Styled exposing (Attribute, button, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Http
@@ -48,9 +48,14 @@ type DescriptionPanel
 
 type ViewPanel
     = Idle
-    | Building Example
+    | Building Example ViewPanelOptions
     | Built Example
     | BuildError
+
+
+type alias ViewPanelOptions =
+    { animationColors : Bool
+    }
 
 
 type Status a
@@ -59,6 +64,14 @@ type Status a
     | LoadingSlowly
     | Loaded a
     | Failed
+
+
+type Msg
+    = ToggleDescriptionPanel
+    | SelectExample Example
+    | CompletedLoadExamples (Result Http.Error (List Example))
+    | DesaturateLogoColors
+    | SaturateLogoColors
 
 
 init : Author -> Package -> Context -> ( Model, Cmd Msg )
@@ -95,7 +108,7 @@ commonSliderStyles =
     ]
 
 
-sliderCenter : Bool -> ViewPanel -> Styled.Html msg
+sliderCenter : Bool -> ViewPanel -> Styled.Html Msg
 sliderCenter center viewPanel =
     div
         [ StyledAttribs.css
@@ -115,7 +128,7 @@ centerWrapper center content =
         content
 
 
-centerContent : ViewPanel -> Styled.Html msg
+centerContent : ViewPanel -> Styled.Html Msg
 centerContent viewPanel =
     div
         [ StyledAttribs.css
@@ -129,16 +142,24 @@ centerContent viewPanel =
             ]
         ]
         [ case viewPanel of
-            Building example ->
-                animatedBuildingView example
+            Building example options ->
+                animatedBuildingView example options
 
             _ ->
                 text ""
         ]
 
 
-animatedBuildingView : Example -> Styled.Html msg
-animatedBuildingView example =
+animatedBuildingView : Example -> ViewPanelOptions -> Styled.Html Msg
+animatedBuildingView example viewPanelOptions =
+    let
+        ( resolvedColor, resolvedColorMsg, resolvedColorButtonText ) =
+            if viewPanelOptions.animationColors then
+                ( ElmLogo.Official, DesaturateLogoColors, "Desaturate animation color" )
+
+            else
+                ( ElmLogo.CustomColor exColorColt200, SaturateLogoColors, "Saturate animation color" )
+    in
     div []
         [ div
             [ StyledAttribs.css <|
@@ -147,11 +168,17 @@ animatedBuildingView example =
             ]
             [ ElmLogo.view <|
                 (ElmLogo.animated ElmLogo.BasicShapeBlink
-                    |> ElmLogo.color ElmLogo.Official
+                    |> ElmLogo.color resolvedColor
                     |> ElmLogo.size ElmLogo.Large
                 )
             ]
-        , div [ StyledAttribs.css ([ Css.top (Css.pct 35) ] ++ CommonStyles.absoluteCenterHorizontal) ] [ p [] [ text ("Building example " ++ example.name) ] ]
+        , div
+            [ StyledAttribs.css ([ Css.top (Css.pct 35) ] ++ CommonStyles.absoluteCenterHorizontal) ]
+            [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center, Css.flexDirection Css.column ] ]
+                [ Button.view (Button.secondary |> Button.onClick resolvedColorMsg) resolvedColorButtonText
+                , p [] [ text ("Building example " ++ example.name) ]
+                ]
+            ]
         ]
 
 
@@ -411,13 +438,17 @@ centerShadowStyles center =
 
 
 
+-- DEFAULTS
+
+
+defaultViewPanelOptions : ViewPanelOptions
+defaultViewPanelOptions =
+    { animationColors = True
+    }
+
+
+
 -- UPDATE
-
-
-type Msg
-    = ToggleDescriptionPanel
-    | SelectExample Example
-    | CompletedLoadExamples (Result Http.Error (List Example))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -440,7 +471,7 @@ update msg model =
                 ( resolvedExamples, resolvedViewPanel ) =
                     case model.examples of
                         Loaded ( _, examples ) ->
-                            ( Loaded ( SelectedExample example, examples ), Building example )
+                            ( Loaded ( SelectedExample example, examples ), Building example defaultViewPanelOptions )
 
                         _ ->
                             ( StatusIdle, Idle )
@@ -453,7 +484,7 @@ update msg model =
                     case examples of
                         -- preselect the first example by default
                         head :: _ ->
-                            ( Loaded ( SelectedExample head, examples ), Building head )
+                            ( Loaded ( SelectedExample head, examples ), Building head defaultViewPanelOptions )
 
                         [] ->
                             ( StatusIdle, Idle )
@@ -462,3 +493,27 @@ update msg model =
 
         CompletedLoadExamples (Err err) ->
             ( model, Cmd.none )
+
+        DesaturateLogoColors ->
+            let
+                resolvedViePanel =
+                    case model.viewPanel of
+                        Building example options ->
+                            Building example { options | animationColors = False }
+
+                        _ ->
+                            model.viewPanel
+            in
+            ( { model | viewPanel = resolvedViePanel }, Cmd.none )
+
+        SaturateLogoColors ->
+            let
+                resolvedViePanel =
+                    case model.viewPanel of
+                        Building example options ->
+                            Building example { options | animationColors = True }
+
+                        _ ->
+                            model.viewPanel
+            in
+            ( { model | viewPanel = resolvedViePanel }, Cmd.none )

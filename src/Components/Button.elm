@@ -4,9 +4,10 @@ import Css exposing (Style)
 import Html.Styled as Styled exposing (button, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
-import Styles.Color exposing (exColorBurn500, exColorBurn600)
+import Styles.Color exposing (exColorBurn500, exColorBurn600, exColorMulch600)
 import Styles.Grid as Grid
 import Styles.Transition as Transition
+import Styles.Typography exposing (exTypographyButtonSecondaryFontSize)
 import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes as SvgAttribs exposing (height, points, viewBox)
 
@@ -78,7 +79,7 @@ view (Config config) label =
                 Secondary ->
                     [ span
                         [ StyledAttribs.css
-                            [ Css.fontSize (Css.rem 1.125)
+                            [ Css.fontSize exTypographyButtonSecondaryFontSize
                             , Css.property "padding" <| calc
                             , Css.height (Css.pct 100)
                             ]
@@ -126,7 +127,7 @@ secondaryStyles : List Style
 secondaryStyles =
     [ Css.displayFlex
     , Css.position Css.relative
-    , Css.color (Css.hex "#859900")
+    , Css.color exColorMulch600
     , Css.fontWeight (Css.int 700)
     , Css.boxSizing Css.borderBox
     , Css.backgroundColor Css.transparent

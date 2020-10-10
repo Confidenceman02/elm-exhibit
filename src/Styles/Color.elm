@@ -4,6 +4,7 @@ module Styles.Color exposing
     , exColorBurn600
     , exColorColt100
     , exColorColt200
+    , exColorMulch600
     , exColorOfficialDarkBlue
     , exColorOfficialGreen
     , exColorOfficialLightBlue
@@ -59,6 +60,11 @@ exColorColt200 =
 exColorBurn500 : Color
 exColorBurn500 =
     exColorOfficialYellow
+
+
+exColorMulch600 : Color
+exColorMulch600 =
+    Css.hex "#859900"
 
 
 exColorBurn600 : Color
