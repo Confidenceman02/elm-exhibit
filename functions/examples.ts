@@ -18,13 +18,14 @@ export async function handler(event: APIGatewayEvent, context: Context) {
   }
 
   if (params.author && params.package) {
-    return {
-      statusCode: StatusCodes.OK,
-      body: JSON.stringify({examples: examples}),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
+    return errorResponse(StatusCodes.BAD_REQUEST, "AuthorAndPackageNotFound" )
+    // return {
+    //   statusCode: StatusCodes.OK,
+    //   body: JSON.stringify({examples: examples}),
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   }
+    // }
   } else {
     return errorResponse(StatusCodes.BAD_REQUEST, "KeineAhnung")
   }
