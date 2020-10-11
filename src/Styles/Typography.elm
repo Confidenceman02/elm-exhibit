@@ -4,6 +4,8 @@ module Styles.Typography exposing
     , exTypographyHeading1FontWeight
     , exTypographyHeading4FontSize
     , exTypographyHeading4FontWeight
+    , exTypographyParagraphBodyFontSize
+    , exTypographyParagraphIntroFontSize
     )
 
 import Css exposing (IntOrAuto, Rem)
@@ -32,3 +34,13 @@ exTypographyHeading4FontSize =
 exTypographyHeading4FontWeight : Int
 exTypographyHeading4FontWeight =
     700
+
+
+exTypographyParagraphIntroFontSize : Rem
+exTypographyParagraphIntroFontSize =
+    Css.rem 1.25
+
+
+exTypographyParagraphBodyFontSize : Rem
+exTypographyParagraphBodyFontSize =
+    Css.rem 1
