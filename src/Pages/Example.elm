@@ -70,7 +70,7 @@ type Status a
 type Msg
     = ToggleDescriptionPanel
     | SelectExample Example
-    | CompletedLoadExamples (Result Http.Error (List Example))
+    | CompletedLoadExamples (Result Example.ExampleError (List Example))
     | DesaturateLogoColors
     | SaturateLogoColors
 
