@@ -2,11 +2,21 @@ import examples from "../data/examples.json";
 import {APIGatewayEvent, Context} from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
 
+type ErrorTag  = "AuthorNotFound" | "PackageNotFound" | "AuthorAndPackageNotFound" | "KeineAhnung"
+
+interface ErrorBody
+  {
+    statusCode: StatusCodes;
+    body: {
+      tag: ErrorTag
+    };
+  }
+
 export async function handler(event: APIGatewayEvent, context: Context) {
   const params = event.queryStringParameters;
 
   if (!params) {
-    return errorResponse(StatusCodes.BAD_REQUEST, "Missing author and package parameters" )
+    return errorResponse(StatusCodes.BAD_REQUEST, "KeineAhnung" )
   }
 
   if (params.author && params.package) {
@@ -18,13 +28,13 @@ export async function handler(event: APIGatewayEvent, context: Context) {
       }
     }
   } else {
-    return errorResponse(StatusCodes.BAD_REQUEST, "Missing author and package parameters")
+    return errorResponse(StatusCodes.BAD_REQUEST, "KeineAhnung")
   }
 }
 
-function errorResponse(statusCode: StatusCodes, errMsg: string) {
+function errorResponse(statusCode: StatusCodes, tag: ErrorTag): ErrorBody {
   return {
     statusCode: statusCode,
-    body: { error: errMsg }
+    body: { tag: tag }
   }
 }
