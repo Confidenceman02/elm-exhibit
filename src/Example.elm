@@ -1,4 +1,4 @@
-module Example exposing (Example, Id, fetch)
+module Example exposing (Example, ExampleError, Id, fetch)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
@@ -7,7 +7,6 @@ import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Package exposing (Package)
-import Url.Builder as UrlBuilder
 
 
 type Id
@@ -19,6 +18,14 @@ type alias Example =
     , name : String
     , description : String
     }
+
+
+type ExampleError
+    = ExampleBuildFailed
+    | AuthorNotFound
+    | PackageNotFound
+    | AuthorAndPackageNotFound
+    | KeineAhnung
 
 
 decoder : Decoder Example
