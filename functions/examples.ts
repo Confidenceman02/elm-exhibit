@@ -2,7 +2,7 @@ import examples from "../data/examples.json";
 import {APIGatewayEvent, Context} from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
 
-type ErrorTag  = "AuthorNotFound" | "PackageNotFound" | "AuthorAndPackageNotFound" | "KeineAhnung"
+type ErrorTag  = "ExampleBuildFailed" | "AuthorNotFound" | "PackageNotFound" | "AuthorAndPackageNotFound" | "KeineAhnung"
 
 interface ErrorBody
   {
