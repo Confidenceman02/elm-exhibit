@@ -29,8 +29,7 @@ type ExampleError
 
 
 type alias ErrorBody =
-    { statusCode : Int
-    , tag : ExampleError
+    { tag : ExampleError
     }
 
 

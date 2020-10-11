@@ -7,9 +7,7 @@ type ErrorTag  = "AuthorNotFound" | "PackageNotFound" | "AuthorAndPackageNotFoun
 interface ErrorBody
   {
     statusCode: StatusCodes;
-    body: {
-      tag: ErrorTag
-    };
+    body: string;
   }
 
 export async function handler(event: APIGatewayEvent, context: Context) {
@@ -35,6 +33,6 @@ export async function handler(event: APIGatewayEvent, context: Context) {
 function errorResponse(statusCode: StatusCodes, tag: ErrorTag): ErrorBody {
   return {
     statusCode: statusCode,
-    body: { tag: tag }
+    body: JSON.stringify({ tag: tag })
   }
 }
