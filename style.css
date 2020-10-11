@@ -11,14 +11,6 @@ h1 {
  font-weight: 700;
 }
 
-h2 {
- font-weight: 700;
-}
-
-p {
- font-weight: 400;
-}
-
 .js-focus-visible :focus:not(.focus-visible) {
  outline: none;
 }
