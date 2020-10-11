@@ -51,7 +51,7 @@ type ViewPanel
     = Idle
     | Building Example ViewPanelOptions
     | Built Example
-    | BuildError
+    | BuildError Example.ExampleError
 
 
 type alias ViewPanelOptions =
@@ -145,6 +145,9 @@ centerContent viewPanel =
         [ case viewPanel of
             Building example options ->
                 animatedBuildingView example options
+
+            BuildError error ->
+                text "Shit something happened"
 
             _ ->
                 text ""
