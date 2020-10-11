@@ -4,16 +4,17 @@ import Author exposing (Author)
 import Components.Button as Button
 import Components.ElmLogo as ElmLogo
 import Components.Heading as Heading
+import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css as Css
 import Example as Example exposing (Example)
 import Header as Header
-import Html.Styled as Styled exposing (Attribute, button, div, h2, li, p, span, text, ul)
+import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
-import Http
 import Markdown as Markdown
 import Package exposing (Package)
+import Pages.Errors.Bummer as Bummer
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
@@ -94,11 +95,19 @@ view model =
     let
         descriptionOpen =
             model.descriptionPanel == Open
+
+        examplesExist =
+            case model.examples of
+                Failed ->
+                    False
+
+                _ ->
+                    True
     in
     { title = "examples"
     , content =
         stageWrapper
-            [ sliderLeft model, sliderCenter (not <| descriptionOpen) model.viewPanel, sliderRight model ]
+            [ sliderLeft model, sliderCenter model, viewIf examplesExist (sliderRight model) ]
     }
 
 
@@ -109,8 +118,15 @@ commonSliderStyles =
     ]
 
 
-sliderCenter : Bool -> ViewPanel -> Styled.Html Msg
-sliderCenter center viewPanel =
+sliderCenter : Model -> Styled.Html Msg
+sliderCenter model =
+    let
+        descriptionOpen =
+            model.descriptionPanel == Open
+
+        centerSlider =
+            not <| descriptionOpen
+    in
     div
         [ StyledAttribs.css
             [ Css.width (Css.pct 100)
@@ -118,7 +134,7 @@ sliderCenter center viewPanel =
             , Css.backgroundColor exColorColt100
             ]
         ]
-        [ centerWrapper center [ centerContentShadow center, centerContent viewPanel ] ]
+        [ centerWrapper centerSlider [ centerContentShadow centerSlider, centerContent model ] ]
 
 
 centerWrapper : Bool -> List (Styled.Html msg) -> Styled.Html msg
@@ -129,8 +145,8 @@ centerWrapper center content =
         content
 
 
-centerContent : ViewPanel -> Styled.Html Msg
-centerContent viewPanel =
+centerContent : Model -> Styled.Html Msg
+centerContent model =
     div
         [ StyledAttribs.css
             [ Css.display Css.block
@@ -142,15 +158,49 @@ centerContent viewPanel =
             , Css.borderRadius (Css.px 12)
             ]
         ]
-        [ case viewPanel of
+        [ case model.viewPanel of
             Building example options ->
                 animatedBuildingView example options
 
-            BuildError error ->
-                text "Shit something happened"
+            BuildError exampleError ->
+                exampleErrorToView exampleError
 
             _ ->
                 text ""
+        ]
+
+
+exampleErrorToView : Example.ExampleError -> Styled.Html msg
+exampleErrorToView exampleError =
+    case exampleError of
+        Example.AuthorAndPackageNotFound author package ->
+            Bummer.view (authorAndPackageNotFoundErrorView author package)
+
+        _ ->
+            Bummer.view (text "some stuff")
+
+
+authorAndPackageNotFoundErrorView : Author -> Package -> Styled.Html msg
+authorAndPackageNotFoundErrorView author package =
+    div []
+        [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+            [ text "We can’t seem to find the exhibitionist "
+            , Paragraph.view
+                (Paragraph.default
+                    |> Paragraph.style Paragraph.Intro
+                    |> Paragraph.inline True
+                )
+                [ text <| Author.toString author ]
+            , text " or the "
+            , Paragraph.view
+                (Paragraph.default
+                    |> Paragraph.style Paragraph.Intro
+                    |> Paragraph.inline True
+                )
+                [ text <| Package.toString package ]
+            , text " exhibit."
+            ]
+        , Paragraph.view Paragraph.default [ text "You can search for other exhibits ", text "here", text " or check out some of our personal favourites below." ]
         ]
 
 
