@@ -68,7 +68,6 @@ mapTagToExampleError tag =
 errorBodyDecoder : Decoder ErrorBody
 errorBodyDecoder =
     Decode.succeed ErrorBody
-        |> required "statusCode" Decode.int
         |> required "tag" (Decode.string |> Decode.andThen mapTagToExampleError)
 
 
@@ -80,8 +79,8 @@ decodeResponseString response =
                 Ok errorBody ->
                     Err errorBody.tag
 
-                Err _ ->
-                    Err KeineAhnung
+                Err err ->
+                    Err KeineAhnung |> Debug.log (Decode.errorToString err)
 
         Http.GoodStatus_ _ body ->
             case Decode.decodeString examplesDecoder body of

@@ -156,14 +156,6 @@ centerContent viewPanel =
 
 animatedBuildingView : Example -> ViewPanelOptions -> Styled.Html Msg
 animatedBuildingView example viewPanelOptions =
-    let
-        ( resolvedColor, resolvedColorMsg, resolvedColorButtonText ) =
-            if viewPanelOptions.animationColors then
-                ( ElmLogo.Official, DesaturateLogoColors, "Desaturate animation color" )
-
-            else
-                ( ElmLogo.CustomColor exColorColt200, SaturateLogoColors, "Saturate animation color" )
-    in
     div []
         [ div
             [ StyledAttribs.css <|
@@ -179,8 +171,7 @@ animatedBuildingView example viewPanelOptions =
         , div
             [ StyledAttribs.css ([ Css.top (Css.pct 30) ] ++ CommonStyles.absoluteCenterHorizontal) ]
             [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center, Css.flexDirection Css.column ] ]
-                [ --Button.view (Button.secondary |> Button.onClick resolvedColorMsg) resolvedColorButtonText
-                  div
+                [ div
                     [ StyledAttribs.css [ Css.minWidth (Css.px centerContentWidth), Css.displayFlex, Css.justifyContent Css.center ] ]
                     [ span [] [ Heading.view Heading.h4 ("Building example " ++ example.name) ] ]
                 ]
@@ -498,7 +489,7 @@ update msg model =
             ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none )
 
         CompletedLoadExamples (Err err) ->
-            ( model, Cmd.none )
+            ( { model | examples = Failed, viewPanel = BuildError err }, Cmd.none )
 
         DesaturateLogoColors ->
             let
