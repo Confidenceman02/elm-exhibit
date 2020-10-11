@@ -1,4 +1,4 @@
-module Example exposing (Example, ExampleError, Id, fetch)
+module Example exposing (Example, ExampleError(..), Id, fetch)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
@@ -24,7 +24,7 @@ type ExampleError
     = ExampleBuildFailed
     | AuthorNotFound
     | PackageNotFound
-    | AuthorAndPackageNotFound
+    | AuthorAndPackageNotFound Author Package
     | KeineAhnung
 
 
@@ -46,8 +46,8 @@ examplesDecoder =
     Decode.field "examples" (Decode.list exampleDecoder)
 
 
-mapTagToExampleError : String -> Decoder ExampleError
-mapTagToExampleError tag =
+mapTagToExampleError : Author -> Package -> String -> Decoder ExampleError
+mapTagToExampleError author package tag =
     case tag of
         "ExampleBuildFailed" ->
             Decode.succeed ExampleBuildFailed
@@ -59,28 +59,28 @@ mapTagToExampleError tag =
             Decode.succeed PackageNotFound
 
         "AuthorAndPackageNotFound" ->
-            Decode.succeed AuthorAndPackageNotFound
+            Decode.succeed (AuthorAndPackageNotFound author package)
 
         _ ->
             Decode.succeed KeineAhnung
 
 
-errorBodyDecoder : Decoder ErrorBody
-errorBodyDecoder =
+errorBodyDecoder : Author -> Package -> Decoder ErrorBody
+errorBodyDecoder author package =
     Decode.succeed ErrorBody
-        |> required "tag" (Decode.string |> Decode.andThen mapTagToExampleError)
+        |> required "tag" (Decode.string |> Decode.andThen (mapTagToExampleError author package))
 
 
-decodeResponseString : Response String -> Result ExampleError (List Example)
-decodeResponseString response =
+decodeResponseString : Author -> Package -> Response String -> Result ExampleError (List Example)
+decodeResponseString author package response =
     case response of
         Http.BadStatus_ _ body ->
-            case Decode.decodeString errorBodyDecoder body of
+            case Decode.decodeString (errorBodyDecoder author package) body of
                 Ok errorBody ->
                     Err errorBody.tag
 
                 Err err ->
-                    Err KeineAhnung |> Debug.log (Decode.errorToString err)
+                    Err KeineAhnung
 
         Http.GoodStatus_ _ body ->
             case Decode.decodeString examplesDecoder body of
@@ -101,4 +101,4 @@ fetch toMsg author package =
             [ Author.toQueryParam author, Package.toQueryParam package ]
         )
         toMsg
-        decodeResponseString
+        (decodeResponseString author package)
