@@ -2,11 +2,11 @@ module Example exposing (Example, ExampleError(..), Id, fetch)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
-import Author exposing (Author)
+import Author as Author exposing (Author)
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
-import Package exposing (Package)
+import Package as Package exposing (Package)
 
 
 type Id
@@ -22,15 +22,18 @@ type alias Example =
 
 type ExampleError
     = ExampleBuildFailed
-    | AuthorNotFound
+    | AuthorNotFound Author Package FoundAuthor
     | PackageNotFound
     | AuthorAndPackageNotFound Author Package
     | KeineAhnung
 
 
-type alias ErrorBody =
-    { tag : ExampleError
-    }
+
+-- So we found the package but it has a different author
+
+
+type alias FoundAuthor =
+    Author
 
 
 exampleDecoder : Decoder Example
@@ -46,6 +49,11 @@ examplesDecoder =
     Decode.field "examples" (Decode.list exampleDecoder)
 
 
+authorNotFoundDecoder : Decoder Author
+authorNotFoundDecoder =
+    Decode.at [ "foundAuthor" ] Author.decoder
+
+
 mapTagToExampleError : Author -> Package -> String -> Decoder ExampleError
 mapTagToExampleError author package tag =
     case tag of
@@ -53,7 +61,7 @@ mapTagToExampleError author package tag =
             Decode.succeed ExampleBuildFailed
 
         "AuthorNotFound" ->
-            Decode.succeed AuthorNotFound
+            Decode.map (AuthorNotFound author package) authorNotFoundDecoder
 
         "PackageNotFound" ->
             Decode.succeed PackageNotFound
@@ -65,10 +73,10 @@ mapTagToExampleError author package tag =
             Decode.succeed KeineAhnung
 
 
-errorBodyDecoder : Author -> Package -> Decoder ErrorBody
+errorBodyDecoder : Author -> Package -> Decoder ExampleError
 errorBodyDecoder author package =
-    Decode.succeed ErrorBody
-        |> required "tag" (Decode.string |> Decode.andThen (mapTagToExampleError author package))
+    Decode.field "tag" Decode.string
+        |> Decode.andThen (mapTagToExampleError author package)
 
 
 decodeResponseString : Author -> Package -> Response String -> Result ExampleError (List Example)
@@ -77,7 +85,7 @@ decodeResponseString author package response =
         Http.BadStatus_ _ body ->
             case Decode.decodeString (errorBodyDecoder author package) body of
                 Ok errorBody ->
-                    Err errorBody.tag
+                    Err errorBody
 
                 Err err ->
                     Err KeineAhnung

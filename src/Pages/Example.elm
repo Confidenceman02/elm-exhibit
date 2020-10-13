@@ -177,6 +177,9 @@ exampleErrorToView exampleError =
         Example.AuthorAndPackageNotFound author package ->
             Bummer.view (authorAndPackageNotFoundErrorView author package)
 
+        Example.AuthorNotFound author package foundAuthor ->
+            text "AuthorNotFound"
+
         _ ->
             Bummer.view (text "some stuff")
 
