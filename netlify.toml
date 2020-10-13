@@ -6,3 +6,4 @@
   publish = "dist"
   command = "yarn parcel index.html"
   functions = "built-lambda"
+  framework = "parcel"
