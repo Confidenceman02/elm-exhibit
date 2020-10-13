@@ -2,6 +2,7 @@ module Header exposing (example, home, navBottomBorder, navHeight, view)
 
 import Author exposing (Author)
 import Components.ElmLogo as ElmLogo
+import Components.Link as Link
 import Css as Css
 import Html.Styled as Styled exposing (a, div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs exposing (href)
@@ -100,20 +101,15 @@ nav config =
 
 homeLink : Styled.Html msg
 homeLink =
-    div [ StyledAttribs.css [ Css.displayFlex ] ]
-        [ a
-            [ href "/"
-            , StyledAttribs.css
-                [ Css.textDecoration Css.none
-                , Css.marginRight (Css.px 32)
-                , Css.displayFlex
-                , Css.alignItems Css.center
-                , Css.color Css.inherit
+    div [ StyledAttribs.css [ Css.displayFlex, Css.marginRight (Css.px 32) ] ]
+        [ Link.view (Link.default |> Link.href "/")
+            (Link.htmlBody
+                [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
+                    [ ElmLogo.view <| ElmLogo.static
+                    , appTitle
+                    ]
                 ]
-            ]
-            [ ElmLogo.view <| ElmLogo.static
-            , appTitle
-            ]
+            )
         ]
 
 

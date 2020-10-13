@@ -4,6 +4,7 @@ import Author exposing (Author)
 import Components.Button as Button
 import Components.ElmLogo as ElmLogo
 import Components.Heading as Heading
+import Components.Link as Link
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css as Css
@@ -200,7 +201,11 @@ authorAndPackageNotFoundErrorView author package =
                 [ text <| Package.toString package ]
             , text " exhibit."
             ]
-        , Paragraph.view Paragraph.default [ text "You can search for other exhibits ", text "here", text " or check out some of our personal favourites below." ]
+        , Paragraph.view Paragraph.default
+            [ text "You can search for other exhibits "
+            , Link.view Link.default (Link.stringBody "here")
+            , text " or check out some of our personal favourites below."
+            ]
         ]
 
 
