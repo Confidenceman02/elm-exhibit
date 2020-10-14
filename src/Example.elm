@@ -1,4 +1,4 @@
-module Example exposing (Example, ExampleError(..), Id, fetch)
+module Example exposing (Example, ExampleError(..), FoundAuthor, Id, fetch)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint

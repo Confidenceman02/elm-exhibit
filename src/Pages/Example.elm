@@ -15,7 +15,7 @@ import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Markdown as Markdown
 import Package exposing (Package)
-import Pages.Errors.Bummer as Bummer
+import Pages.Errors.Errors as ErrorPage
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
@@ -175,41 +175,71 @@ exampleErrorToView : Example.ExampleError -> Styled.Html msg
 exampleErrorToView exampleError =
     case exampleError of
         Example.AuthorAndPackageNotFound author package ->
-            Bummer.view (authorAndPackageNotFoundErrorView author package)
+            ErrorPage.view
+                (ErrorPage.bummer
+                    |> ErrorPage.content (authorAndPackageNotFoundErrorView author package)
+                )
 
         Example.AuthorNotFound author package foundAuthor ->
-            text "AuthorNotFound"
+            ErrorPage.view
+                (ErrorPage.weird |> ErrorPage.content (authorNotFoundView author package foundAuthor))
 
         _ ->
-            Bummer.view (text "some stuff")
+            text "some stuff"
 
 
-authorAndPackageNotFoundErrorView : Author -> Package -> Styled.Html msg
-authorAndPackageNotFoundErrorView author package =
-    div []
-        [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
-            [ text "We can’t seem to find the exhibitionist "
-            , Paragraph.view
-                (Paragraph.default
-                    |> Paragraph.style Paragraph.Intro
-                    |> Paragraph.inline True
-                )
-                [ text <| Author.toString author ]
-            , text " or the "
-            , Paragraph.view
-                (Paragraph.default
-                    |> Paragraph.style Paragraph.Intro
-                    |> Paragraph.inline True
-                )
-                [ text <| Package.toString package ]
-            , text " exhibit."
-            ]
+authorNotFoundView : Author -> Package -> Example.FoundAuthor -> List (Styled.Html msg)
+authorNotFoundView author package foundAuthor =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We can't seem to find the exhibitionist "
+        , Paragraph.view
+            (Paragraph.default
+                |> Paragraph.style Paragraph.Intro
+                |> Paragraph.inline True
+            )
+            [ text <| Author.toString author ]
+        , text "."
         , Paragraph.view Paragraph.default
-            [ text "You can search for other exhibits "
+            [ text "Looks like the "
+            , text <| Package.toString package
+            , text " exhibit belongs to "
+            , text (Author.toString foundAuthor)
+            , text " though."
+            ]
+        , Paragraph.view Paragraph.default [ text "Is that who you meant?" ]
+        , Paragraph.view Paragraph.default
+            [ text "Check out the exhibit "
             , Link.view Link.default (Link.stringBody "here")
-            , text " or check out some of our personal favourites below."
             ]
         ]
+    ]
+
+
+authorAndPackageNotFoundErrorView : Author -> Package -> List (Styled.Html msg)
+authorAndPackageNotFoundErrorView author package =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We can’t seem to find the exhibitionist "
+        , Paragraph.view
+            (Paragraph.default
+                |> Paragraph.style Paragraph.Intro
+                |> Paragraph.inline True
+            )
+            [ text <| Author.toString author ]
+        , text " or the "
+        , Paragraph.view
+            (Paragraph.default
+                |> Paragraph.style Paragraph.Intro
+                |> Paragraph.inline True
+            )
+            [ text <| Package.toString package ]
+        , text " exhibit."
+        ]
+    , Paragraph.view Paragraph.default
+        [ text "You can search for other exhibits "
+        , Link.view Link.default (Link.stringBody "here")
+        , text " or check out some of our personal favourites below."
+        ]
+    ]
 
 
 animatedBuildingView : Example -> ViewPanelOptions -> Styled.Html Msg
