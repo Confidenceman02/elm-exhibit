@@ -86,7 +86,6 @@ init author package context =
       , viewPanel = Idle
       , context = context
       }
-      --  fetch examples
     , Example.fetch CompletedLoadExamples author package
     )
 
@@ -94,9 +93,6 @@ init author package context =
 view : Model -> { title : String, content : Styled.Html Msg }
 view model =
     let
-        descriptionOpen =
-            model.descriptionPanel == Open
-
         examplesExist =
             case model.examples of
                 Failed ->
@@ -160,8 +156,8 @@ centerContent model =
             ]
         ]
         [ case model.viewPanel of
-            Building example options ->
-                animatedBuildingView example options
+            Building example _ ->
+                animatedBuildingView example
 
             BuildError exampleError ->
                 exampleErrorToView exampleError
@@ -184,8 +180,31 @@ exampleErrorToView exampleError =
             ErrorPage.view
                 (ErrorPage.weird |> ErrorPage.content (authorNotFoundView author package foundAuthor))
 
+        Example.PackageNotFound author package ->
+            ErrorPage.view (ErrorPage.weird |> ErrorPage.content (packageNotFoundView author package))
+
         _ ->
             text "some stuff"
+
+
+packageNotFoundView : Author -> Package -> List (Styled.Html msg)
+packageNotFoundView author package =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We can't seem to find the exhibit "
+        , text <| Package.toString package
+        , text "."
+        , Paragraph.view Paragraph.default [ text <| Author.toString author, text " has some other exhibits you might like to checkout though. " ]
+        , Paragraph.view Paragraph.default
+            [ text "See them "
+            , Link.view
+                (Link.default
+                    |> Link.href "/"
+                )
+                (Link.stringBody "here")
+            , text "."
+            ]
+        ]
+    ]
 
 
 authorNotFoundView : Author -> Package -> Example.FoundAuthor -> List (Styled.Html msg)
@@ -196,12 +215,7 @@ authorNotFoundView author package foundAuthor =
     in
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can't seem to find the exhibitionist "
-        , Paragraph.view
-            (Paragraph.default
-                |> Paragraph.style Paragraph.Intro
-                |> Paragraph.inline True
-            )
-            [ text <| Author.toString author ]
+        , text <| Author.toString author
         , text "."
         , Paragraph.view Paragraph.default
             [ text "Looks like the "
@@ -250,8 +264,8 @@ authorAndPackageNotFoundErrorView author package =
     ]
 
 
-animatedBuildingView : Example -> ViewPanelOptions -> Styled.Html Msg
-animatedBuildingView example viewPanelOptions =
+animatedBuildingView : Example -> Styled.Html Msg
+animatedBuildingView example =
     div []
         [ div
             [ StyledAttribs.css <|

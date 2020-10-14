@@ -23,7 +23,7 @@ type alias Example =
 type ExampleError
     = ExampleBuildFailed
     | AuthorNotFound Author Package FoundAuthor
-    | PackageNotFound
+    | PackageNotFound Author Package
     | AuthorAndPackageNotFound Author Package
     | KeineAhnung
 
@@ -64,7 +64,7 @@ mapTagToExampleError author package tag =
             Decode.map (AuthorNotFound author package) authorNotFoundDecoder
 
         "PackageNotFound" ->
-            Decode.succeed PackageNotFound
+            Decode.succeed (PackageNotFound author package)
 
         "AuthorAndPackageNotFound" ->
             Decode.succeed (AuthorAndPackageNotFound author package)

@@ -23,7 +23,7 @@ export async function handler(event: APIGatewayEvent, context: Context) {
   }
 
   if (params.author && params.package) {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "AuthorNotFound", foundAuthor: "Confidenceman03" } )
+    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "PackageNotFound" } )
     // return {
     //   statusCode: StatusCodes.OK,
     //   body: JSON.stringify({examples: examples}),
