@@ -190,6 +190,10 @@ exampleErrorToView exampleError =
 
 authorNotFoundView : Author -> Package -> Example.FoundAuthor -> List (Styled.Html msg)
 authorNotFoundView author package foundAuthor =
+    let
+        resolvedExhibitHref =
+            "/" ++ String.join "/" [ "example", Author.toString foundAuthor, Package.toString package ]
+    in
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can't seem to find the exhibitionist "
         , Paragraph.view
@@ -209,7 +213,11 @@ authorNotFoundView author package foundAuthor =
         , Paragraph.view Paragraph.default [ text "Is that who you meant?" ]
         , Paragraph.view Paragraph.default
             [ text "Check out the exhibit "
-            , Link.view Link.default (Link.stringBody "here")
+            , Link.view
+                (Link.default
+                    |> Link.href resolvedExhibitHref
+                )
+                (Link.stringBody "here")
             ]
         ]
     ]
