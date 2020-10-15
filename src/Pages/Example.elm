@@ -164,15 +164,15 @@ centerContent model =
                 animatedBuildingView example
 
             BuildError exampleError ->
-                exampleErrorToView exampleError
+                exampleErrorToView model.examples exampleError
 
             _ ->
                 text ""
         ]
 
 
-exampleErrorToView : Example.ExampleError -> Styled.Html msg
-exampleErrorToView exampleError =
+exampleErrorToView : Status ( SelectedExample, List Example.Example ) -> Example.ExampleError -> Styled.Html msg
+exampleErrorToView examples exampleError =
     case exampleError of
         Example.AuthorAndPackageNotFound author package ->
             ErrorPage.view
@@ -187,8 +187,21 @@ exampleErrorToView exampleError =
         Example.PackageNotFound author package ->
             ErrorPage.view (ErrorPage.weird |> ErrorPage.content (packageNotFoundView author package))
 
+        Example.KeineAhnung ->
+            ErrorPage.view (ErrorPage.ourBad |> ErrorPage.content keineAhnungView)
+
         _ ->
-            text "some stuff"
+            text "ExampleBuildFailed"
+
+
+keineAhnungView : List (Styled.Html msg)
+keineAhnungView =
+    [ Paragraph.view
+        (Paragraph.default
+            |> Paragraph.style Paragraph.Intro
+        )
+        [ text "We aren't exactly sure what happened but we're really sorry!" ]
+    ]
 
 
 packageNotFoundView : Author -> Package -> List (Styled.Html msg)
@@ -591,40 +604,51 @@ update msg model =
 
         CompletedLoadExamples (Ok examples) ->
             let
-                ( resolvedExamples, resolvedViewPanel ) =
+                ( resolvedExamples, resolvedViewPanel, exampleCmd ) =
                     case examples of
                         -- preselect the first example by default
                         head :: _ ->
-                            ( Loaded ( SelectedExample head, examples ), Building head defaultViewPanelOptions )
+                            ( Loaded ( SelectedExample head, examples )
+                            , Building head defaultViewPanelOptions
+                              -- send build example request
+                            , Example.build CompletedBuildExample model.author model.package head
+                            )
 
                         [] ->
-                            ( StatusIdle, Idle )
+                            ( StatusIdle, Idle, Cmd.none )
             in
-            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none )
+            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, exampleCmd )
 
         CompletedLoadExamples (Err err) ->
             ( { model | examples = Failed, viewPanel = BuildError err }, Cmd.none )
 
-        DesaturateLogoColors ->
-            let
-                resolvedViePanel =
-                    case model.viewPanel of
-                        Building example options ->
-                            Building example { options | animationColors = False }
+        CompletedBuildExample (Ok compiledExample) ->
+            ( model, Cmd.none ) |> Debug.log "YEAAAAAPP"
 
-                        _ ->
-                            model.viewPanel
-            in
-            ( { model | viewPanel = resolvedViePanel }, Cmd.none )
+        CompletedBuildExample (Err err) ->
+            ( model, Cmd.none )
 
-        SaturateLogoColors ->
-            let
-                resolvedViePanel =
-                    case model.viewPanel of
-                        Building example options ->
-                            Building example { options | animationColors = True }
 
-                        _ ->
-                            model.viewPanel
-            in
-            ( { model | viewPanel = resolvedViePanel }, Cmd.none )
+
+--DesaturateLogoColors ->
+--    let
+--        resolvedViePanel =
+--            case model.viewPanel of
+--                Building example options ->
+--                    Building example { options | animationColors = False }
+--
+--                _ ->
+--                    model.viewPanel
+--    in
+--    ( { model | viewPanel = resolvedViePanel }, Cmd.none )
+--SaturateLogoColors ->
+--    let
+--        resolvedViePanel =
+--            case model.viewPanel of
+--                Building example options ->
+--                    Building example { options | animationColors = True }
+--
+--                _ ->
+--                    model.viewPanel
+--    in
+--    ( { model | viewPanel = resolvedViePanel }, Cmd.none )
