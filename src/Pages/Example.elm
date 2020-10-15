@@ -32,7 +32,7 @@ toContext model =
 
 type alias Model =
     { author : Author
-    , packageName : Package
+    , package : Package
     , examples : Status ( SelectedExample, List Example.Example )
     , descriptionPanel : DescriptionPanel
     , viewPanel : ViewPanel
@@ -73,14 +73,18 @@ type Msg
     = ToggleDescriptionPanel
     | SelectExample Example
     | CompletedLoadExamples (Result Example.ExampleError (List Example))
-    | DesaturateLogoColors
-    | SaturateLogoColors
+    | CompletedBuildExample (Result Example.ExampleError Example.CompiledExample)
+
+
+
+--| DesaturateLogoColors
+--| SaturateLogoColors
 
 
 init : Author -> Package -> Context -> ( Model, Cmd Msg )
 init author package context =
     ( { author = author
-      , packageName = package
+      , package = package
       , examples = Loading
       , descriptionPanel = Closed
       , viewPanel = Idle
