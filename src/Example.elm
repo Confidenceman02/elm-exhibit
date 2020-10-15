@@ -1,4 +1,4 @@
-module Example exposing (Example, ExampleError(..), FoundAuthor, Id, fetch)
+module Example exposing (CompiledExample, Example, ExampleError(..), FoundAuthor, Id, build, fetch)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
@@ -7,6 +7,7 @@ import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import Package as Package exposing (Package)
+import Url.Builder as UrlBuilder exposing (QueryParameter)
 
 
 type Id
@@ -18,6 +19,10 @@ type alias Example =
     , name : String
     , description : String
     }
+
+
+type CompiledExample
+    = CompiledExample String
 
 
 type ExampleError
@@ -47,6 +52,11 @@ exampleDecoder =
 examplesDecoder : Decoder (List Example)
 examplesDecoder =
     Decode.field "examples" (Decode.list exampleDecoder)
+
+
+compiledExample : Decoder CompiledExample
+compiledExample =
+    Decode.map CompiledExample Decode.string
 
 
 authorNotFoundDecoder : Decoder Author
@@ -79,27 +89,32 @@ errorBodyDecoder author package =
         |> Decode.andThen (mapTagToExampleError author package)
 
 
-decodeResponseString : Author -> Package -> Response String -> Result ExampleError (List Example)
-decodeResponseString author package response =
+decodeResponseString : Author -> Package -> Decoder a -> Response String -> Result ExampleError a
+decodeResponseString author package decoder response =
     case response of
         Http.BadStatus_ _ body ->
             case Decode.decodeString (errorBodyDecoder author package) body of
                 Ok errorBody ->
                     Err errorBody
 
-                Err err ->
-                    Err KeineAhnung
-
-        Http.GoodStatus_ _ body ->
-            case Decode.decodeString examplesDecoder body of
-                Ok decodedBody ->
-                    Ok decodedBody
-
                 Err _ ->
                     Err KeineAhnung
 
+        Http.GoodStatus_ _ body ->
+            case Decode.decodeString decoder body of
+                Ok decodedBody ->
+                    Ok decodedBody
+
+                Err err ->
+                    Err KeineAhnung |> Debug.log (Decode.errorToString err)
+
         _ ->
             Err KeineAhnung
+
+
+nameQueryToParam : Example -> QueryParameter
+nameQueryToParam example =
+    UrlBuilder.string "example" example.name
 
 
 fetch : (Result ExampleError (List Example) -> msg) -> Author -> Package -> Cmd msg
@@ -109,4 +124,14 @@ fetch toMsg author package =
             [ Author.toQueryParam author, Package.toQueryParam package ]
         )
         toMsg
-        (decodeResponseString author package)
+        (decodeResponseString author package examplesDecoder)
+
+
+build : (Result ExampleError CompiledExample -> msg) -> Author -> Package -> Example -> Cmd msg
+build toMsg author package example =
+    Api.get
+        (Endpoint.lambdaUrl [ "build-example" ]
+            [ Author.toQueryParam author, Package.toQueryParam package, nameQueryToParam example ]
+        )
+        toMsg
+        (decodeResponseString author package compiledExample)

@@ -1,4 +1,4 @@
-module Pages.Errors.Errors exposing (bummer, content, view, weird)
+module Pages.Errors.Errors exposing (bummer, content, oops, ourBad, view, weird)
 
 import Components.ElmLogo as ElmLogo
 import Components.Heading as Heading

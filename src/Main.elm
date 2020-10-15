@@ -81,7 +81,7 @@ view model =
     in
     case model of
         Examples examplesModel ->
-            viewPage (Page.Examples examplesModel.author examplesModel.packageName) GotExamplesMsg (ExamplesPage.view examplesModel)
+            viewPage (Page.Examples examplesModel.author examplesModel.package) GotExamplesMsg (ExamplesPage.view examplesModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
