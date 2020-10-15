@@ -1,13 +1,9 @@
 import examples from "../data/examples.json";
 import {APIGatewayEvent, Context} from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
+import { errorResponse } from "./common";
+import {ResponseBody} from "./types";
 
-type ErrorTag  =
-  { tag: "ExampleBuildFailed" }
-  | { tag: "AuthorNotFound", foundAuthor: string }
-  | { tag: "PackageNotFound" }
-  | { tag: "AuthorAndPackageNotFound" }
-  | { tag: "KeineAhnung" }
 
 interface ErrorBody
   {
@@ -15,7 +11,7 @@ interface ErrorBody
     body: string;
   }
 
-export async function handler(event: APIGatewayEvent, context: Context) {
+export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const params = event.queryStringParameters;
 
   if (!params) {
@@ -23,22 +19,14 @@ export async function handler(event: APIGatewayEvent, context: Context) {
   }
 
   if (params.author && params.package) {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "PackageNotFound" } )
-    // return {
-    //   statusCode: StatusCodes.OK,
-    //   body: JSON.stringify({examples: examples}),
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   }
-    // }
+    return {
+      statusCode: StatusCodes.OK,
+      body: JSON.stringify({examples: examples}),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
   } else {
     return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
-  }
-}
-
-function errorResponse(statusCode: StatusCodes, error: ErrorTag): ErrorBody {
-  return {
-    statusCode: statusCode,
-    body: JSON.stringify(error)
   }
 }
