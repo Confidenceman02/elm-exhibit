@@ -22,6 +22,8 @@ type alias Configuration msg =
 type Variant
     = Bummer
     | Weird
+    | OurBad
+    | Oops
 
 
 defaults : Configuration msg
@@ -47,6 +49,22 @@ weird =
         }
 
 
+ourBad : Config msg
+ourBad =
+    Config
+        { defaults
+            | variant = OurBad
+        }
+
+
+oops : Config msg
+oops =
+    Config
+        { defaults
+            | variant = Oops
+        }
+
+
 
 -- MODIFIERS
 
@@ -66,6 +84,12 @@ view (Config config) =
 
                 Weird ->
                     "Weird.."
+
+                OurBad ->
+                    "Our bad.."
+
+                Oops ->
+                    "Oops.."
     in
     div
         [ StyledAttribs.css
