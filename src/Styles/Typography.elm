@@ -8,7 +8,7 @@ module Styles.Typography exposing
     , exTypographyParagraphIntroFontSize
     )
 
-import Css exposing (IntOrAuto, Rem)
+import Css exposing (Rem)
 
 
 exTypographyButtonSecondaryFontSize : Rem
