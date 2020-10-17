@@ -1,10 +1,22 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
-import { errorResponse } from "./common";
+import {errorResponse, removeWhiteSpace} from "./common";
 import { promises as fs } from "fs";
 import path from "path";
 import { minify } from "html-minifier";
 import { ResponseBody } from "./types";
+import redis from "redis";
+
+const redisPort = process.env.REDIS_SERVICE_PORT ? process.env.REDIS_SERVICE_PORT : "0"
+
+const client = redis.createClient({
+  host: process.env.REDIS_SERVICE_IP,
+  port: parseInt(redisPort)
+})
+
+function getCacheKey(author: string, pkg: string, example: string): string {
+  return removeWhiteSpace(`${author}-${pkg}-${example}-compiled`)
+}
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const params = event.queryStringParameters;

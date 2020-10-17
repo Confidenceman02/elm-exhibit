@@ -10,3 +10,7 @@ export function errorResponse(statusCode: StatusCodes, error: ErrorBody): Respon
     }
   }
 }
+
+export function removeWhiteSpace(value: string): string {
+  return value.replace(/\\s/g, '')
+}
