@@ -1,13 +1,17 @@
-module Header exposing (example, home, navBottomBorder, navHeight, view)
+module Header exposing (example, home, navBottomBorder, navHeight, session, view)
 
 import Author exposing (Author)
+import Components.Button as Button
 import Components.ElmLogo as ElmLogo
+import Components.GithubLogo as GithubLogo
 import Components.Link as Link
 import Css as Css
 import Html.Styled as Styled exposing (a, div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs exposing (href)
 import Package exposing (Package)
+import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
+import Styles.Common exposing (absoluteCenterHorizontal, absoluteCenterVertical)
 
 
 navHeight : Float
@@ -29,8 +33,15 @@ type Variant
     | Home
 
 
+type GitAuth
+    = LoggedIn
+    | LoggedOut
+    | None
+
+
 type alias Configuration =
     { variant : Variant
+    , session : Maybe Session
     }
 
 
@@ -44,6 +55,7 @@ type alias PackageConfiguration =
 defaultConfig : Configuration
 defaultConfig =
     { variant = Home
+    , session = Nothing
     }
 
 
@@ -54,6 +66,11 @@ defaultConfig =
 example : Author -> Package -> Config
 example author package =
     Config { defaultConfig | variant = Example author package }
+
+
+session : Session -> Config -> Config
+session sesh (Config config) =
+    Config { config | session = Just sesh }
 
 
 home : Config
@@ -71,9 +88,23 @@ view (Config config) =
             , Css.backgroundColor exColorSky600
             , Css.overflowX Css.hidden
             , Css.borderBottom3 (Css.px navBottomBorder) Css.solid exColorSky700
+            , Css.height (Css.px navHeight)
             ]
         ]
-        [ nav config ]
+        [ div [ StyledAttribs.css absoluteCenterHorizontal ]
+            [ nav config
+
+            --, div [ StyledAttribs.css ([ Css.top (Css.px 0), Css.right (Css.px 0) ] ++ absoluteCenterVertical) ]
+            --    [ GithubLogo.view GithubLogo.default ]
+            ]
+        , sessionActionView
+        ]
+
+
+sessionActionView : Styled.Html msg
+sessionActionView =
+    div [ StyledAttribs.css ([ Css.top (Css.px 0), Css.right (Css.px 2) ] ++ absoluteCenterVertical) ]
+        [ Button.view (Button.wrapper [ GithubLogo.view GithubLogo.default ]) "Sign in with github" ]
 
 
 nav : Configuration -> Styled.Html msg
@@ -81,27 +112,24 @@ nav config =
     div
         [ StyledAttribs.css
             [ Css.color exColorWhite
-            , Css.maxWidth (Css.px 920)
-            , Css.height (Css.px navHeight)
-            , Css.margin2 (Css.px 0) Css.auto
             , Css.displayFlex
             , Css.alignItems Css.center
-            , Css.justifyContent Css.center
             ]
         ]
-        [ homeLink
+        [ shadowHomeLink
         , case config.variant of
             Example author package ->
                 exampleTitle author package
 
             _ ->
                 text ""
+        , homeLink
         ]
 
 
 homeLink : Styled.Html msg
 homeLink =
-    div [ StyledAttribs.css [ Css.displayFlex, Css.marginRight (Css.px 32) ] ]
+    div [ StyledAttribs.css [ Css.position Css.absolute ] ]
         [ Link.view (Link.default |> Link.href "/")
             (Link.htmlBody
                 [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
@@ -110,6 +138,16 @@ homeLink =
                     ]
                 ]
             )
+        ]
+
+
+shadowHomeLink : Styled.Html msg
+shadowHomeLink =
+    div [ StyledAttribs.css [ Css.displayFlex, Css.marginRight (Css.px 32), Css.visibility Css.hidden ] ]
+        [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
+            [ ElmLogo.view <| ElmLogo.static
+            , appTitle
+            ]
         ]
 
 
