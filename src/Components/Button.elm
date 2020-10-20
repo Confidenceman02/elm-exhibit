@@ -1,4 +1,4 @@
-module Components.Button exposing (Icon(..), Orientation(..), icon, onClick, secondary, view)
+module Components.Button exposing (Icon(..), Orientation(..), icon, onClick, secondary, view, wrapper)
 
 import Css exposing (Style)
 import Html.Styled as Styled exposing (button, span, text)
@@ -12,9 +12,10 @@ import Svg.Styled exposing (polygon, svg)
 import Svg.Styled.Attributes as SvgAttribs exposing (height, points, viewBox)
 
 
-type Variant
+type Variant msg
     = Secondary
     | IconButton Icon
+    | Wrapper (List (Styled.Html msg))
 
 
 type Icon
@@ -26,7 +27,7 @@ type Config msg
 
 
 type alias Configuration msg =
-    { variant : Variant
+    { variant : Variant msg
     , onClick : Maybe msg
     }
 
@@ -53,6 +54,11 @@ icon iconType =
     Config { defaults | variant = IconButton iconType }
 
 
+wrapper : List (Styled.Html msg) -> Config msg
+wrapper content =
+    Config { defaults | variant = Wrapper content }
+
+
 view : Config msg -> String -> Styled.Html msg
 view (Config config) label =
     let
@@ -74,6 +80,9 @@ view (Config config) label =
                 IconButton _ ->
                     iconStyles
 
+                Wrapper content ->
+                    wrapperStyles
+
         resolveButtonBody =
             case config.variant of
                 Secondary ->
@@ -89,6 +98,9 @@ view (Config config) label =
 
                 IconButton (Triangle orientation) ->
                     [ triangle orientation ]
+
+                Wrapper content ->
+                    content
     in
     button
         ([ StyledAttribs.css resolveStyles ] ++ eventAttribs)
@@ -151,6 +163,17 @@ iconStyles =
     , Css.left (Css.px 0)
     , Css.marginLeft (Grid.calc Grid.grid Grid.divide -1)
     , Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
+    ]
+
+
+wrapperStyles : List Style
+wrapperStyles =
+    [ Css.backgroundColor Css.transparent
+    , Css.padding (Css.px 0)
+    , Css.border (Css.px 0)
+    , Css.property "padding" (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
+    , Css.borderRadius (Css.px 6)
+    , Css.hover [ Css.backgroundColor (Css.rgba 55 55 55 0.1) ] -- $kz-color-wisteria-100
     ]
 
 
