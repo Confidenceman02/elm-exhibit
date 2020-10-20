@@ -4,6 +4,7 @@ import Author exposing (Author)
 import Components.Button as Button
 import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
+import Components.Heading as Heading
 import Components.Link as Link
 import Css as Css
 import Html.Styled as Styled exposing (a, div, h1, span, text)
@@ -12,6 +13,7 @@ import Package exposing (Package)
 import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Styles.Common exposing (absoluteCenterHorizontal, absoluteCenterVertical)
+import Styles.Grid as Grid
 
 
 navHeight : Float
@@ -93,9 +95,6 @@ view (Config config) =
         ]
         [ div [ StyledAttribs.css absoluteCenterHorizontal ]
             [ nav config
-
-            --, div [ StyledAttribs.css ([ Css.top (Css.px 0), Css.right (Css.px 0) ] ++ absoluteCenterVertical) ]
-            --    [ GithubLogo.view GithubLogo.default ]
             ]
         , sessionActionView
         ]
@@ -103,8 +102,17 @@ view (Config config) =
 
 sessionActionView : Styled.Html msg
 sessionActionView =
-    div [ StyledAttribs.css ([ Css.top (Css.px 0), Css.right (Css.px 2) ] ++ absoluteCenterVertical) ]
-        [ Button.view (Button.wrapper [ GithubLogo.view GithubLogo.default ]) "Sign in with github" ]
+    div [ StyledAttribs.css [ Css.top (Css.px 0), Css.right (Css.px 2), Css.marginRight Grid.halfGrid, Css.position Css.absolute, Css.marginTop (Css.px 5) ] ]
+        [ Button.view
+            (Button.wrapper
+                [ span [ StyledAttribs.css [ Css.alignItems Css.center, Css.displayFlex ] ]
+                    [ span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ] [ Heading.view (Heading.h5 |> Heading.inline True) "Sign in with Github" ]
+                    , GithubLogo.view GithubLogo.default
+                    ]
+                ]
+            )
+            "Sign in with github"
+        ]
 
 
 nav : Configuration -> Styled.Html msg
@@ -116,6 +124,7 @@ nav config =
             , Css.alignItems Css.center
             ]
         ]
+        -- shadowLink is just taking up the space so we can absolutely position the actual home logo link
         [ shadowHomeLink
         , case config.variant of
             Example author package ->
