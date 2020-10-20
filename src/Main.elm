@@ -10,6 +10,7 @@ import Pages.Example as ExamplesPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
+import Session
 import Url exposing (Url)
 
 
@@ -28,8 +29,8 @@ type Model
 
 
 init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init entryData url navKey =
-    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey)
+init _ url navKey =
+    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey Session.init)
 
 
 changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
@@ -81,7 +82,7 @@ view model =
     in
     case model of
         Examples examplesModel ->
-            viewPage (Page.Examples examplesModel.author examplesModel.package) GotExamplesMsg (ExamplesPage.view examplesModel)
+            viewPage (Page.Examples examplesModel.author examplesModel.package examplesModel.context.session) GotExamplesMsg (ExamplesPage.view examplesModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
