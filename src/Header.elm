@@ -1,4 +1,4 @@
-module Header exposing (example, home, navBottomBorder, navHeight, session, view)
+module Header exposing (Config, example, home, navBottomBorder, navHeight, session, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -7,12 +7,13 @@ import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
 import Components.Link as Link
 import Css as Css
-import Html.Styled as Styled exposing (a, div, h1, span, text)
-import Html.Styled.Attributes as StyledAttribs exposing (href)
+import Html.Styled as Styled exposing (div, h1, span, text)
+import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Extra exposing (viewMaybe)
 import Package exposing (Package)
 import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
-import Styles.Common exposing (absoluteCenterHorizontal, absoluteCenterVertical)
+import Styles.Common exposing (absoluteCenterHorizontal)
 import Styles.Grid as Grid
 
 
@@ -96,17 +97,17 @@ view (Config config) =
         [ div [ StyledAttribs.css absoluteCenterHorizontal ]
             [ nav config
             ]
-        , sessionActionView
+        , viewMaybe sessionActionView config.session
         ]
 
 
-sessionActionView : Styled.Html msg
-sessionActionView =
+sessionActionView : Session -> Styled.Html msg
+sessionActionView sesh =
     div [ StyledAttribs.css [ Css.top (Css.px 0), Css.right (Css.px 2), Css.marginRight Grid.halfGrid, Css.position Css.absolute, Css.marginTop (Css.px 5) ] ]
         [ Button.view
             (Button.wrapper
                 [ span [ StyledAttribs.css [ Css.alignItems Css.center, Css.displayFlex ] ]
-                    [ span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ] [ Heading.view (Heading.h5 |> Heading.inline True) "Sign in with Github" ]
+                    [ span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ] [ Heading.view (Heading.h5 |> Heading.inline True) "Log in with Github" ]
                     , GithubLogo.view GithubLogo.default
                     ]
                 ]

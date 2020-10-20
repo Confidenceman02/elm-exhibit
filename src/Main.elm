@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (view)
 
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Nav

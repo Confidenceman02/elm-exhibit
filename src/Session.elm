@@ -10,4 +10,4 @@ type Session
 
 init : Session
 init =
-    CheckingForAuth
+    Guest

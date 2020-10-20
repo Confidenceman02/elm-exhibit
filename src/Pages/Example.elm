@@ -627,28 +627,3 @@ update msg model =
 
         CompletedBuildExample (Err err) ->
             ( model, Cmd.none )
-
-
-
---DesaturateLogoColors ->
---    let
---        resolvedViePanel =
---            case model.viewPanel of
---                Building example options ->
---                    Building example { options | animationColors = False }
---
---                _ ->
---                    model.viewPanel
---    in
---    ( { model | viewPanel = resolvedViePanel }, Cmd.none )
---SaturateLogoColors ->
---    let
---        resolvedViePanel =
---            case model.viewPanel of
---                Building example options ->
---                    Building example { options | animationColors = True }
---
---                _ ->
---                    model.viewPanel
---    in
---    ( { model | viewPanel = resolvedViePanel }, Cmd.none )
