@@ -20,6 +20,7 @@ type Msg
     | ChangedUrl Url
     | GotExamplesMsg ExamplesPage.Msg
     | GotHomeMsg HomePage.Msg
+    | RestoredSession (Result Session.SessionError Session.SessionSuccess)
 
 
 type Model
@@ -35,6 +36,10 @@ init _ url navKey =
 
 changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute context =
+    let
+        sessionIdle =
+            Session.isIdle context.session
+    in
     case maybeRoute of
         Nothing ->
             ( NotFound context, Cmd.none )
@@ -43,8 +48,15 @@ changeRouteTo maybeRoute context =
             let
                 ( model, cmds ) =
                     ExamplesPage.init author package context
+
+                sessionRequest =
+                    if sessionIdle then
+                        Session.refresh RestoredSession
+
+                    else
+                        Cmd.none
             in
-            ( Examples model, Cmd.map GotExamplesMsg cmds )
+            ( Examples model, Cmd.batch [ sessionRequest, Cmd.map GotExamplesMsg cmds ] )
 
         -- TODO: Create home page
         Just Route.Home ->
@@ -108,6 +120,16 @@ update msg model =
 
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) (toContext model)
+
+        ( RestoredSession result, Examples m ) ->
+            let
+                updatedModel =
+                    { m | context = updatedContext m.context }
+
+                updatedContext context =
+                    { context | session = Session.toSession result }
+            in
+            ( Examples updatedModel, Cmd.none ) |> Debug.log "EXAMPLES CONTEXT"
 
         _ ->
             ( model, Cmd.none )
