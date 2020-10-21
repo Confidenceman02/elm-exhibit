@@ -2,13 +2,15 @@ import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import {errorResponse, removeWhiteSpace} from "./common";
 import { promises as fs } from "fs";
+import { Promise } from "bluebird";
 import path from "path";
 import { minify } from "html-minifier";
 import { ResponseBody } from "./types";
-import redis from "redis";
+import redisLib from "redis";
 
 const redisPort = process.env.REDIS_SERVICE_PORT ? process.env.REDIS_SERVICE_PORT : "0"
 
+const redis = Promise.promisifyAll(redisLib)
 const client = redis.createClient({
   host: process.env.REDIS_SERVICE_IP,
   port: parseInt(redisPort)
@@ -25,25 +27,35 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
     return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" } )
   }
 
+  client.on("error", (e) => {
+    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" } )
+  })
+
+
   if (params.author && params.package && params.example) {
-    try {
+    const val = await client.get("happy")
+
+    if (val) {
       // temporary html resolving. Real html will come from elm compiler.
-      const htmlString = await fs.readFile(path.resolve(process.cwd(),'data/basic.html'), "utf-8")
+      // const htmlString = await fs.readFile(path.resolve(process.cwd(),'data/elm.js'), "utf-8")
       // get rid of all the new line characters etc.
-      const minifiedHtml: string = minify(htmlString.toString(), {quoteCharacter: "'", preserveLineBreaks: false, collapseWhitespace: true});
+      // const minifiedHtml: string = htmlString.toString();
 
       return {
         statusCode: StatusCodes.OK,
-        body: JSON.stringify(minifiedHtml),
+        body: "WORKEDJ",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "text/javascript"
         }
       }
-    } catch (e) {
-      return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
     }
-    // check to see if the example is cached
-  } else {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
+    return {
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      body: "NOVALUESON",
+      headers: {
+        "Content-Type": "text/javascript"
+      }
+    }
   }
+  return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
 }

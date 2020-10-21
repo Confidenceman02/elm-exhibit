@@ -14,3 +14,7 @@ export function errorResponse(statusCode: StatusCodes, error: ErrorBody): Respon
 export function removeWhiteSpace(value: string): string {
   return value.replace(/\s/g, '')
 }
+
+export const jsonHeaders = {
+  "Content-Type": "application/json"
+}

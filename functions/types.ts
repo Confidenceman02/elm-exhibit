@@ -1,13 +1,19 @@
 import {StatusCodes} from "http-status-codes";
 
+type NoIdea = { tag: "KeineAhnung" }
+
 export type ExampleErrorBody  =
   { tag: "ExampleBuildFailed" }
   | { tag: "AuthorNotFound", foundAuthor: string }
   | { tag: "PackageNotFound" }
   | { tag: "AuthorAndPackageNotFound" }
-  | { tag: "KeineAhnung" }
+  | NoIdea
 
-export type ErrorBody = ExampleErrorBody
+export type SessionErrorBody =
+  { tag: "RefreshFailed" }
+  | NoIdea
+
+export type ErrorBody = ExampleErrorBody | SessionErrorBody
 
 export type ResponseBody =
   {
