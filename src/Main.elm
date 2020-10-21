@@ -129,7 +129,7 @@ update msg model =
                 updatedContext context =
                     { context | session = Session.toSession result }
             in
-            ( Examples updatedModel, Cmd.none ) |> Debug.log "EXAMPLES CONTEXT"
+            ( Examples updatedModel, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
