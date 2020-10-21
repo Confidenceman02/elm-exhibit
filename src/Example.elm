@@ -106,7 +106,7 @@ decodeResponseString author package decoder response =
                     Ok decodedBody
 
                 Err err ->
-                    Err KeineAhnung |> Debug.log (Decode.errorToString err)
+                    Err KeineAhnung
 
         _ ->
             Err KeineAhnung
