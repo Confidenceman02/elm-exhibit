@@ -1,4 +1,15 @@
-module Session exposing (Session, SessionError, SessionSuccess, init, isIdle, refresh, toSession)
+module Session exposing
+    ( Session
+    , SessionError
+    , SessionSuccess
+    , init
+    , isGuest
+    , isIdle
+    , isRefreshing
+    , isSignedIn
+    , refresh
+    , toSession
+    )
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
@@ -8,11 +19,11 @@ import Viewer exposing (Cred, Viewer)
 
 
 type Session
-    = LoggedIn Viewer
+    = SignedIn Viewer
     | Guest
     | Idle
     | LoggingIn
-    | RestoringSession
+    | Refreshing
 
 
 init : Session
@@ -24,26 +35,16 @@ toSession : Result SessionError SessionSuccess -> Session
 toSession result =
     case result of
         Ok (SessionRefreshed cred) ->
-            LoggedIn (Viewer.init cred)
+            SignedIn (Viewer.init cred)
 
         Ok (SessionGranted cred) ->
-            LoggedIn (Viewer.init cred)
+            SignedIn (Viewer.init cred)
 
         Err RefreshFailed ->
             Guest
 
         _ ->
             Guest
-
-
-isIdle : Session -> Bool
-isIdle sesh =
-    case sesh of
-        Idle ->
-            True
-
-        _ ->
-            False
 
 
 type SessionError
@@ -113,11 +114,57 @@ decodeResponseString decoder response =
             Err KeineAhnung
 
 
-refresh : (Result SessionError SessionSuccess -> msg) -> Cmd msg
+refresh : (Result SessionError SessionSuccess -> msg) -> ( Cmd msg, Session )
 refresh toMsg =
-    Api.get
+    ( Api.get
         (Endpoint.lambdaUrl [ "session-refresh" ] [])
         toMsg
         (decodeResponseString
             successBodyDecoder
         )
+    , Refreshing
+    )
+
+
+
+-- HELPERS
+
+
+isIdle : Session -> Bool
+isIdle sesh =
+    case sesh of
+        Idle ->
+            True
+
+        _ ->
+            False
+
+
+isRefreshing : Session -> Bool
+isRefreshing sesh =
+    case sesh of
+        Refreshing ->
+            True
+
+        _ ->
+            False
+
+
+isSignedIn : Session -> Bool
+isSignedIn sesh =
+    case sesh of
+        SignedIn _ ->
+            True
+
+        _ ->
+            False
+
+
+isGuest : Session -> Bool
+isGuest sesh =
+    case sesh of
+        Guest ->
+            True
+
+        _ ->
+            False

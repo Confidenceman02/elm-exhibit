@@ -49,14 +49,20 @@ changeRouteTo maybeRoute context =
                 ( model, cmds ) =
                     ExamplesPage.init author package context
 
-                sessionRequest =
+                ( sessionRequestCmd, updatedSession ) =
                     if sessionIdle then
                         Session.refresh RestoredSession
 
                     else
-                        Cmd.none
+                        ( Cmd.none, model.context.session )
+
+                updatedContext =
+                    Context.updateSession updatedSession model.context
+
+                updatedModel =
+                    { model | context = updatedContext }
             in
-            ( Examples model, Cmd.batch [ sessionRequest, Cmd.map GotExamplesMsg cmds ] )
+            ( Examples updatedModel, Cmd.batch [ sessionRequestCmd, Cmd.map GotExamplesMsg cmds ] )
 
         -- TODO: Create home page
         Just Route.Home ->
