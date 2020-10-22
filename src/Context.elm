@@ -1,4 +1,4 @@
-module Context exposing (Context, navKey, toContext)
+module Context exposing (Context, navKey, toContext, updateSession)
 
 import Browser.Navigation as Nav
 import Session exposing (Session)
@@ -23,3 +23,8 @@ toContext url k session =
 navKey : Context -> Nav.Key
 navKey context =
     context.navKey
+
+
+updateSession : Session -> Context -> Context
+updateSession sesh context =
+    { context | session = sesh }
