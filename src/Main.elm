@@ -20,7 +20,7 @@ type Msg
     | ChangedUrl Url
     | GotExamplesMsg ExamplesPage.Msg
     | GotHomeMsg HomePage.Msg
-    | RestoredSession (Result Session.SessionError Session.SessionSuccess)
+    | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
 
 
 type Model
@@ -31,15 +31,16 @@ type Model
 
 init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url navKey =
-    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey Session.init)
+    let
+        ( refreshSessionCmd, session ) =
+            Session.refresh RefreshedSession
+    in
+    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey session)
+        |> Tuple.mapSecond (\cmds -> Cmd.batch [ cmds, refreshSessionCmd ])
 
 
 changeRouteTo : Maybe Route -> Context -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute context =
-    let
-        sessionIdle =
-            Session.isIdle context.session
-    in
     case maybeRoute of
         Nothing ->
             ( NotFound context, Cmd.none )
@@ -48,21 +49,8 @@ changeRouteTo maybeRoute context =
             let
                 ( model, cmds ) =
                     ExamplesPage.init author package context
-
-                ( sessionRequestCmd, updatedSession ) =
-                    if sessionIdle then
-                        Session.refresh RestoredSession
-
-                    else
-                        ( Cmd.none, model.context.session )
-
-                updatedContext =
-                    Context.updateSession updatedSession model.context
-
-                updatedModel =
-                    { model | context = updatedContext }
             in
-            ( Examples updatedModel, Cmd.batch [ sessionRequestCmd, Cmd.map GotExamplesMsg cmds ] )
+            ( Examples model, Cmd.batch [ Cmd.map GotExamplesMsg cmds ] )
 
         -- TODO: Create home page
         Just Route.Home ->
@@ -127,7 +115,7 @@ update msg model =
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) (toContext model)
 
-        ( RestoredSession result, Examples m ) ->
+        ( RefreshedSession result, Examples m ) ->
             let
                 updatedModel =
                     { m | context = updatedContext m.context }

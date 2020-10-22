@@ -76,11 +76,6 @@ type Msg
     | CompletedBuildExample (Result Example.ExampleError Example.CompiledExample)
 
 
-
---| DesaturateLogoColors
---| SaturateLogoColors
-
-
 init : Author -> Package -> Context -> ( Model, Cmd Msg )
 init author package context =
     ( { author = author
@@ -623,7 +618,7 @@ update msg model =
             ( { model | examples = Failed, viewPanel = BuildError err }, Cmd.none )
 
         CompletedBuildExample (Ok compiledExample) ->
-            ( model, Cmd.none ) |> Debug.log "YEAAAAAPP"
+            ( model, Cmd.none )
 
         CompletedBuildExample (Err err) ->
             ( model, Cmd.none )
