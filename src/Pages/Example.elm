@@ -1,4 +1,4 @@
-module Pages.Example exposing (Model, Msg, init, toContext, update, view)
+module Pages.Example exposing (Effect(..), Model, Msg, init, toContext, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -74,6 +74,16 @@ type Msg
     | SelectExample Example
     | CompletedLoadExamples (Result Example.ExampleError (List Example))
     | CompletedBuildExample (Result Example.ExampleError Example.CompiledExample)
+    | HeaderMsg Header.Msg
+
+
+type Effect
+    = HeaderEffect Header.HeaderEffect
+
+
+toHeaderMsg : Header.Msg -> Msg
+toHeaderMsg =
+    HeaderMsg
 
 
 init : Author -> Package -> Context -> ( Model, Cmd Msg )
@@ -621,4 +631,11 @@ update msg model =
             ( model, Cmd.none )
 
         CompletedBuildExample (Err err) ->
+            ( model, Cmd.none )
+
+        HeaderMsg headerMsg ->
+            let
+                headerEffect =
+                    Header.update headerMsg
+            in
             ( model, Cmd.none )

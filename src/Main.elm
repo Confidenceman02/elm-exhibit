@@ -3,6 +3,8 @@ module Main exposing (view)
 import Browser as Browser exposing (Document)
 import Browser.Navigation as Nav
 import Context exposing (Context)
+import Effect exposing (Effect)
+import Header
 import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
@@ -88,7 +90,15 @@ view model =
     in
     case model of
         Examples examplesModel ->
-            viewPage (Page.Examples examplesModel.author examplesModel.package examplesModel.context.session) GotExamplesMsg (ExamplesPage.view examplesModel)
+            viewPage
+                (Page.Examples
+                    examplesModel.author
+                    examplesModel.package
+                    examplesModel.context.session
+                    ExamplesPage.toHeaderMsg
+                )
+                GotExamplesMsg
+                (ExamplesPage.view examplesModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
@@ -134,9 +144,28 @@ updateWith toModel toMsg ( subModel, subCmd ) =
     ( toModel subModel, Cmd.map toMsg subCmd )
 
 
+updateWithEffect : (subModel -> Model) -> (subMsg -> Msg) -> Effect.Handler effect Msg -> ( subModel, Cmd subMsg, Effect effect ) -> ( Model, Cmd Msg )
+updateWithEffect toModel toMsg effectHandler ( subModel, subCmd, effect ) =
+    ( toModel subModel, Cmd.batch [ Cmd.map toMsg subCmd, Effect.evaluate effectHandler effect ] )
+
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
+
+
+exampleEffectHandler : ExamplesPage.Effect -> Cmd Msg
+exampleEffectHandler effect =
+    case effect of
+        ExamplesPage.HeaderEffect headerEffect ->
+            Cmd.none
+
+
+headerEffectHandler : Header.HeaderEffect -> Cmd Msg
+headerEffectHandler effect =
+    case effect of
+        Header.SignInEffect ->
+            Cmd.none
 
 
 main : Program Encode.Value Model Msg

@@ -7,23 +7,25 @@ import Package exposing (Package)
 import Session exposing (Session)
 
 
-type Page
+type Page msg
     = Home
-    | Examples Author Package Session
+    | Examples Author Package Session (Header.Msg -> msg)
 
 
-view : Page -> { title : String, content : Styled.Html msg } -> { title : String, body : List (Styled.Html msg) }
+view : Page msg -> { title : String, content : Styled.Html msg } -> { title : String, body : List (Styled.Html msg) }
 view page { title, content } =
     { title = title
     , body = viewHeader page :: [ content ]
     }
 
 
-viewHeader : Page -> Styled.Html msg
+viewHeader : Page msg -> Styled.Html msg
 viewHeader page =
     case page of
-        Examples author package session ->
-            Header.view (Header.example author package |> Header.session session)
+        Examples author package session toHeaderMsg ->
+            -- This looks weird but the Header has its own msgs it can dispatch so we need to
+            -- catch those in the relevant Page. The Examples page in this case.
+            Styled.map toHeaderMsg (Header.view (Header.example author package |> Header.session session))
 
         Home ->
             text ""
