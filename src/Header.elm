@@ -1,4 +1,4 @@
-module Header exposing (Config, example, home, navBottomBorder, navHeight, session, view)
+module Header exposing (Config, HeaderEffect(..), Msg, example, home, navBottomBorder, navHeight, session, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -7,6 +7,7 @@ import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
 import Components.Link as Link
 import Css as Css
+import Effect exposing (Effect)
 import Html.Styled as Styled exposing (div, h1, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
@@ -42,6 +43,10 @@ type GitAuth
     | None
 
 
+type Msg
+    = SignIn
+
+
 type alias Configuration =
     { variant : Variant
     , session : Maybe Session
@@ -60,6 +65,10 @@ defaultConfig =
     { variant = Home
     , session = Nothing
     }
+
+
+type HeaderEffect
+    = SignInEffect
 
 
 
@@ -81,7 +90,7 @@ home =
     Config { defaultConfig | variant = Home }
 
 
-view : Config -> Styled.Html msg
+view : Config -> Styled.Html Msg
 view (Config config) =
     div
         [ StyledAttribs.css
@@ -206,3 +215,14 @@ isExample v =
 
         _ ->
             False
+
+
+
+-- UPDATE
+
+
+update : Msg -> Effect HeaderEffect
+update msg =
+    case msg of
+        SignIn ->
+            Effect.single SignInEffect
