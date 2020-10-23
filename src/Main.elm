@@ -154,14 +154,14 @@ subscriptions _ =
     Sub.none
 
 
-exampleEffectHandler : ExamplesPage.Effect -> Cmd Msg
+exampleEffectHandler : Effect.Handler ExamplesPage.Effect Msg
 exampleEffectHandler effect =
     case effect of
         ExamplesPage.HeaderEffect headerEffect ->
-            Cmd.none
+            headerEffectHandler headerEffect
 
 
-headerEffectHandler : Header.HeaderEffect -> Cmd Msg
+headerEffectHandler : Effect.Handler Header.HeaderEffect Msg
 headerEffectHandler effect =
     case effect of
         Header.SignInEffect ->
