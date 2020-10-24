@@ -8,6 +8,7 @@ import Components.Link as Link
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css as Css
+import Effect as Effect
 import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
@@ -580,7 +581,7 @@ defaultViewPanelOptions =
 -- UPDATE
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Effect.Effect Effect )
 update msg model =
     case msg of
         ToggleDescriptionPanel ->
@@ -593,7 +594,7 @@ update msg model =
                         _ ->
                             Open
             in
-            ( { model | descriptionPanel = panel }, Cmd.none )
+            ( { model | descriptionPanel = panel }, Cmd.none, Effect.none )
 
         SelectExample example ->
             let
@@ -605,7 +606,7 @@ update msg model =
                         _ ->
                             ( StatusIdle, Idle )
             in
-            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none )
+            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, Cmd.none, Effect.none )
 
         CompletedLoadExamples (Ok examples) ->
             let
@@ -622,20 +623,20 @@ update msg model =
                         [] ->
                             ( StatusIdle, Idle, Cmd.none )
             in
-            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, exampleCmd )
+            ( { model | examples = resolvedExamples, viewPanel = resolvedViewPanel }, exampleCmd, Effect.none )
 
         CompletedLoadExamples (Err err) ->
-            ( { model | examples = Failed, viewPanel = BuildError err }, Cmd.none )
+            ( { model | examples = Failed, viewPanel = BuildError err }, Cmd.none, Effect.none )
 
         CompletedBuildExample (Ok compiledExample) ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Effect.none )
 
         CompletedBuildExample (Err err) ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Effect.none )
 
         HeaderMsg headerMsg ->
             let
                 headerEffect =
                     Header.update headerMsg
             in
-            ( model, Cmd.none )
+            ( model, Cmd.none, Effect.map HeaderEffect headerEffect )

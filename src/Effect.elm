@@ -1,4 +1,4 @@
-module Effect exposing (Effect, Handler, evaluate, none, single)
+module Effect exposing (Effect, Handler, evaluate, map, none, single)
 
 
 type Effect effectMsg
@@ -28,3 +28,13 @@ evaluate handler effect =
 
         Single effectMsg ->
             handler effectMsg
+
+
+map : (a -> b) -> Effect a -> Effect b
+map f effect =
+    case effect of
+        None ->
+            None
+
+        Single a ->
+            Single (f a)

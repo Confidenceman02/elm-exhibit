@@ -112,7 +112,7 @@ update msg model =
     case ( msg, model ) of
         ( GotExamplesMsg examplesMsg, Examples examples ) ->
             ExamplesPage.update examplesMsg examples
-                |> updateWith Examples GotExamplesMsg
+                |> updateWithEffect Examples GotExamplesMsg exampleEffectHandler
 
         ( ClickedLink urlRequest, _ ) ->
             case urlRequest of
