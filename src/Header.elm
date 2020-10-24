@@ -45,6 +45,7 @@ type GitAuth
 
 type Msg
     = SignIn
+    | SignOut
 
 
 type alias Configuration =
@@ -69,6 +70,7 @@ defaultConfig =
 
 type HeaderEffect
     = SignInEffect
+    | SignOutEffect
 
 
 
@@ -110,7 +112,7 @@ view (Config config) =
         ]
 
 
-sessionActionView : Session -> Styled.Html msg
+sessionActionView : Session -> Styled.Html Msg
 sessionActionView sesh =
     let
         resolveText =
@@ -122,6 +124,16 @@ sessionActionView sesh =
 
             else
                 ""
+
+        withSessionAction config =
+            if Session.isSignedIn sesh then
+                Button.onClick SignOut config
+
+            else if Session.isGuest sesh then
+                Button.onClick SignIn config
+
+            else
+                config
     in
     viewIf
         ((not <| Session.isRefreshing sesh)
@@ -135,6 +147,7 @@ sessionActionView sesh =
                         , GithubLogo.view GithubLogo.default
                         ]
                     ]
+                    |> withSessionAction
                 )
                 resolveText
             ]
@@ -226,3 +239,6 @@ update msg =
     case msg of
         SignIn ->
             Effect.single SignInEffect
+
+        SignOut ->
+            Effect.single SignOutEffect

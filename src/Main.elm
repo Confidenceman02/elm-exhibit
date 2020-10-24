@@ -167,6 +167,9 @@ headerEffectHandler effect =
         Header.SignInEffect ->
             Cmd.none
 
+        Header.SignOutEffect ->
+            Cmd.none
+
 
 main : Program Encode.Value Model Msg
 main =
