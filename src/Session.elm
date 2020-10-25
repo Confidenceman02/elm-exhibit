@@ -2,6 +2,7 @@ module Session exposing
     ( Session
     , SessionError
     , SessionSuccess
+    , fromResult
     , init
     , isGuest
     , isIdle
@@ -10,11 +11,11 @@ module Session exposing
     , isSignedIn
     , login
     , refresh
-    , toSession
     )
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
+import Browser.Navigation as Nav
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -34,20 +35,20 @@ init =
     Idle
 
 
-toSession : Result SessionError SessionSuccess -> Session
-toSession result =
+fromResult : Result SessionError SessionSuccess -> ( Cmd msg, Session )
+fromResult result =
     case result of
         Ok (SessionRefreshed cred) ->
-            SignedIn (Viewer.init cred)
+            ( Cmd.none, SignedIn (Viewer.init cred) )
 
         Ok (SessionGranted cred) ->
-            SignedIn (Viewer.init cred)
+            ( Cmd.none, SignedIn (Viewer.init cred) )
 
-        Err RefreshFailed ->
-            Guest
+        Ok (Redirecting meta) ->
+            ( Nav.load meta.location, LoggingIn )
 
         _ ->
-            Guest
+            ( Cmd.none, Guest )
 
 
 type SessionError

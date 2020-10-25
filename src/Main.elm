@@ -131,20 +131,20 @@ update msg model =
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
 
-                updatedSession =
-                    Session.toSession result
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
             in
-            ( Examples updatedModel, Cmd.none )
+            ( Examples updatedModel, sessionCmd )
 
         ( SessionAuthorizing result, Examples m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
 
-                updatedSession =
-                    Session.toSession result
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
             in
-            ( Examples updatedModel, Cmd.none )
+            ( Examples updatedModel, sessionCmd )
 
         _ ->
             ( model, Cmd.none )
