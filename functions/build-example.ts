@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
-import {errorResponse, removeWhiteSpace} from "./common";
+import {errorResponse, noIdea, removeWhiteSpace} from "./common";
 import { promises as fs } from "fs";
 import { Promise } from "bluebird";
 import path from "path";
@@ -24,13 +24,12 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   const params = event.queryStringParameters;
 
   if (!params) {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" } )
+    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
   }
 
   client.on("error", (e) => {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" } )
+    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
   })
-
 
   if (params.author && params.package && params.example) {
     const val = await client.get("happy")
@@ -53,9 +52,9 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
       body: "NOVALUESON",
       headers: {
-        "Content-Type": "text/javascript"
+        "Content-Type": "application/json"
       }
     }
   }
-  return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
+  return errorResponse(StatusCodes.BAD_REQUEST, noIdea)
 }

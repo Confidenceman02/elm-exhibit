@@ -1,6 +1,6 @@
 import {StatusCodes} from "http-status-codes";
 
-type NoIdea = { tag: "KeineAhnung" }
+export type NoIdea = { tag: "KeineAhnung" }
 
 export type ExampleErrorBody  =
   { tag: "ExampleBuildFailed" }

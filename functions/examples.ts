@@ -1,7 +1,7 @@
 import examples from "../data/examples.json";
 import { APIGatewayEvent, Context } from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
-import { errorResponse } from "./common";
+import {errorResponse, noIdea } from "./common";
 import { ResponseBody } from "./types";
 
 interface ErrorBody
@@ -14,7 +14,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   const params = event.queryStringParameters;
 
   if (!params) {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" } )
+    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
   }
 
   if (params.author && params.package) {
@@ -26,6 +26,6 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       }
     }
   } else {
-    return errorResponse(StatusCodes.BAD_REQUEST, { tag: "KeineAhnung" })
+    return errorResponse(StatusCodes.BAD_REQUEST, noIdea)
   }
 }

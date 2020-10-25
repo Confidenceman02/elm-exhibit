@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { ErrorBody, ResponseBody } from "./types";
+import {ErrorBody, NoIdea, ResponseBody} from "./types";
 
 export function errorResponse(statusCode: StatusCodes, error: ErrorBody): ResponseBody {
   return {
@@ -18,3 +18,5 @@ export function removeWhiteSpace(value: string): string {
 export const jsonHeaders = {
   "Content-Type": "application/json"
 }
+
+export const noIdea: NoIdea = { tag: "KeineAhnung" }
