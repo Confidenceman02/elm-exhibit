@@ -28,6 +28,7 @@
     "@types/html-minifier": "^4.0.0",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.11.8",
+    "bluebird": "^3.7.2",
     "chai": "^4.2.0",
     "elm-analyse": "^0.16.5",
     "elm-json": "^0.2.8",
