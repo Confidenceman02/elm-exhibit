@@ -23,3 +23,11 @@ export type ResponseBody =
       [key: string]: string
     }
   }
+
+export type RedirectBody =
+  {
+    statusCode: StatusCodes,
+    headers: {
+      Location: string
+    }
+  }

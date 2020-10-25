@@ -1,9 +1,8 @@
 import examples from "../data/examples.json";
-import {APIGatewayEvent, Context} from 'aws-lambda';
+import { APIGatewayEvent, Context } from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
 import { errorResponse } from "./common";
 import { ResponseBody } from "./types";
-
 
 interface ErrorBody
   {
