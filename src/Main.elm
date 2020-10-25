@@ -23,6 +23,7 @@ type Msg
     | GotExamplesMsg ExamplesPage.Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
+    | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
 
 
 type Model
@@ -128,10 +129,20 @@ update msg model =
         ( RefreshedSession result, Examples m ) ->
             let
                 updatedModel =
-                    { m | context = updatedContext m.context }
+                    { m | context = Context.updateSession updatedSession m.context }
 
-                updatedContext context =
-                    { context | session = Session.toSession result }
+                updatedSession =
+                    Session.toSession result
+            in
+            ( Examples updatedModel, Cmd.none )
+
+        ( SessionAuthorizing result, Examples m ) ->
+            let
+                updatedModel =
+                    { m | context = Context.updateSession updatedSession m.context }
+
+                updatedSession =
+                    Session.toSession result
             in
             ( Examples updatedModel, Cmd.none )
 
@@ -169,7 +180,14 @@ headerEffectHandler : Effect.Handler ExamplesPage.Model Header.HeaderEffect Msg
 headerEffectHandler model effect =
     case effect of
         Header.SignInEffect ->
-            ( model, Cmd.none )
+            let
+                ( sessionCmd, session ) =
+                    Session.login SessionAuthorizing
+
+                updatedContext =
+                    Context.updateSession session model.context
+            in
+            ( { model | context = updatedContext }, sessionCmd )
 
         Header.SignOutEffect ->
             ( model, Cmd.none )
