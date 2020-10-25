@@ -5,8 +5,10 @@ module Session exposing
     , init
     , isGuest
     , isIdle
+    , isLoggingIn
     , isRefreshing
     , isSignedIn
+    , login
     , refresh
     , toSession
     )
@@ -15,6 +17,7 @@ import Api.Api as Api
 import Api.Endpoint as Endpoint
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (required)
 import Viewer exposing (Cred, Viewer)
 
 
@@ -54,7 +57,19 @@ type SessionError
 
 type SessionSuccess
     = SessionRefreshed Cred
+    | Redirecting RedirectBody
     | SessionGranted Cred
+
+
+type alias RedirectBody =
+    { location : String
+    }
+
+
+redirectingDecoder : Decoder RedirectBody
+redirectingDecoder =
+    Decode.succeed RedirectBody
+        |> required "location" Decode.string
 
 
 mapTagToSessionSuccess : String -> Decoder SessionSuccess
@@ -65,6 +80,9 @@ mapTagToSessionSuccess tag =
 
         "SessionGranted" ->
             Decode.map SessionGranted Viewer.credDecoder
+
+        "Redirecting" ->
+            Decode.map Redirecting redirectingDecoder
 
         _ ->
             Decode.fail "Could not decode session success tag"
@@ -102,7 +120,7 @@ decodeResponseString decoder response =
                 Err _ ->
                     Err KeineAhnung
 
-        Http.GoodStatus_ _ body ->
+        Http.GoodStatus_ metadata body ->
             case Decode.decodeString decoder body of
                 Ok decodedBody ->
                     Ok decodedBody
@@ -123,6 +141,23 @@ refresh toMsg =
             successBodyDecoder
         )
     , Refreshing
+    )
+
+
+{-|
+
+    When logging in there is a chance user will be redirected to authorize github app.
+    We lose the state as it is thus far but the origin page will be returned to on
+    successful auth.
+
+-}
+login : (Result SessionError SessionSuccess -> msg) -> ( Cmd msg, Session )
+login toMsg =
+    ( Api.get
+        (Endpoint.lambdaUrl [ "session-grant" ] [])
+        toMsg
+        (decodeResponseString successBodyDecoder)
+    , LoggingIn
     )
 
 
@@ -164,6 +199,16 @@ isGuest : Session -> Bool
 isGuest sesh =
     case sesh of
         Guest ->
+            True
+
+        _ ->
+            False
+
+
+isLoggingIn : Session -> Bool
+isLoggingIn sesh =
+    case sesh of
+        LoggingIn ->
             True
 
         _ ->
