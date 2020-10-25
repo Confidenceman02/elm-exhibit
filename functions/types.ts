@@ -11,6 +11,7 @@ export type ExampleErrorBody  =
 
 export type SessionErrorBody =
   { tag: "RefreshFailed" }
+  | { tag: "Redirecting", location: string }
   | { tag: "LogInFailed" }
   | NoIdea
 
