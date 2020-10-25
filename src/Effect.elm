@@ -6,8 +6,8 @@ type Effect effectMsg
     | Single effectMsg
 
 
-type alias Handler effect msg =
-    effect -> Cmd msg
+type alias Handler model effect msg =
+    model -> effect -> ( model, Cmd msg )
 
 
 none : Effect effectMsg
@@ -20,14 +20,14 @@ single effectMsg =
     Single effectMsg
 
 
-evaluate : Handler effect msg -> Effect effect -> Cmd msg
-evaluate handler effect =
+evaluate : Handler model effect msg -> model -> Effect effect -> ( model, Cmd msg )
+evaluate handler model effect =
     case effect of
         None ->
-            Cmd.none
+            ( model, Cmd.none )
 
         Single effectMsg ->
-            handler effectMsg
+            handler model effectMsg
 
 
 map : (a -> b) -> Effect a -> Effect b

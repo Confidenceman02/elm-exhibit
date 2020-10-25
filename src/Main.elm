@@ -144,9 +144,13 @@ updateWith toModel toMsg ( subModel, subCmd ) =
     ( toModel subModel, Cmd.map toMsg subCmd )
 
 
-updateWithEffect : (subModel -> Model) -> (subMsg -> Msg) -> Effect.Handler effect Msg -> ( subModel, Cmd subMsg, Effect effect ) -> ( Model, Cmd Msg )
+updateWithEffect : (subModel -> Model) -> (subMsg -> Msg) -> Effect.Handler subModel effect Msg -> ( subModel, Cmd subMsg, Effect effect ) -> ( Model, Cmd Msg )
 updateWithEffect toModel toMsg effectHandler ( subModel, subCmd, effect ) =
-    ( toModel subModel, Cmd.batch [ Cmd.map toMsg subCmd, Effect.evaluate effectHandler effect ] )
+    let
+        ( subModelWithEffect, effectCmd ) =
+            Effect.evaluate effectHandler subModel effect
+    in
+    ( toModel subModelWithEffect, Cmd.batch [ Cmd.map toMsg subCmd, effectCmd ] )
 
 
 subscriptions : Model -> Sub Msg
@@ -154,21 +158,21 @@ subscriptions _ =
     Sub.none
 
 
-exampleEffectHandler : Effect.Handler ExamplesPage.Effect Msg
-exampleEffectHandler effect =
+exampleEffectHandler : Effect.Handler ExamplesPage.Model ExamplesPage.Effect Msg
+exampleEffectHandler model effect =
     case effect of
         ExamplesPage.HeaderEffect headerEffect ->
-            headerEffectHandler headerEffect
+            headerEffectHandler model headerEffect
 
 
-headerEffectHandler : Effect.Handler Header.HeaderEffect Msg
-headerEffectHandler effect =
+headerEffectHandler : Effect.Handler ExamplesPage.Model Header.HeaderEffect Msg
+headerEffectHandler model effect =
     case effect of
         Header.SignInEffect ->
-            Cmd.none
+            ( model, Cmd.none )
 
         Header.SignOutEffect ->
-            Cmd.none
+            ( model, Cmd.none )
 
 
 main : Program Encode.Value Model Msg
