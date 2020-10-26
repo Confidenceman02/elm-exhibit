@@ -3,6 +3,7 @@ module Pages.Example exposing (Effect(..), Model, Msg, init, toContext, toHeader
 import Author exposing (Author)
 import Components.Button as Button
 import Components.ElmLogo as ElmLogo
+import Components.ExhibitPane as ExhibitPane
 import Components.Heading as Heading
 import Components.Link as Link
 import Components.Paragraph as Paragraph
@@ -141,7 +142,7 @@ sliderCenter model =
             , Css.backgroundColor exColorColt100
             ]
         ]
-        [ centerWrapper centerSlider [ centerContentShadow centerSlider, centerContent model ] ]
+        [ centerWrapper centerSlider [ centerContent centerSlider model ] ]
 
 
 centerWrapper : Bool -> List (Styled.Html msg) -> Styled.Html msg
@@ -152,19 +153,17 @@ centerWrapper center content =
         content
 
 
-centerContent : Model -> Styled.Html Msg
-centerContent model =
-    div
-        [ StyledAttribs.css
-            [ Css.display Css.block
-            , Css.position Css.relative
-            , Css.width (Css.px centerContentWidth)
-            , Css.height (Css.px centerContentHeight)
-            , Css.overflow Css.hidden
-            , Css.backgroundColor exColorWhite
-            , Css.borderRadius (Css.px 12)
-            ]
-        ]
+centerContent : Bool -> Model -> Styled.Html Msg
+centerContent center model =
+    let
+        resolveShadowPosition =
+            if center then
+                ExhibitPane.Center
+
+            else
+                ExhibitPane.Offset
+    in
+    ExhibitPane.view (ExhibitPane.default |> ExhibitPane.shadowPosition resolveShadowPosition)
         [ case model.viewPanel of
             Building example _ ->
                 animatedBuildingView example
@@ -309,28 +308,6 @@ animatedBuildingView example =
                     [ span [] [ Heading.view Heading.h4 ("Building example " ++ example.name) ] ]
                 ]
             ]
-        ]
-
-
-centerContentShadow : Bool -> Styled.Html msg
-centerContentShadow center =
-    svg
-        [ width "510"
-        , height "691"
-        , viewBox "0 0 510 691"
-        , centerShadowStyles center
-        ]
-        [ filter [ id "shadowBlur" ] [ feGaussianBlur [ in_ "sourceGraphics", stdDeviation "7" ] [] ]
-        , rect
-            [ x "14.855576"
-            , y "16.587036"
-            , rx "12"
-            , height (String.fromFloat centerContentHeight)
-            , width (String.fromFloat centerContentWidth)
-            , fill exColorColt200.value
-            , SvgStyledAttribs.filter "url(#shadowBlur)"
-            ]
-            []
         ]
 
 
@@ -544,24 +521,6 @@ centerWrapperStyles center =
         ([ Css.position Css.absolute
          , Css.transform (Css.translate2 (Css.pct -50) (Css.pct 0))
          , Css.marginTop (Grid.calc Grid.grid Grid.multiply 1.5)
-         ]
-            ++ Transition.left (Css.pct resolveLeft)
-        )
-
-
-centerShadowStyles : Bool -> Attribute msg
-centerShadowStyles center =
-    let
-        resolveLeft =
-            if center then
-                -3
-
-            else
-                -4
-    in
-    SvgStyledAttribs.css
-        ([ Css.position Css.absolute
-         , Css.top (Css.pct -1.5)
          ]
             ++ Transition.left (Css.pct resolveLeft)
         )
