@@ -120,7 +120,7 @@ sessionActionView sesh =
                 "Signed in"
 
             else if Session.isGuest sesh then
-                "Sign in with github"
+                "Sign in with Github"
 
             else if Session.isLoggingIn sesh then
                 "Logging in"
