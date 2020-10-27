@@ -37,12 +37,6 @@ type Variant
     | Home
 
 
-type GitAuth
-    = LoggedIn
-    | LoggedOut
-    | None
-
-
 type Msg
     = SignIn
     | SignOut
