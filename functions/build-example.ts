@@ -1,20 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import {errorResponse, noIdea, removeWhiteSpace} from "./common";
-import { promises as fs } from "fs";
-import { Promise } from "bluebird";
-import path from "path";
-import { minify } from "html-minifier";
 import { ResponseBody } from "./types";
-import redisLib from "redis";
-
-const redisPort = process.env.REDIS_SERVICE_PORT ? process.env.REDIS_SERVICE_PORT : "0"
-
-const redis = Promise.promisifyAll(redisLib)
-const client = redis.createClient({
-  host: process.env.REDIS_SERVICE_IP,
-  port: parseInt(redisPort)
-})
+import redisClient from "./redis/client"
 
 function getCacheKey(author: string, pkg: string, example: string): string {
   return removeWhiteSpace(`${author}-${pkg}-${example}-compiled`)
@@ -27,13 +15,8 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
     return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
   }
 
-  client.on("error", (e) => {
-    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
-  })
-
   if (params.author && params.package && params.example) {
-    const val = await client.get("happy")
-
+    const val = await redisClient.GETAsync("hello")
     if (val) {
       // temporary html resolving. Real html will come from elm compiler.
       // const htmlString = await fs.readFile(path.resolve(process.cwd(),'data/elm.js'), "utf-8")
@@ -42,7 +25,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
 
       return {
         statusCode: StatusCodes.OK,
-        body: "WORKEDJ",
+        body: "WORKED",
         headers: {
           "Content-Type": "text/javascript"
         }
