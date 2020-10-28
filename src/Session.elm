@@ -1,5 +1,6 @@
 module Session exposing
-    ( Session
+    ( ExchangeableCode
+    , Session
     , SessionError
     , SessionSuccess
     , fromResult
@@ -28,6 +29,10 @@ type Session
     | Idle
     | LoggingIn
     | Refreshing
+
+
+type ExchangeableCode
+    = ExchangeableCode String
 
 
 init : Session

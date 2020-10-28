@@ -10,6 +10,7 @@ import Session exposing (Session)
 type Page msg
     = Home
     | Examples Author Package Session (Header.Msg -> msg)
+    | AuthGithubRedirect
 
 
 view : Page msg -> { title : String, content : Styled.Html msg } -> { title : String, body : List (Styled.Html msg) }
@@ -28,4 +29,7 @@ viewHeader page =
             Styled.map toHeaderMsg (Header.view (Header.example author package |> Header.session session))
 
         Home ->
+            text ""
+
+        AuthGithubRedirect ->
             text ""

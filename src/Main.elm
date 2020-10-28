@@ -8,6 +8,7 @@ import Header
 import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
+import Pages.AuthRedirect as AuthRedirectPage
 import Pages.Example as ExamplesPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
@@ -24,17 +25,20 @@ type Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
     | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
+    | GotAuthGithubRedirectMsg AuthRedirectPage.Msg
 
 
 type Model
     = Examples ExamplesPage.Model
     | Home HomePage.Model
     | NotFound Context
+    | AuthRedirect Context
 
 
 init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url navKey =
     let
+        -- Attempt to login a user on init
         ( refreshSessionCmd, session ) =
             Session.refresh RefreshedSession
     in
@@ -63,6 +67,9 @@ changeRouteTo maybeRoute context =
             in
             ( Home model, Cmd.none )
 
+        Just Route.AuthGithubRedirect ->
+            ( AuthRedirect context, Cmd.none )
+
 
 toContext : Model -> Context
 toContext model =
@@ -74,6 +81,9 @@ toContext model =
             HomePage.toContext m
 
         NotFound context ->
+            context
+
+        AuthRedirect context ->
             context
 
 
@@ -103,6 +113,9 @@ view model =
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
+
+        AuthRedirect _ ->
+            viewPage Page.AuthGithubRedirect GotAuthGithubRedirectMsg AuthRedirectPage.view
 
         NotFound _ ->
             NotFoundPage.view
