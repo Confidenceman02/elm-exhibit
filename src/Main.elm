@@ -38,11 +38,16 @@ type Model
 init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url navKey =
     let
-        -- Attempt to login a user on init
+        route =
+            Route.fromUrl url
+
+        -- Attempt to login a user on init.
+        -- This might need to be conditional, e.g. we dont want to be refreshing if
+        -- Github redirected user here after app acceptance flow.
         ( refreshSessionCmd, session ) =
             Session.refresh RefreshedSession
     in
-    changeRouteTo (Route.fromUrl url) (Context.toContext url navKey session)
+    changeRouteTo route (Context.toContext url navKey session)
         |> Tuple.mapSecond (\cmds -> Cmd.batch [ cmds, refreshSessionCmd ])
 
 
@@ -67,7 +72,10 @@ changeRouteTo maybeRoute context =
             in
             ( Home model, Cmd.none )
 
-        Just Route.AuthGithubRedirect ->
+        Just (Route.AuthGithubRedirect (Just authParams)) ->
+            ( AuthRedirect context, Cmd.none ) |> Debug.log "WE HAVE PARAMS"
+
+        Just (Route.AuthGithubRedirect Nothing) ->
             ( AuthRedirect context, Cmd.none )
 
 

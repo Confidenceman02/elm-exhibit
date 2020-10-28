@@ -1,7 +1,7 @@
 module Session exposing
-    ( ExchangeableCode
-    , Session
+    ( Session
     , SessionError
+    , SessionId
     , SessionSuccess
     , fromResult
     , init
@@ -12,6 +12,7 @@ module Session exposing
     , isSignedIn
     , login
     , refresh
+    , toSessionId
     )
 
 import Api.Api as Api
@@ -31,8 +32,8 @@ type Session
     | Refreshing
 
 
-type ExchangeableCode
-    = ExchangeableCode String
+type SessionId
+    = SessionId String
 
 
 init : Session
@@ -54,6 +55,11 @@ fromResult result =
 
         _ ->
             ( Cmd.none, Guest )
+
+
+toSessionId : String -> SessionId
+toSessionId id =
+    SessionId id
 
 
 type SessionError
