@@ -1,6 +1,6 @@
-module Pages.NotFound exposing (..)
+module Pages.NotFound exposing (view)
 
-import Browser as Browser exposing (Document)
+import Browser exposing (Document)
 import Html exposing (Html, div, h1, img, main_, text)
 import Html.Attributes exposing (alt, class, id, src, tabindex)
 

@@ -2,7 +2,15 @@ module Components.Heading exposing (h1, h4, h5, inline, overrides, view)
 
 import Css
 import Html.Styled as Styled exposing (text)
-import Styles.Typography exposing (exTypographyHeading1FontSize, exTypographyHeading1FontWeight, exTypographyHeading4FontSize, exTypographyHeading4FontWeight, exTypographyHeading5FontSize, exTypographyHeading5FontWeight)
+import Styles.Typography
+    exposing
+        ( exTypographyHeading1FontSize
+        , exTypographyHeading1FontWeight
+        , exTypographyHeading4FontSize
+        , exTypographyHeading4FontWeight
+        , exTypographyHeading5FontSize
+        , exTypographyHeading5FontWeight
+        )
 import Svg.Styled.Attributes as StyledAttribs
 
 

@@ -1,7 +1,7 @@
 module Components.Paragraph exposing (Style(..), default, inline, overrides, style, view)
 
 import Css
-import Html.Styled as Styled exposing (p, text)
+import Html.Styled as Styled exposing (p)
 import Styles.Typography exposing (exTypographyParagraphBodyFontSize, exTypographyParagraphIntroFontSize)
 import Svg.Styled.Attributes as StyledAttribs
 

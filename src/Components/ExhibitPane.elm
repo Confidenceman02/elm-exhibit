@@ -5,8 +5,8 @@ import Html.Styled as Styled exposing (Attribute, div)
 import Html.Styled.Attributes as StyledAttribs
 import Styles.Color exposing (exColorColt200, exColorWhite)
 import Styles.Transition as Transition
-import Svg.Styled exposing (feGaussianBlur, filter, path, rect, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, rx, stdDeviation, viewBox, width, x, y)
+import Svg.Styled exposing (feGaussianBlur, filter, rect, svg)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (fill, height, id, in_, rx, stdDeviation, viewBox, width, x, y)
 
 
 type Config
