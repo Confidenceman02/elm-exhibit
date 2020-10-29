@@ -23,8 +23,8 @@ import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
-import Svg.Styled exposing (feGaussianBlur, filter, path, rect, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, id, in_, rx, stdDeviation, viewBox, width, x, y)
+import Svg.Styled exposing (path, svg)
+import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, viewBox)
 
 
 toContext : Model -> Context

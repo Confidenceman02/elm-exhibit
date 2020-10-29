@@ -1,4 +1,4 @@
-module Pages.Interstitial.Interstitial exposing (bummer, content, oops, ourBad, view, weird)
+module Pages.Interstitial.Interstitial exposing (bummer, content, oops, ourBad, signingIn, view, weird)
 
 import Components.ElmLogo as ElmLogo
 import Components.Heading as Heading
@@ -64,6 +64,11 @@ oops =
         { defaults
             | variant = Oops
         }
+
+
+signingIn : Config msg
+signingIn =
+    Config { defaults | variant = SigningIn }
 
 
 
