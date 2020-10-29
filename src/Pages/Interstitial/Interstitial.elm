@@ -1,4 +1,4 @@
-module Pages.Errors.Errors exposing (bummer, content, oops, ourBad, view, weird)
+module Pages.Interstitial.Interstitial exposing (bummer, content, oops, ourBad, view, weird)
 
 import Components.ElmLogo as ElmLogo
 import Components.Heading as Heading
@@ -24,6 +24,7 @@ type Variant
     | Weird
     | OurBad
     | Oops
+    | SigningIn
 
 
 defaults : Configuration msg
@@ -90,6 +91,17 @@ view (Config config) =
 
                 Oops ->
                     "Oops.."
+
+                SigningIn ->
+                    "Signing you in"
+
+        resolveLogoColor =
+            case config.variant of
+                SigningIn ->
+                    Color.exColorOfficialGreen
+
+                _ ->
+                    Color.exColorOfficialYellow
     in
     div
         [ StyledAttribs.css
@@ -102,7 +114,7 @@ view (Config config) =
                 , Css.alignItems Css.baseline
                 ]
             ]
-            [ ElmLogo.view (ElmLogo.static |> ElmLogo.color (ElmLogo.CustomColor Color.exColorOfficialYellow))
+            [ ElmLogo.view (ElmLogo.static |> ElmLogo.color (ElmLogo.CustomColor resolveLogoColor))
             , span [ StyledAttribs.css [ Css.marginLeft Grid.grid ] ]
                 [ Heading.view
                     (Heading.h1

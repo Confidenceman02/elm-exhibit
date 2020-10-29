@@ -17,7 +17,7 @@ import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Markdown as Markdown
 import Package exposing (Package)
-import Pages.Errors.Errors as ErrorPage
+import Pages.Interstitial.Interstitial as InterstitialPage
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
@@ -180,20 +180,20 @@ exampleErrorToView : Status ( SelectedExample, List Example.Example ) -> Example
 exampleErrorToView examples exampleError =
     case exampleError of
         Example.AuthorAndPackageNotFound author package ->
-            ErrorPage.view
-                (ErrorPage.bummer
-                    |> ErrorPage.content (authorAndPackageNotFoundErrorView author package)
+            InterstitialPage.view
+                (InterstitialPage.bummer
+                    |> InterstitialPage.content (authorAndPackageNotFoundErrorView author package)
                 )
 
         Example.AuthorNotFound author package foundAuthor ->
-            ErrorPage.view
-                (ErrorPage.weird |> ErrorPage.content (authorNotFoundView author package foundAuthor))
+            InterstitialPage.view
+                (InterstitialPage.weird |> InterstitialPage.content (authorNotFoundView author package foundAuthor))
 
         Example.PackageNotFound author package ->
-            ErrorPage.view (ErrorPage.weird |> ErrorPage.content (packageNotFoundView author package))
+            InterstitialPage.view (InterstitialPage.weird |> InterstitialPage.content (packageNotFoundView author package))
 
         Example.KeineAhnung ->
-            ErrorPage.view (ErrorPage.ourBad |> ErrorPage.content keineAhnungView)
+            InterstitialPage.view (InterstitialPage.ourBad |> InterstitialPage.content keineAhnungView)
 
         _ ->
             text "ExampleBuildFailed"
