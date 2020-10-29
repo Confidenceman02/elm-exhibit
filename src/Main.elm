@@ -32,7 +32,7 @@ type Model
     = Examples ExamplesPage.Model
     | Home HomePage.Model
     | NotFound Context
-    | AuthRedirect Context
+    | AuthRedirect AuthRedirectPage.Model
 
 
 init : Encode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -41,9 +41,10 @@ init _ url navKey =
         route =
             Route.fromUrl url
 
+        -- We dont want to be refreshing session if
+        -- Github redirected user here after app acceptance flow because
+        -- that means there is no session in the first place to refresh!
         -- Attempt to login a user on init.
-        -- This might need to be conditional, e.g. we dont want to be refreshing if
-        -- Github redirected user here after app acceptance flow.
         ( refreshSessionCmd, session ) =
             Session.refresh RefreshedSession
     in
@@ -72,27 +73,28 @@ changeRouteTo maybeRoute context =
             in
             ( Home model, Cmd.none )
 
-        Just (Route.AuthGithubRedirect (Just authParams)) ->
-            ( AuthRedirect context, Cmd.none ) |> Debug.log "WE HAVE PARAMS"
-
-        Just (Route.AuthGithubRedirect Nothing) ->
-            ( AuthRedirect context, Cmd.none )
+        Just (Route.AuthGithubRedirect params) ->
+            let
+                model =
+                    AuthRedirectPage.init context params
+            in
+            ( AuthRedirect model, Cmd.none )
 
 
 toContext : Model -> Context
 toContext model =
     case model of
         Examples m ->
-            ExamplesPage.toContext m
+            m.context
 
         Home m ->
-            HomePage.toContext m
+            m.context
 
         NotFound context ->
             context
 
-        AuthRedirect context ->
-            context
+        AuthRedirect m ->
+            m.context
 
 
 view : Model -> Document Msg

@@ -1,8 +1,10 @@
-module Pages.AuthRedirect exposing (Msg, view)
+module Pages.AuthRedirect exposing (Model, Msg, init, view)
 
 import Components.ExhibitPane as ExhibitPane
 import Components.Paragraph as Paragraph
+import Context exposing (Context)
 import Css
+import GithubAuth as GithubAuth
 import Header
 import Html.Styled as Styled exposing (Attribute, div, text)
 import Html.Styled.Attributes as StyledAttribs
@@ -15,9 +17,20 @@ type Msg
     = None
 
 
+type alias Model =
+    { context : Context
+    , authParams : Maybe GithubAuth.CallBackParams
+    }
+
+
 view : { title : String, content : Styled.Html msg }
 view =
     { title = "auth redirect", content = pageWrapper [ paneView ] }
+
+
+init : Context -> Maybe GithubAuth.CallBackParams -> Model
+init context maybeAuthParams =
+    { context = context, authParams = maybeAuthParams }
 
 
 paneView : Styled.Html msg
