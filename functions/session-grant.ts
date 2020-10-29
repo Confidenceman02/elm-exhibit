@@ -13,7 +13,10 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   const { referer } = event.headers
   if (gitHubClientId) {
     const sessionId = uuidv4()
+    const stateAsJSON = JSON.stringify({ tempSessionId: sessionId, referer: referer })
+    const encodedState: string = new Buffer(stateAsJSON, "utf8").toString("base64")
     githubLoginEndpoint.searchParams.append("client_id", gitHubClientId)
+    githubLoginEndpoint.searchParams.append("state", encodedState)
     // save temporary session meta
     const tempSession = await initTempSession({ sessionId, referer } )
 
