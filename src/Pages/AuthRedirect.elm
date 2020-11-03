@@ -9,6 +9,7 @@ import Header
 import Html.Styled as Styled exposing (Attribute, div, text)
 import Html.Styled.Attributes as StyledAttribs
 import Pages.Interstitial.Interstitial as Interstitial
+import Ports exposing (decodeRefererFromStateParam)
 import Styles.Color exposing (exColorColt100)
 import Styles.Grid as Grid
 
@@ -20,17 +21,27 @@ type Msg
 type alias Model =
     { context : Context
     , authParams : Maybe GithubAuth.CallBackParams
+    , referer : Maybe GithubAuth.Referer
     }
 
 
-view : { title : String, content : Styled.Html msg }
-view =
+view : Model -> { title : String, content : Styled.Html msg }
+view model =
     { title = "auth redirect", content = pageWrapper [ paneView ] }
 
 
-init : Context -> Maybe GithubAuth.CallBackParams -> Model
+init : Context -> Maybe GithubAuth.CallBackParams -> ( Model, Cmd Msg )
 init context maybeAuthParams =
-    { context = context, authParams = maybeAuthParams }
+    let
+        cmds =
+            case maybeAuthParams of
+                Just authParams ->
+                    decodeRefererFromStateParam (GithubAuth.stateStringFromParams authParams)
+
+                _ ->
+                    Cmd.none
+    in
+    ( { context = context, authParams = maybeAuthParams, referer = Nothing }, cmds )
 
 
 paneView : Styled.Html msg
