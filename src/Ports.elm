@@ -1,4 +1,9 @@
-port module Ports exposing (decodeBase64String)
+port module Ports exposing (decodeRefererFromStateParam, decodedRefererFromStateParam)
+
+import Json.Encode as Encode
 
 
-port decodeBase64String : String -> Cmd msg
+port decodeRefererFromStateParam : String -> Cmd msg
+
+
+port decodedRefererFromStateParam : (Encode.Value -> msg) -> Sub msg
