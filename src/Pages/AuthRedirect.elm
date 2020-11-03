@@ -27,7 +27,7 @@ type alias Model =
 
 view : Model -> { title : String, content : Styled.Html msg }
 view model =
-    { title = "auth redirect", content = pageWrapper [ paneView ] }
+    { title = "auth redirect", content = pageWrapper [ paneView model ] }
 
 
 init : Context -> Maybe GithubAuth.CallBackParams -> ( Model, Cmd Msg )
@@ -44,29 +44,38 @@ init context maybeAuthParams =
     ( { context = context, authParams = maybeAuthParams, referer = Nothing }, cmds )
 
 
-paneView : Styled.Html msg
-paneView =
+paneView : Model -> Styled.Html msg
+paneView model =
     paneWrapper
         [ pane
             [ ExhibitPane.view ExhibitPane.default
                 [ Interstitial.view
                     (Interstitial.signingIn
                         |> Interstitial.content
-                            paneContent
+                            (paneContent model)
                     )
                 ]
             ]
         ]
 
 
-paneContent : List (Styled.Html msg)
-paneContent =
+paneContent : Model -> List (Styled.Html msg)
+paneContent model =
+    let
+        resolvedReferer =
+            case model.referer of
+                Just referer ->
+                    Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Body) [ text <| GithubAuth.refererToString referer ]
+
+                _ ->
+                    text "where you tried to log in from."
+    in
     [ div [ StyledAttribs.css [ Css.width (Css.pct 75) ] ]
         [ Paragraph.view
             (Paragraph.default
                 |> Paragraph.style Paragraph.Intro
             )
-            [ text "After we sign you in we will redirect you back to " ]
+            [ text "After we sign you in we will redirect you back to ", resolvedReferer ]
         , Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro) [ text "Please don't navigate away from this page in the mean time." ]
         ]
     ]

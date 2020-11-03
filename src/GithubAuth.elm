@@ -1,4 +1,4 @@
-module GithubAuth exposing (CallBackParams, Referer, callBackParamsParser, stateStringFromParams, toReferer)
+module GithubAuth exposing (CallBackParams, Referer, callBackParamsParser, refererToString, stateStringFromParams, toReferer)
 
 import Url.Parser.Query as Query exposing (Parser)
 
@@ -39,6 +39,11 @@ toState state =
 toReferer : String -> Referer
 toReferer s =
     Referer s
+
+
+refererToString : Referer -> String
+refererToString (Referer r) =
+    r
 
 
 callBackParamsParser : Parser (Maybe CallBackParams)
