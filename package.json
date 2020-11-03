@@ -2,7 +2,7 @@
   "name": "elm-exhibit",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "bin/dev.sh",
     "build": "parcel build index.html",
