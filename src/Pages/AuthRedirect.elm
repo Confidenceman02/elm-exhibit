@@ -1,4 +1,4 @@
-module Pages.AuthRedirect exposing (Model, Msg, init, view)
+module Pages.AuthRedirect exposing (Model, Msg, init, subscriptions, update, view)
 
 import Components.ExhibitPane as ExhibitPane
 import Components.Paragraph as Paragraph
@@ -15,7 +15,7 @@ import Styles.Grid as Grid
 
 
 type Msg
-    = None
+    = DecodedRefererString String
 
 
 type alias Model =
@@ -114,5 +114,10 @@ pageWrapper content =
 update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
-        None ->
-            ( model, Cmd.none )
+        DecodedRefererString decodedReferer ->
+            ( model, Cmd.none ) |> Debug.log decodedReferer
+
+
+subscriptions : Sub Msg
+subscriptions =
+    Ports.decodedRefererFromStateParam DecodedRefererString

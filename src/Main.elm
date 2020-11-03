@@ -138,6 +138,13 @@ update msg model =
             ExamplesPage.update examplesMsg examples
                 |> updateWithEffect Examples GotExamplesMsg exampleEffectHandler
 
+        ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
+            let
+                ( updatedModel, cmds ) =
+                    AuthRedirectPage.update m authRedirectMsg
+            in
+            ( AuthRedirect updatedModel, Cmd.map GotAuthGithubRedirectMsg cmds )
+
         ( ClickedLink urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
@@ -188,8 +195,13 @@ updateWithEffect toModel toMsg effectHandler ( subModel, subCmd, effect ) =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model of
+        AuthRedirect _ ->
+            Sub.map GotAuthGithubRedirectMsg AuthRedirectPage.subscriptions
+
+        _ ->
+            Sub.none
 
 
 exampleEffectHandler : Effect.Handler ExamplesPage.Model ExamplesPage.Effect Msg
