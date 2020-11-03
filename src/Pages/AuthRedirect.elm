@@ -109,3 +109,10 @@ pageWrapper content =
             ]
         ]
         content
+
+
+update : Model -> Msg -> ( Model, Cmd Msg )
+update model msg =
+    case msg of
+        None ->
+            ( model, Cmd.none )
