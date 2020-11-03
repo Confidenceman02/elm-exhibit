@@ -75,10 +75,10 @@ changeRouteTo maybeRoute context =
 
         Just (Route.AuthGithubRedirect params) ->
             let
-                model =
+                ( model, cmds ) =
                     AuthRedirectPage.init context params
             in
-            ( AuthRedirect model, Cmd.none )
+            ( AuthRedirect model, Cmd.map GotAuthGithubRedirectMsg cmds )
 
 
 toContext : Model -> Context
@@ -124,8 +124,8 @@ view model =
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
 
-        AuthRedirect _ ->
-            viewPage Page.AuthGithubRedirect GotAuthGithubRedirectMsg AuthRedirectPage.view
+        AuthRedirect m ->
+            viewPage Page.AuthGithubRedirect GotAuthGithubRedirectMsg (AuthRedirectPage.view m)
 
         NotFound _ ->
             NotFoundPage.view
