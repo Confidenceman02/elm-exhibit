@@ -2,7 +2,8 @@
   "extends": "@tsconfig/node12/tsconfig.json",
   "compilerOptions": {
     "noImplicitAny": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["dom"]
   },
   "include": ["functions/**/*"],
   "exclude": ["node_modules", "tests"]
