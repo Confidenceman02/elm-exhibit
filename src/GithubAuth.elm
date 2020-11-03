@@ -1,22 +1,41 @@
-module GithubAuth exposing (CallBackParams, callBackParamsParser)
+module GithubAuth exposing (CallBackParams, Referer, callBackParamsParser)
 
-import Session
 import Url.Parser.Query as Query exposing (Parser)
 
 
 type CallBackParams
-    = CallBackParams TempCode Session.SessionId
+    = CallBackParams TempCode State
 
 
 type TempCode
     = TempCode String
 
 
+type State
+    = State String
+
+
+type Referer
+    = Referer String
+
+
+
+{-
+   State is an encoded JSON string in base64 that holds
+   some basic user info e.g. ""sessionId": "1234", "referer": "www.somewhere.com"".
+-}
+
+
+toState : String -> State
+toState state =
+    State state
+
+
 callBackParamsParser : Parser (Maybe CallBackParams)
 callBackParamsParser =
-    Query.map2 (\code sessionId -> resolveParsedParams code sessionId) (Query.string "code") (Query.string "state")
+    Query.map2 (\code state -> resolveParsedParams code state) (Query.string "code") (Query.string "state")
 
 
 resolveParsedParams : Maybe String -> Maybe String -> Maybe CallBackParams
-resolveParsedParams code seshId =
-    Maybe.map2 (\c id -> CallBackParams (TempCode c) (Session.toSessionId id)) code seshId
+resolveParsedParams code state =
+    Maybe.map2 (\c s -> CallBackParams (TempCode c) (toState s)) code state
