@@ -115,7 +115,7 @@ update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
         DecodedRefererString decodedReferer ->
-            ( model, Cmd.none ) |> Debug.log decodedReferer
+            ( { model | referer = Just <| GithubAuth.toReferer decodedReferer }, Cmd.none ) |> Debug.log decodedReferer
 
 
 subscriptions : Sub Msg
