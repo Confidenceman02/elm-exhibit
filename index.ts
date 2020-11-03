@@ -1,11 +1,16 @@
 import { Elm } from './src/Main.elm'
 
-
-
-// var storageKey = "store";
-// var flags = localStorage.getItem(storageKey);
 var app = Elm.Main.init({node: document.querySelector('main'), flags: {}});
-//
+
+app.ports.decodeRefererFromStateParam.subscribe((base64String) => {
+    const decodedString = window.atob(base64String)
+    try {
+        const parsedString = JSON.parse(decodedString)
+        console.log(decodedString)
+    } catch (e) {
+       throw e
+    }
+})
 // app.ports.storeCache.subscribe(function(val) {
 //
 //   if (val === null) {
