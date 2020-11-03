@@ -5,6 +5,9 @@ export namespace Elm {
         decodeRefererFromStateParam: {
           subscribe(callback: (data: string) => void): void
         }
+        decodedRefererFromStateParam: {
+          send(data: string)
+        }
       };
     }
     export function init(options: {

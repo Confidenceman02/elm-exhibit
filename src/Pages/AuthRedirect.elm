@@ -66,7 +66,7 @@ paneContent =
             (Paragraph.default
                 |> Paragraph.style Paragraph.Intro
             )
-            [ text "After we sign you in we will redirect you back to where you were." ]
+            [ text "After we sign you in we will redirect you back to " ]
         , Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro) [ text "Please don't navigate away from this page in the mean time." ]
         ]
     ]
