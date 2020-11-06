@@ -10,12 +10,14 @@ import Html.Styled as Styled exposing (Attribute, div, text)
 import Html.Styled.Attributes as StyledAttribs
 import Pages.Interstitial.Interstitial as Interstitial
 import Ports exposing (decodeRefererFromStateParam)
+import Session
 import Styles.Color exposing (exColorColt100)
 import Styles.Grid as Grid
 
 
 type Msg
     = DecodedRefererString String
+    | SessionLoggedIn (Result Session.SessionError Session.SessionSuccess)
 
 
 type alias Model =
@@ -33,15 +35,19 @@ view model =
 init : Context -> Maybe GithubAuth.CallBackParams -> ( Model, Cmd Msg )
 init context maybeAuthParams =
     let
-        cmds =
+        ( cmds, session ) =
             case maybeAuthParams of
                 Just authParams ->
-                    decodeRefererFromStateParam (GithubAuth.stateStringFromParams authParams)
+                    let
+                        ( sessionCmd, updatedSession ) =
+                            Session.callBack SessionLoggedIn authParams
+                    in
+                    ( Cmd.batch [ decodeRefererFromStateParam (GithubAuth.stateStringFromParams authParams), sessionCmd ], updatedSession )
 
                 _ ->
-                    Cmd.none
+                    ( Cmd.none, Session.init )
     in
-    ( { context = context, authParams = maybeAuthParams, referer = Nothing }, cmds )
+    ( { context = Context.updateSession session context, authParams = maybeAuthParams, referer = Nothing }, cmds )
 
 
 paneView : Model -> Styled.Html msg
@@ -83,7 +89,13 @@ paneContent model =
             [ text "After we sign you in we will redirect you back to " ]
         ]
     , resolvedReferer
-    , div [ StyledAttribs.css [ Css.width (Css.pct 75) ] ] [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro) [ text "Please don't navigate away from this page in the mean time." ] ]
+    , div [ StyledAttribs.css [ Css.width (Css.pct 75) ] ]
+        [ Paragraph.view
+            (Paragraph.default
+                |> Paragraph.style Paragraph.Intro
+            )
+            [ text "Please don't navigate away from this page in the mean time." ]
+        ]
     ]
 
 
@@ -130,7 +142,10 @@ update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
         DecodedRefererString decodedReferer ->
-            ( { model | referer = Just <| GithubAuth.toReferer decodedReferer }, Cmd.none ) |> Debug.log decodedReferer
+            ( { model | referer = Just <| GithubAuth.toReferer decodedReferer }, Cmd.none )
+
+        SessionLoggedIn result ->
+            ( model, Cmd.none ) |> Debug.log "SESSION LOGGED IN"
 
 
 subscriptions : Sub Msg

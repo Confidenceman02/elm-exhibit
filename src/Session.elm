@@ -3,6 +3,7 @@ module Session exposing
     , SessionError
     , SessionId
     , SessionSuccess
+    , callBack
     , fromResult
     , init
     , isGuest
@@ -18,6 +19,7 @@ module Session exposing
 import Api.Api as Api
 import Api.Endpoint as Endpoint
 import Browser.Navigation as Nav
+import GithubAuth
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -169,6 +171,27 @@ login toMsg =
         (Endpoint.lambdaUrl [ "session-grant" ] [])
         toMsg
         (decodeResponseString successBodyDecoder)
+    , LoggingIn
+    )
+
+
+{-|
+
+    After auth redirect we use the session callback endpoint to exchange the code
+    for an access token.
+
+    This endpoint will also do other stuff for us like set the cookie header for
+    subsequent requests.
+
+-}
+callBack : (Result SessionError SessionSuccess -> msg) -> GithubAuth.CallBackParams -> ( Cmd msg, Session )
+callBack toMsg callBackParams =
+    ( Api.get
+        (Endpoint.lambdaUrl [ "session-auth-callback" ] (GithubAuth.callBackParamsToUrlParams callBackParams))
+        toMsg
+        (decodeResponseString
+            successBodyDecoder
+        )
     , LoggingIn
     )
 
