@@ -6,6 +6,8 @@ module Styles.Typography exposing
     , exTypographyHeading4FontWeight
     , exTypographyHeading5FontSize
     , exTypographyHeading5FontWeight
+    , exTypographyParagraphBodyBoldFontSize
+    , exTypographyParagraphBodyBoldFontWeight
     , exTypographyParagraphBodyFontSize
     , exTypographyParagraphIntroFontSize
     )
@@ -56,3 +58,13 @@ exTypographyParagraphIntroFontSize =
 exTypographyParagraphBodyFontSize : Rem
 exTypographyParagraphBodyFontSize =
     Css.rem 1
+
+
+exTypographyParagraphBodyBoldFontSize : Rem
+exTypographyParagraphBodyBoldFontSize =
+    Css.rem 1
+
+
+exTypographyParagraphBodyBoldFontWeight : Int
+exTypographyParagraphBodyBoldFontWeight =
+    700

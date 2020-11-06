@@ -65,7 +65,12 @@ paneContent model =
         resolvedReferer =
             case model.referer of
                 Just referer ->
-                    Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Body) [ text <| GithubAuth.refererToString referer ]
+                    Paragraph.view
+                        (Paragraph.default
+                            |> Paragraph.style Paragraph.BodyBold
+                            |> Paragraph.overrides [ Css.overflowWrap Css.breakWord ]
+                        )
+                        [ text <| GithubAuth.refererToString referer ]
 
                 _ ->
                     text "where you tried to log in from."
@@ -75,9 +80,10 @@ paneContent model =
             (Paragraph.default
                 |> Paragraph.style Paragraph.Intro
             )
-            [ text "After we sign you in we will redirect you back to ", resolvedReferer ]
-        , Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro) [ text "Please don't navigate away from this page in the mean time." ]
+            [ text "After we sign you in we will redirect you back to " ]
         ]
+    , resolvedReferer
+    , div [ StyledAttribs.css [ Css.width (Css.pct 75) ] ] [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro) [ text "Please don't navigate away from this page in the mean time." ] ]
     ]
 
 
