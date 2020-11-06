@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
-import {errorResponse, noIdea, removeWhiteSpace} from "./common";
+import {errorResponse, noIdea} from "./response";
+import { removeWhiteSpace } from "./common";
 import { ResponseBody } from "./types";
 import redisClient from "./redis/client"
 

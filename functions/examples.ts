@@ -1,7 +1,7 @@
 import examples from "../data/examples.json";
 import { APIGatewayEvent, Context } from 'aws-lambda';
 import { StatusCodes } from "http-status-codes";
-import {errorResponse, noIdea } from "./common";
+import {errorResponse, noIdea, successBody} from "./response";
 import { ResponseBody } from "./types";
 
 interface ErrorBody
@@ -18,13 +18,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   }
 
   if (params.author && params.package) {
-    return {
-      statusCode: StatusCodes.OK,
-      body: JSON.stringify({examples: examples}),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
+    return successBody(StatusCodes.OK, { examples })
   } else {
     return errorResponse(StatusCodes.BAD_REQUEST, noIdea)
   }

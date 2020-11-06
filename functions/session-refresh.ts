@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import { ResponseBody } from "./types";
-import { errorResponse, jsonHeaders } from "./common";
+import { errorResponse, jsonHeaders } from "./response";
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const { cookie } = event.headers

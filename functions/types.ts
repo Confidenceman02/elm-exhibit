@@ -9,16 +9,22 @@ export type ExampleErrorBody  =
   | { tag: "AuthorAndPackageNotFound" }
   | NoIdea
 
+export type ExampleSuccessBody =
+    { examples: Example[] }
+
 export type SessionErrorBody =
   { tag: "RefreshFailed" }
-  | { tag: "Redirecting", location: string }
   | { tag: "LogInFailed" }
   | NoIdea
 
-export type SessionSuccessTag =
+export type SessionSuccessBody =
   { tag: "SessionRefreshed" }
+  | { tag: "Redirecting", location: string }
+  | { tag: "SessionGranted" }
 
 export type ErrorBody = ExampleErrorBody | SessionErrorBody
+
+export type SuccessBody = SessionSuccessBody | ExampleSuccessBody
 
 export type ResponseBody =
   {
@@ -29,10 +35,9 @@ export type ResponseBody =
     }
   }
 
-export type RedirectBody =
+interface Example
   {
-    statusCode: StatusCodes,
-    headers: {
-      Location: string
-    }
+    id: string,
+    name: string,
+    description: string
   }

@@ -1,8 +1,8 @@
 import { APIGatewayEvent, Context } from "aws-lambda";
-import { RedirectBody, ResponseBody } from "./types";
+import { ResponseBody } from "./types";
 import { StatusCodes } from "http-status-codes";
 import { URL } from "url";
-import { errorResponse, jsonHeaders } from "./common";
+import {errorResponse, successBody} from "./response";
 import { v4 as uuidv4 } from "uuid"
 import {initTempSession} from "./redis/actions";
 
@@ -21,15 +21,8 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
     const tempSession = await initTempSession({ sessionId, referer } )
 
     if (tempSession) {
-      return {
-        statusCode: StatusCodes.OK,
-        body: JSON.stringify({ tag: "Redirecting", location: githubLoginEndpoint.href }),
-        headers: {
-          ...jsonHeaders
-        }
-      }
+      return successBody(StatusCodes.OK, { tag: "Redirecting", location: githubLoginEndpoint.href })
     }
   }
-
   return errorResponse(StatusCodes.INTERNAL_SERVER_ERROR, { tag: "LogInFailed" })
 }
