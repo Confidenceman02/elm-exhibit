@@ -1,4 +1,4 @@
-module Route exposing (Route(..), fromUrl)
+module Route exposing (Route(..), fromUrl, isAuthGithubRedirect)
 
 import Author as Author exposing (Author)
 import GithubAuth
@@ -25,3 +25,13 @@ parser =
 fromUrl : Url -> Maybe Route
 fromUrl url =
     Parser.parse parser url
+
+
+isAuthGithubRedirect : Route -> Bool
+isAuthGithubRedirect route =
+    case route of
+        AuthGithubRedirect _ ->
+            True
+
+        _ ->
+            False

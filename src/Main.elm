@@ -44,9 +44,17 @@ init _ url navKey =
         -- We dont want to be refreshing session if
         -- Github redirected user here after app acceptance flow because
         -- that means there is no session in the first place to refresh!
-        -- Attempt to login a user on init.
         ( refreshSessionCmd, session ) =
-            Session.refresh RefreshedSession
+            case route of
+                Just r ->
+                    if Route.isAuthGithubRedirect r then
+                        ( Cmd.none, Session.init )
+
+                    else
+                        Session.refresh RefreshedSession
+
+                Nothing ->
+                    ( Cmd.none, Session.init )
     in
     changeRouteTo route (Context.toContext url navKey session)
         |> Tuple.mapSecond (\cmds -> Cmd.batch [ cmds, refreshSessionCmd ])
