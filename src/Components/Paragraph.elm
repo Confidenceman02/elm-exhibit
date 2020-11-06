@@ -2,16 +2,16 @@ module Components.Paragraph exposing (Style(..), default, inline, overrides, sty
 
 import Css
 import Html.Styled as Styled exposing (p)
-import Styles.Typography exposing (exTypographyParagraphBodyFontSize, exTypographyParagraphIntroFontSize)
+import Styles.Typography exposing (exTypographyParagraphBodyBoldFontSize, exTypographyParagraphBodyBoldFontWeight, exTypographyParagraphBodyFontSize, exTypographyParagraphIntroFontSize)
 import Svg.Styled.Attributes as StyledAttribs
 
 
-type Config msg
-    = Config (Configuration msg)
+type Config
+    = Config Configuration
 
 
-type alias Configuration msg =
-    { styledOverrides : Maybe (List (Styled.Attribute msg))
+type alias Configuration =
+    { styledOverrides : Maybe (List Css.Style)
     , inline : Bool
     , style : Style
     }
@@ -21,12 +21,12 @@ type alias Configuration msg =
 -- DEFAULTS
 
 
-default : Config msg
+default : Config
 default =
     Config defaults
 
 
-defaults : Configuration msg
+defaults : Configuration
 defaults =
     { styledOverrides = Nothing
     , inline = False
@@ -36,6 +36,7 @@ defaults =
 
 type Style
     = Body
+    | BodyBold
     | Intro
 
 
@@ -43,22 +44,22 @@ type Style
 -- MODIFIERS
 
 
-overrides : List (Styled.Attribute msg) -> Config msg -> Config msg
+overrides : List Css.Style -> Config -> Config
 overrides o (Config config) =
     Config { config | styledOverrides = Just o }
 
 
-inline : Bool -> Config msg -> Config msg
+inline : Bool -> Config -> Config
 inline predicate (Config config) =
     Config { config | inline = predicate }
 
 
-style : Style -> Config msg -> Config msg
+style : Style -> Config -> Config
 style s (Config config) =
     Config { config | style = s }
 
 
-view : Config msg -> List (Styled.Html msg) -> Styled.Html msg
+view : Config -> List (Styled.Html msg) -> Styled.Html msg
 view (Config config) content =
     let
         resolveOverrides =
@@ -77,6 +78,9 @@ view (Config config) content =
                 Body ->
                     [ Css.fontSize exTypographyParagraphBodyFontSize ] ++ styles
 
+                BodyBold ->
+                    [ Css.fontSize exTypographyParagraphBodyBoldFontSize, Css.fontWeight (Css.int exTypographyParagraphBodyBoldFontWeight) ] ++ styles
+
         withInline styles =
             if config.inline then
                 [ Css.display Css.inlineBlock, Css.margin (Css.px 0) ] ++ styles
@@ -86,7 +90,7 @@ view (Config config) content =
     in
     p
         [ StyledAttribs.css
-            ([]
+            (resolveOverrides
                 |> withStyle
                 |> withInline
             )
