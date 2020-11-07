@@ -1,4 +1,4 @@
-import {removeWhiteSpace, Tuple} from "../functions/common";
+import {removeWhiteSpace, Result} from "../functions/common";
 import { expect } from "chai";
 import {Status} from "../functions/types";
 
@@ -9,15 +9,15 @@ describe('removeWhiteSpace', () => {
   })
 })
 
-describe('toTuple', () => {
+describe('Result', () => {
   describe('Err', () => {
-    it('should return Err tuple', () => {
-      expect(Tuple().Err).to.deep.eq({ Status: Status.Err })
+    it('should return Err result', () => {
+      expect(Result().Err).to.deep.eq({ Status: Status.Err })
     })
   })
   describe('Ok', () => {
-    it('should return Ok tuple', () => {
-      expect(Tuple().Ok('something')).to.deep.eq({ Status: Status.Ok, data: 'something' })
+    it('should return Ok result', () => {
+      expect(Result().Ok('something')).to.deep.eq({ Status: Status.Ok, data: 'something' })
     })
   })
 })

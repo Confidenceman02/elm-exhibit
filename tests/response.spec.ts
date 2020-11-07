@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {errorResponse, noIdea} from "../functions/response";
+import {errorResponse} from "../functions/response";
 import {ExampleErrorBody, SessionErrorBody} from "../functions/types";
 import {StatusCodes} from "http-status-codes";
 
