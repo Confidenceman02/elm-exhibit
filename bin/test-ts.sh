@@ -2,4 +2,4 @@
 set -eo pipefail
 
 echo "Testing ts"
-yarn mocha -r ts-node/register 'tests/**/*.ts'
+yarn mocha --inline-diffs -r ts-node/register 'tests/**/*.ts'

@@ -24,5 +24,5 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       return successBody(StatusCodes.OK, { tag: "Redirecting", location: githubLoginEndpoint.href })
     }
   }
-  return errorResponse(StatusCodes.INTERNAL_SERVER_ERROR, { tag: "LogInFailed" })
+  return errorResponse({ tag: "LogInFailed" })
 }

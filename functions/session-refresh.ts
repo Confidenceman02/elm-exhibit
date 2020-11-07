@@ -13,6 +13,6 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       headers: { ...jsonHeaders }
     }
   } else {
-    return errorResponse(StatusCodes.NOT_FOUND, { tag: "RefreshFailed" })
+    return errorResponse({ tag: "RefreshFailed" })
   }
 }

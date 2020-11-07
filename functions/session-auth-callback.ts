@@ -7,7 +7,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   const params = event.queryStringParameters
 
   if (!params) {
-    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
+    return errorResponse(noIdea)
   }
 
   if (params.code && params.state) {
@@ -15,5 +15,5 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   //  return credentials such as name and id
     return successBody(StatusCodes.OK, { tag: "SessionGranted" })
   }
-  return errorResponse(StatusCodes.BAD_REQUEST, noIdea)
+  return errorResponse(noIdea)
 }
