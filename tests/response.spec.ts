@@ -1,4 +1,4 @@
-import {expect} from "chai"
+import {expect} from "chai";
 import {errorResponse, noIdea} from "../functions/response";
 import {ExampleErrorBody, SessionErrorBody} from "../functions/types";
 import {StatusCodes} from "http-status-codes";
