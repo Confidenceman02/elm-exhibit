@@ -19,7 +19,6 @@ export function successBody(statusCode: StatusCodes, body: SuccessBody): Respons
       ...jsonHeaders
     }
   }
-
 }
 
 export const noIdea: NoIdea = { tag: "KeineAhnung" }

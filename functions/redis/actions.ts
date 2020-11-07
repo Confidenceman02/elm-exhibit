@@ -12,3 +12,16 @@ export async function initTempSession(meta: TempSessionMeta): Promise<boolean> {
 
   return !!setSession
 }
+
+export async function getTempSession(tempSesh: TempSession) {
+  // This generated key should be an exact match to the initially generated key
+  const dbKey = generateDBKey(DBTag.TempSession, tempSesh.tempSessionId)
+  const tempSessionData = await client.HGETALLAsync(dbKey)
+  return tempSessionData
+}
+
+export async function tempSessionExists(tempSesh: TempSession): Promise<boolean> {
+  const dbKey = generateDBKey(DBTag.TempSession, tempSesh.tempSessionId)
+  const keyExists = await client.EXISTSAsync(dbKey)
+  return !!keyExists
+}
