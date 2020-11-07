@@ -1,0 +1,4 @@
+diff: true
+inline-diffs: true
+extension:
+  - ts

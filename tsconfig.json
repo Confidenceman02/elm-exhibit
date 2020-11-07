@@ -5,6 +5,6 @@
     "resolveJsonModule": true,
     "lib": ["dom"]
   },
-  "include": ["functions/**/*"],
-  "exclude": ["node_modules", "tests"]
+  "include": ["functions/**/*", "tests/**/*.spec.ts", "tests/mocha.env.ts"],
+  "exclude": ["node_modules"]
 }
