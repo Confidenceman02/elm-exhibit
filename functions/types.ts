@@ -41,3 +41,23 @@ interface Example
     name: string,
     description: string
   }
+
+export interface TempSession
+{
+  tempSessionId: string;
+  referer: string;
+}
+
+export enum Status {
+    Err,
+    Ok
+}
+
+export type ResultTuple<T> = ([Status.Ok, T] | [Status.Err, undefined])
+
+export interface ResultResolver<T>
+{
+  Err: [Status.Err, undefined];
+  Ok: (arg: T) => [Status.Ok, T]
+}
+
