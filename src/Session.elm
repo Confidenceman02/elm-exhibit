@@ -8,9 +8,9 @@ module Session exposing
     , init
     , isGuest
     , isIdle
+    , isLoggedIn
     , isLoggingIn
     , isRefreshing
-    , isSignedIn
     , login
     , refresh
     , toSessionId
@@ -27,7 +27,7 @@ import Viewer exposing (Cred, Viewer)
 
 
 type Session
-    = SignedIn Viewer
+    = LoggedIn Viewer
     | Guest
     | Idle
     | LoggingIn
@@ -47,10 +47,10 @@ fromResult : Result SessionError SessionSuccess -> ( Cmd msg, Session )
 fromResult result =
     case result of
         Ok (SessionRefreshed cred) ->
-            ( Cmd.none, SignedIn (Viewer.init cred) )
+            ( Cmd.none, LoggedIn (Viewer.init cred) )
 
         Ok (SessionGranted cred) ->
-            ( Cmd.none, SignedIn (Viewer.init cred) )
+            ( Cmd.none, LoggedIn (Viewer.init cred) )
 
         Ok (Redirecting meta) ->
             ( Nav.load meta.location, LoggingIn )
@@ -220,10 +220,10 @@ isRefreshing sesh =
             False
 
 
-isSignedIn : Session -> Bool
-isSignedIn sesh =
+isLoggedIn : Session -> Bool
+isLoggedIn sesh =
     case sesh of
-        SignedIn _ ->
+        LoggedIn _ ->
             True
 
         _ ->

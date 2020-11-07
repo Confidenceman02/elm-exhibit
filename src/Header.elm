@@ -110,11 +110,11 @@ sessionActionView : Session -> Styled.Html Msg
 sessionActionView sesh =
     let
         resolveText =
-            if Session.isSignedIn sesh then
-                "Signed in"
+            if Session.isLoggedIn sesh then
+                "Logged in"
 
             else if Session.isGuest sesh then
-                "Sign in with Github"
+                "Log in with Github"
 
             else if Session.isLoggingIn sesh then
                 "Logging in"
@@ -123,7 +123,7 @@ sessionActionView sesh =
                 ""
 
         withSessionAction config =
-            if Session.isSignedIn sesh then
+            if Session.isLoggedIn sesh then
                 Button.onClick SignOut config
 
             else if Session.isGuest sesh then
