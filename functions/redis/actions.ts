@@ -1,12 +1,8 @@
 import client from "./client"
 import {generateDBKey} from "./common";
-import {DBTag} from "./types";
+import {DBTag, TempSessionMeta} from "./types";
+import {TempSession} from "../types";
 
-type TempSessionMeta =
-  {
-    sessionId: string,
-    referer: string
-  }
 // This will store the referer so that when the user approves the github app we can
 // redirect them back to where they tried to login from. i.e. example page
 export async function initTempSession(meta: TempSessionMeta): Promise<boolean> {
