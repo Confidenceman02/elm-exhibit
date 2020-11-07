@@ -1,7 +1,6 @@
 import {APIGatewayEvent, Context} from "aws-lambda";
 import {ResponseBody, ResultType, TempSession} from "./types";
-import {errorResponse, noIdea, successBody} from "./response";
-import {StatusCodes} from "http-status-codes";
+import {errorResponse, noIdea} from "./response";
 import {tempSessionExists} from "./redis/actions";
 import {githubLoginEndpoint} from "./endpoint";
 
@@ -24,7 +23,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
         //  exchange code for access token
         const endPointResult: ResultType<URL> = githubLoginEndpoint(params.code)
       }
-      return successBody(StatusCodes.OK, { tag: "SessionGranted" })
+      return errorResponse({ tag: "LogInFailed" })
     } catch (e) {
       return errorResponse(noIdea)
     }
