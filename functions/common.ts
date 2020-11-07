@@ -6,7 +6,7 @@ export function removeWhiteSpace(value: string): string {
 
 export function Tuple<T>(): ResultResolver<T> {
   return {
-    Err: [Status.Err, undefined],
-    Ok: (arg: T) => [Status.Ok, arg]
+    Err: { Status: Status.Err },
+    Ok: (arg: T) => ({ Status: Status.Ok, data: arg })
   }
 }

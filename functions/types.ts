@@ -53,11 +53,11 @@ export enum Status {
     Ok
 }
 
-export type ResultTuple<T> = ([Status.Ok, T] | [Status.Err, undefined])
+export type ResultTuple<T> = ({ Status: Status.Ok, data: T } | { Status: Status.Err })
 
 export interface ResultResolver<T>
 {
-  Err: [Status.Err, undefined];
-  Ok: (arg: T) => [Status.Ok, T]
+  Err: { Status: Status.Err };
+  Ok: (arg: T) => { Status: Status.Ok, data: T }
 }
 
