@@ -5,8 +5,7 @@ export enum Status {
 
 export type ResultType<T> = ({ Status: Status.Ok, data: T } | { Status: Status.Err })
 
-export interface ResultResolver<T>
-{
+interface ResultResolver<T> {
   Err: { Status: Status.Err };
   Ok: (arg: T) => { Status: Status.Ok, data: T }
 }
