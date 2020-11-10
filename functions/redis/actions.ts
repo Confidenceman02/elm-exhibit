@@ -8,7 +8,7 @@ import {TempSession} from "../types";
 export async function initTempSession(meta: TempSessionMeta): Promise<boolean> {
   const dbKey = generateDBKey(DBTag.TempSession, meta.sessionId)
   const setSession = await client.HSETAsync(dbKey, "referer", meta.referer )
-  client.EXPIRE(dbKey, 10600)
+  client.EXPIRE(dbKey, 10800)
 
   return !!setSession
 }
