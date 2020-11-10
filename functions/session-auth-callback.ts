@@ -1,9 +1,11 @@
 import {APIGatewayEvent, Context} from "aws-lambda";
-import {ResponseBody, ResultType, TempSession} from "./types";
+import {ResponseBody,TempSession} from "./types";
+import {ResultType, Status} from "../lib/result";
 import {errorResponse, noIdea} from "./response";
 import {tempSessionExists} from "./redis/actions";
-import {githubLoginEndpoint} from "./endpoint";
-
+import {githubLoginEndpoint, githubUserEndpoint} from "./endpoint";
+import fetch from "node-fetch";
+import {acceptJson, withAuth} from "./headers";
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const params = event.queryStringParameters

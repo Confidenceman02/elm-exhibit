@@ -1,5 +1,6 @@
 import {StatusCodes} from "http-status-codes";
 import {ErrorBody, NoIdea, ResponseBody, SuccessBody} from "./types";
+import {jsonHeaders} from "./headers";
 
 export function errorResponse(error: ErrorBody): ResponseBody {
   return {
@@ -22,10 +23,6 @@ export function successBody(statusCode: StatusCodes, body: SuccessBody): Respons
 }
 
 export const noIdea: NoIdea = { tag: "KeineAhnung" }
-
-export const jsonHeaders = {
-  "Content-Type": "application/json"
-}
 
 function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
   switch (error.tag) {
