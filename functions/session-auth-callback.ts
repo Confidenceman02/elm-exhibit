@@ -18,15 +18,22 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
     const decodedState: string = Buffer.from(params.state, "base64").toString("utf8")
 
     try {
-      const stateAsObject: TempSession = JSON.parse(decodedState)
-      // We make sure a temp session exists.
-      const sessionExists = await tempSessionExists(stateAsObject)
-      if (sessionExists) {
-        //  exchange code for access token
-        const endPointResult: ResultType<URL> = githubLoginEndpoint(params.code)
+      const stateParamAsObject: TempSession = JSON.parse(decodedState)
+      // make sure a temp session exists.
+      const sessionExists = await tempSessionExists(stateParamAsObject)
+      const loginEndPoint: ResultType<URL> = githubLoginEndpoint(params.code)
+      if (sessionExists && loginEndPoint.Status === Status.Ok) {
+        const response = await fetch(loginEndPoint.data.href, { method: "POST", headers: { ...acceptJson } })
+        const responseData = await response.json()
+        //  get user github info
+        const githubUserResponse = await fetch(githubUserEndpoint().href, { headers: { ...acceptJson, ...withAuth(responseData.access_token) } })
+        const parsedGithubUserResponse = await githubUserResponse.json()
+        console.log(parsedGithubUserResponse)
+      //  save permanent session
       }
       return errorResponse({ tag: "LogInFailed" })
     } catch (e) {
+      console.log(e)
       return errorResponse(noIdea)
     }
   }
