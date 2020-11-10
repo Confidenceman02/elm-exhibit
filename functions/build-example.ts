@@ -1,19 +1,14 @@
 import { StatusCodes } from "http-status-codes";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import {errorResponse, noIdea} from "./response";
-import { removeWhiteSpace } from "./common";
 import { ResponseBody } from "./types";
 import redisClient from "./redis/client"
-
-function getCacheKey(author: string, pkg: string, example: string): string {
-  return removeWhiteSpace(`${author}-${pkg}-${example}-compiled`)
-}
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const params = event.queryStringParameters;
 
   if (!params) {
-    return errorResponse(StatusCodes.BAD_REQUEST, noIdea )
+    return errorResponse(noIdea )
   }
 
   if (params.author && params.package && params.example) {
@@ -40,5 +35,5 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       }
     }
   }
-  return errorResponse(StatusCodes.BAD_REQUEST, noIdea)
+  return errorResponse(noIdea)
 }
