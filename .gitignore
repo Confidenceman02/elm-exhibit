@@ -6,3 +6,4 @@ built-lambda
 elm-stuff
 .idea
 *.log
+lib/**/*.js
