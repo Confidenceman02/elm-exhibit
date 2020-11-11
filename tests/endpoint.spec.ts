@@ -11,3 +11,10 @@ describe('githubLoginEndpoint', () => {
     }
   })
 })
+
+describe('githubUserEndpoint', () => {
+  it('should return github user endpoint href', () => {
+    const endPoint: URL = githubUserEndpoint()
+    expect(endPoint.href).to.eq("https://api.github.com/user")
+  })
+})
