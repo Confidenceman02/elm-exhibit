@@ -1,6 +1,6 @@
-import {removeWhiteSpace, Result} from "../functions/common";
+import {removeWhiteSpace} from "../functions/common";
 import { expect } from "chai";
-import {Status} from "../functions/types";
+import {Status, Result} from "../lib/result";
 
 describe('removeWhiteSpace', () => {
   it('should remove all white space from string', () => {

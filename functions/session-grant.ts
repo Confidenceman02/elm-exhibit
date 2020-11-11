@@ -13,7 +13,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
   const { referer } = event.headers
   if (gitHubClientId) {
     const sessionId = uuidv4()
-    const stateAsJSON: string = JSON.stringify({ tempSessionId: sessionId, referer: referer })
+    const stateAsJSON: string = JSON.stringify({ sessionId: sessionId, referer: referer })
     const encodedState: string = Buffer.from(stateAsJSON, "utf8").toString("base64")
     githubAuthorizeEndpoint.searchParams.append("client_id", gitHubClientId)
     githubAuthorizeEndpoint.searchParams.append("state", encodedState)

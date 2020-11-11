@@ -1,6 +1,6 @@
-import {githubLoginEndpoint} from "../functions/endpoint";
+import {githubUserEndpoint, githubLoginEndpoint} from "../functions/endpoint";
 import {expect} from "chai";
-import {ResultType, Status} from "../functions/types";
+import {ResultType, Status} from "../lib/result";
 
 describe('githubLoginEndpoint', () => {
   it('should return github login endpoint href with auth params', () => {
