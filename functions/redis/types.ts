@@ -1,7 +1,8 @@
 import {RedisClient} from "redis";
 
 export enum DBTag {
-  TempSession
+  TempSession,
+  Session
 }
 
 export type Seconds = number
