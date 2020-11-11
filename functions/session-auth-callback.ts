@@ -27,9 +27,12 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
         const responseData = await response.json()
         //  get user github info
         const githubUserResponse = await fetch(githubUserEndpoint().href, { headers: { ...acceptJson, ...withAuth(responseData.access_token) } })
-        const parsedGithubUserResponse = await githubUserResponse.json()
-        console.log(parsedGithubUserResponse)
-      //  save permanent session
+        const parsedGithubUserResponse: GithubUserData = await githubUserResponse.json()
+        const initiatedSession = await initSession(stateParamAsObject.sessionId, parsedGithubUserResponse)
+        if (initiatedSession) {
+          console.log("INITIATED", parsedGithubUserResponse)
+        //  respond with cookies
+        }
       }
       return errorResponse({ tag: "LogInFailed" })
     } catch (e) {
