@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {errorResponse} from "../functions/response";
-import {ExampleErrorBody, SessionErrorBody} from "../functions/types";
+import {errorResponse, successResponse} from "../functions/response";
+import {ExampleErrorBody, ExampleSuccessBody, SessionErrorBody, SessionSuccessBody} from "../functions/types";
 import {StatusCodes} from "http-status-codes";
 
 describe("errorResponse", () => {
@@ -58,7 +58,7 @@ describe("errorResponse", () => {
       it("should return error response body", () => {
         const expected =
             {
-              statusCode: StatusCodes.BAD_REQUEST,
+              statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
               body: JSON.stringify(tag),
               headers: {"Content-Type": "application/json"}
             }
@@ -90,6 +90,61 @@ describe("errorResponse", () => {
             }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
+    })
+  })
+})
+
+describe("successBody", () => {
+  describe("ExamplesFetched", () => {
+    const tag: ExampleSuccessBody = {
+      tag: "ExamplesFetched",
+      examples: [{ id: "123", name: "some name", description: "some description" }]
+    }
+    it("should return success response", () => {
+      const expected = {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(tag),
+        headers: {"Content-Type": "application/json"}
+      }
+      expect(successResponse(tag)).to.deep.eq(expected)
+    })
+  })
+  describe("SessionRefreshed", () => {
+    const tag: SessionSuccessBody = { tag: "SessionRefreshed" }
+    it("should return success response", () => {
+      const expected = {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(tag),
+        headers: {"Content-Type": "application/json"}
+      }
+      expect(successResponse(tag)).to.deep.eq(expected)
+    })
+  })
+  describe("Redirecting", () => {
+    const tag: SessionSuccessBody = { tag: "Redirecting", location: "www.bs.com" }
+    it('should return a success response', () => {
+      const expected = {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(tag),
+        headers: {"Content-Type": "application/json"}
+      }
+      expect(successResponse(tag)).to.deep.eq(expected)
+    });
+  })
+  describe("SessionGranted", () => {
+    const tag: SessionSuccessBody = {
+      tag: "SessionGranted",
+      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: "1234", sessionId: "S1234" }}
+    it("should return a success response", () => {
+      const expected = {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(tag),
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": "session_id=S1234; Secure; HttpOnly"
+        }
+      }
+      expect(successResponse(tag)).to.deep.eq(expected)
     })
   })
 })

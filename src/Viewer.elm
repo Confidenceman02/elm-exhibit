@@ -13,8 +13,8 @@ type Cred
 
 
 type alias Credentials =
-    { name : String
-    , id : String
+    { username : String
+    , avatarUrl : String
     }
 
 
