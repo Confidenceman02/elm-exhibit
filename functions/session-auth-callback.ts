@@ -1,8 +1,8 @@
 import {APIGatewayEvent, Context} from "aws-lambda";
 import {GithubUserData, ResponseBody, TempSession} from "./types";
 import {ResultType, Status} from "../lib/result";
-import {errorResponse, noIdea} from "./response";
-import {initSession, tempSessionExists} from "./redis/actions";
+import {errorResponse, noIdea, successResponse} from "./response";
+import {createUser, initSession, tempSessionExists} from "./redis/actions";
 import {githubLoginEndpoint, githubUserEndpoint} from "./endpoint";
 import fetch from "node-fetch";
 import {acceptJson, withAuth} from "./headers";
@@ -28,10 +28,13 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
         //  get user github info
         const githubUserResponse = await fetch(githubUserEndpoint().href, { headers: { ...acceptJson, ...withAuth(responseData.access_token) } })
         const parsedGithubUserResponse: GithubUserData = await githubUserResponse.json()
+        // check for existing user based on id
+        // initiate session
         const initiatedSession = await initSession(stateParamAsObject.sessionId, parsedGithubUserResponse)
-        if (initiatedSession) {
-          console.log("INITIATED", parsedGithubUserResponse)
-        //  respond with cookies
+        const createdUser = await createUser(parsedGithubUserResponse)
+        if (initiatedSession && createdUser) {
+          // get created user
+          console.log(parsedGithubUserResponse)
         }
       }
       return errorResponse({ tag: "LogInFailed" })
