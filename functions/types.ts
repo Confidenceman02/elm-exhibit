@@ -10,7 +10,7 @@ export type ExampleErrorBody  =
   | NoIdea
 
 export type ExampleSuccessBody =
-    { examples: Example[] }
+    { tag: "ExamplesFetched", examples: Example[] }
 
 export type SessionErrorBody =
   { tag: "RefreshFailed" }
@@ -20,11 +20,13 @@ export type SessionErrorBody =
 export type SessionSuccessBody =
   { tag: "SessionRefreshed" }
   | { tag: "Redirecting", location: string }
-  | { tag: "SessionGranted" }
+  | { tag: "SessionGranted", session: UserSession }
 
 export type ErrorBody = ExampleErrorBody | SessionErrorBody
 
 export type SuccessBody = SessionSuccessBody | ExampleSuccessBody
+
+export type TaggedResponseBody = SuccessBody | ErrorBody
 
 export type ResponseBody =
   {
