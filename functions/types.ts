@@ -56,5 +56,7 @@ export type GithubUserData = {
 
 export type UserSession = {
   username: string,
-  avatarUrl: string
+  userId: string
+  avatarUrl: string,
+  sessionId: string
 }
