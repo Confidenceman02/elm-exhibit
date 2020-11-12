@@ -1,8 +1,14 @@
 import {RedisClient} from "redis";
 
-export enum DBTag {
+export type DBTag = PermanentDBTag | ExpirableDBTag
+
+export enum PermanentDBTag {
+  User
+}
+
+export enum ExpirableDBTag {
   TempSession,
-  Session
+  Session,
 }
 
 export type Seconds = number

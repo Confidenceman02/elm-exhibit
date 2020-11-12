@@ -1,19 +1,26 @@
-import {DBTag, Seconds} from "./types";
+import {DBTag, ExpirableDBTag, PermanentDBTag, Seconds} from "./types";
 
-export function generateDBKey(tag: DBTag, uniqueKey: string ): string {
+export function generateExpirableDBKey(tag: ExpirableDBTag, uniqueKey: string ): string {
   switch (tag) {
-    case DBTag.TempSession:
+    case ExpirableDBTag.TempSession:
       return `${uniqueKey}.tempsession`
-    case DBTag.Session:
+    case ExpirableDBTag.Session:
       return `${uniqueKey}.session`
   }
 }
 
-export function resolveExpiration(tag: DBTag): Seconds {
+export function generatePermanentDBKey(tag: PermanentDBTag, uniqueKey: string): string {
   switch (tag) {
-    case DBTag.TempSession:
+    case PermanentDBTag.User:
+      return `${uniqueKey}.user`
+  }
+}
+
+export function resolveExpiration(tag: ExpirableDBTag): Seconds {
+  switch (tag) {
+    case ExpirableDBTag.TempSession:
       return 300
-    case DBTag.Session:
+    case ExpirableDBTag.Session:
       return 604800
   }
 }
