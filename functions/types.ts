@@ -51,6 +51,7 @@ export interface TempSession {
 
 export type GithubUserData = {
   login: string,
+  id: number,
   avatar_url: string
 }
 
