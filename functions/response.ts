@@ -1,6 +1,6 @@
 import {StatusCodes} from "http-status-codes";
-import {ErrorBody, NoIdea, ResponseBody, SuccessBody} from "./types";
-import {jsonHeaders} from "./headers";
+import {ErrorBody, NoIdea, ResponseBody, SuccessBody, TaggedResponseBody} from "./types";
+import {jsonHeaders, withSessionCookie} from "./headers";
 
 export function errorResponse(error: ErrorBody): ResponseBody {
   return {
@@ -12,12 +12,12 @@ export function errorResponse(error: ErrorBody): ResponseBody {
   }
 }
 
-export function successBody(statusCode: StatusCodes, body: SuccessBody): ResponseBody {
+export function successResponse(body: SuccessBody): ResponseBody {
   return {
-    statusCode: statusCode,
+    statusCode: resolveStatusCodeFromSuccessBody(body),
     body: JSON.stringify(body),
     headers: {
-      ...jsonHeaders
+      ...resolveHeadersFromTaggedResponseBody(body)
     }
   }
 }
@@ -39,6 +39,30 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
     case "LogInFailed":
       return StatusCodes.INTERNAL_SERVER_ERROR
     default:
-      return StatusCodes.BAD_REQUEST
+      return StatusCodes.INTERNAL_SERVER_ERROR
+  }
+}
+
+function resolveStatusCodeFromSuccessBody(successBody: SuccessBody): StatusCodes {
+  switch (successBody.tag) {
+    case "ExamplesFetched":
+      return StatusCodes.OK
+    case "SessionRefreshed":
+      return StatusCodes.OK
+    case "SessionGranted":
+      return StatusCodes.OK
+    case "Redirecting":
+      return StatusCodes.OK
+    default:
+      return StatusCodes.INTERNAL_SERVER_ERROR
+  }
+}
+
+function resolveHeadersFromTaggedResponseBody(taggedBody: TaggedResponseBody) {
+  switch (taggedBody.tag) {
+    case "SessionGranted":
+      return { ...jsonHeaders, ...withSessionCookie(taggedBody.session) }
+    default:
+      return { ...jsonHeaders }
   }
 }
