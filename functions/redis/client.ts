@@ -3,7 +3,7 @@ import redisLib from "redis";
 import {IPromisifiedRedis} from "./types";
 import {Result, ResultType} from "../../lib/result";
 
-const redisPort: string | undefined = process.env.REDIS_SERVICE_PORT ? process.env.REDIS_SERVICE_PORT : "0"
+const redisPort: string | undefined = process.env.REDIS_SERVICE_PORT
 const redisIP: string | undefined = process.env.REDIS_SERVICE_IP
 const redis = Promise.promisifyAll(redisLib)
 const client: () => ResultType<IPromisifiedRedis> = (): ResultType<IPromisifiedRedis> => {
