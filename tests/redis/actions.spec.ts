@@ -10,6 +10,11 @@ describe('actions', () => {
       redisClientResult.data.FLUSHALL()
     }
   })
+  afterEach((() => {
+    if(redisClientResult.Status === Status.Ok) {
+      redisClientResult.data.FLUSHALL()
+    }
+  }))
   describe('initTempSession', () => {
     it('should init a temporary session', async () => {
       // const client = redisClientResult.data
