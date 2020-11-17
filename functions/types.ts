@@ -1,4 +1,5 @@
 import {StatusCodes} from "http-status-codes";
+import {UserSession} from "./redis/schema";
 
 export type NoIdea = { tag: "KeineAhnung" }
 
@@ -50,9 +51,3 @@ export type GithubUserData = {
   avatar_url: string
 }
 
-export type UserSession = {
-  username: string,
-  userId: string
-  avatarUrl: string,
-  sessionId: string
-}

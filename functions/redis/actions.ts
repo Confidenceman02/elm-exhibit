@@ -2,7 +2,7 @@ import redisClientResult from "./client"
 import {generateExpirableDBKey, generatePermanentDBKey, resolveExpiration} from "./common";
 import {ExpirableDBTag, PermanentDBTag, TempSession} from "./types";
 import {GithubUserData} from "../types";
-import {Table, UserSchemaKey, User, RedisHValue, redisValueToUser} from "./schema";
+import {RedisHValue,UserSession, redisValueToUser, redisValueToUserSession, Table, User, UserSchemaKey} from "./schema";
 import {Result, ResultType, Status} from '../../lib/result'
 
 // This will store the referer so that when the user approves the github app we can
@@ -22,11 +22,22 @@ export async function initSession(sessionId: string, gitUser: GithubUserData): P
   if (redisClientResult.Status === Status.Ok) {
     const client = redisClientResult.data
     const dbKey = generateExpirableDBKey(ExpirableDBTag.Session, sessionId)
-    const setSession = await client.HSETAsync(dbKey, UserSchemaKey.username, gitUser.login, UserSchemaKey.avatarUrl, gitUser.avatar_url)
+    const setSession = await client.HSETAsync(dbKey, UserSchemaKey.username, gitUser.login, UserSchemaKey.userId, gitUser.id, UserSchemaKey.avatarUrl, gitUser.avatar_url, "sessionId", sessionId)
     client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session))
     return !!setSession
   }
   return false
+}
+
+export async function getSession(sessionId: string): Promise<ResultType<UserSession>> {
+  if (redisClientResult.Status === Status.Ok) {
+    const client = redisClientResult.data
+    const key = generateExpirableDBKey(ExpirableDBTag.Session, sessionId)
+    const redisUserSession: RedisHValue<UserSession> = await client.HGETALLAsync(key)
+    const userSession: UserSession = redisValueToUserSession(redisUserSession)
+    return Result<UserSession>().Ok(userSession)
+  }
+  return Result().Err
 }
 
 export async function tempSessionExists(tempSesh: TempSession): Promise<boolean> {
@@ -56,7 +67,6 @@ export async function getUser(gitUserId: number): Promise<ResultType<User>> {
     const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUserId.toString())
     const redisUser: RedisHValue<User> = await client.HGETALLAsync(userReferenceKey)
     const user = redisValueToUser(redisUser)
-    console.log('USER', user)
     return Result<User>().Ok(user)
   }
   return Result().Err

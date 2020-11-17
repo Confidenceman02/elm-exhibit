@@ -1,4 +1,4 @@
-import {UserSession} from "./types";
+import {UserSession} from "./redis/schema";
 
 export const jsonHeaders = {
   "Content-Type": "application/json"

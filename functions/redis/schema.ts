@@ -6,6 +6,13 @@ export interface User {
   avatarUrl: string
 }
 
+export type UserSession = {
+  username: string,
+  userId: number
+  avatarUrl: string,
+  sessionId: string
+}
+
 export type RedisHValue<T> = {
   [P in keyof T]: string
 }
@@ -20,4 +27,11 @@ export function redisValueToUser(redisValue: RedisHValue<User>): User {
   }
 }
 
-
+export function redisValueToUserSession(redisValue: RedisHValue<UserSession>): UserSession {
+  return {
+    username: redisValue.username,
+    userId: parseInt(redisValue.userId),
+    avatarUrl: redisValue.avatarUrl,
+    sessionId: redisValue.sessionId
+  }
+}

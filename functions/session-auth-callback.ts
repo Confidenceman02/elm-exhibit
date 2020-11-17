@@ -2,7 +2,7 @@ import {APIGatewayEvent, Context} from "aws-lambda";
 import {GithubUserData, ResponseBody, TempSession} from "./types";
 import {ResultType, Status} from "../lib/result";
 import {errorResponse, noIdea} from "./response";
-import {createUser, initSession, tempSessionExists} from "./redis/actions";
+import {createUser, getUser, initSession, tempSessionExists} from "./redis/actions";
 import {githubLoginEndpoint, githubUserEndpoint} from "./endpoint";
 import fetch from "node-fetch";
 import {acceptJson, withAuth} from "./headers";
