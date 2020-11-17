@@ -44,11 +44,6 @@ interface Example
     description: string
   }
 
-export interface TempSession {
-  sessionId: string;
-  referer: string;
-}
-
 export type GithubUserData = {
   login: string,
   id: number,

@@ -17,7 +17,7 @@ export interface IPromisifiedRedis extends RedisClient {
   [x:string]: any
 }
 
-export interface TempSessionMeta {
+export interface TempSession {
     sessionId: string,
     referer: string
 }

@@ -1,8 +1,9 @@
 import redisClientResult from '../../functions/redis/client'
 import {expect} from 'chai'
 import {Status} from '../../lib/result'
-import {initTempSession} from "../../functions/redis/actions";
-import {TempSessionMeta} from "../../functions/redis/types";
+import {createUser, initTempSession, initSession, tempSessionExists} from "../../functions/redis/actions";
+import {TempSession} from "../../functions/redis/types";
+import {GithubUserData} from "../../functions/types";
 
 describe('actions', () => {
   beforeEach(() => {
