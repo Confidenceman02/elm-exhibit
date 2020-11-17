@@ -2,8 +2,8 @@ import redisClientResult from "./client"
 import {generateExpirableDBKey, generatePermanentDBKey, resolveExpiration} from "./common";
 import {ExpirableDBTag, PermanentDBTag, TempSession} from "./types";
 import {GithubUserData} from "../types";
-import {Table, UserSchema} from "./schema";
-import {Status} from '../../lib/result'
+import {Table, UserSchemaKey, User, RedisHValue, redisValueToUser} from "./schema";
+import {Result, ResultType, Status} from '../../lib/result'
 
 // This will store the referer so that when the user approves the github app we can
 // redirect them back to where they tried to login from. i.e. example page
@@ -22,7 +22,7 @@ export async function initSession(sessionId: string, gitUser: GithubUserData): P
   if (redisClientResult.Status === Status.Ok) {
     const client = redisClientResult.data
     const dbKey = generateExpirableDBKey(ExpirableDBTag.Session, sessionId)
-    const setSession = await client.HSETAsync(dbKey, UserSchema.userName, gitUser.login, UserSchema.avatarUrl, gitUser.avatar_url)
+    const setSession = await client.HSETAsync(dbKey, UserSchemaKey.username, gitUser.login, UserSchemaKey.avatarUrl, gitUser.avatar_url)
     client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session))
     return !!setSession
   }
