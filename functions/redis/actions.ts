@@ -44,8 +44,20 @@ export async function createUser(gitUser: GithubUserData): Promise<boolean> {
     const client = redisClientResult.data
     const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUser.id.toString())
     const setUserReference = await client.ZADDAsync(Table.users, gitUser.id, userReferenceKey)
-    const setUser = await client.HSETAsync(userReferenceKey, UserSchema.userName, gitUser.login, UserSchema.userId, gitUser.id, UserSchema.avatarUrl, gitUser.avatar_url)
+    const setUser = await client.HSETAsync(userReferenceKey, UserSchemaKey.username, gitUser.login, UserSchemaKey.userId, gitUser.id, UserSchemaKey.avatarUrl, gitUser.avatar_url)
     return (!!setUserReference && !!setUser)
   }
   return false
+}
+
+export async function getUser(gitUserId: number): Promise<ResultType<User>> {
+  if (redisClientResult.Status === Status.Ok) {
+    const client = redisClientResult.data
+    const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUserId.toString())
+    const redisUser: RedisHValue<User> = await client.HGETALLAsync(userReferenceKey)
+    const user = redisValueToUser(redisUser)
+    console.log('USER', user)
+    return Result<User>().Ok(user)
+  }
+  return Result().Err
 }

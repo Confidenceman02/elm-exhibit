@@ -1,7 +1,7 @@
 import redisClientResult from '../../functions/redis/client'
 import {expect} from 'chai'
 import {Status} from '../../lib/result'
-import {createUser, initTempSession, initSession, tempSessionExists} from "../../functions/redis/actions";
+import {createUser, initTempSession, initSession, tempSessionExists, getUser} from "../../functions/redis/actions";
 import {TempSession} from "../../functions/redis/types";
 import {GithubUserData} from "../../functions/types";
 
@@ -44,6 +44,14 @@ describe('actions', () => {
       const gitUserData: GithubUserData = { login: "ConfidenceMan02", id: 2345, avatar_url: 'www.bs.com' }
       const userCreated = await createUser(gitUserData)
       expect(userCreated).to.be.true
+    })
+  })
+  describe('getUser', () => {
+    it('should get a user', async () => {
+      const gitUserData: GithubUserData = { login: "Confidenceman02", id: 2345, avatar_url: 'www.bs.com' }
+      await createUser(gitUserData)
+      const user = await getUser(gitUserData.id)
+      expect(user).to.deep.eq({Status: Status.Ok, data: { username: 'Confidenceman02', userId: 2345, avatarUrl: 'www.bs.com' } })
     })
   })
 })
