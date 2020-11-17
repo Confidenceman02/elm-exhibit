@@ -134,7 +134,7 @@ describe("successBody", () => {
   describe("SessionGranted", () => {
     const tag: SessionSuccessBody = {
       tag: "SessionGranted",
-      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: "1234", sessionId: "S1234" }}
+      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: 1234, sessionId: "S1234" }}
     it("should return a success response", () => {
       const expected = {
         statusCode: StatusCodes.OK,
