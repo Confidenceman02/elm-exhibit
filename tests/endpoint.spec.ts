@@ -1,4 +1,4 @@
-import {githubUserEndpoint, githubLoginEndpoint} from "../functions/endpoint";
+import {githubAuthorizeEndpoint, githubLoginEndpoint, githubUserEndpoint} from "../functions/endpoint";
 import {expect} from "chai";
 import {ResultType, Status} from "../lib/result";
 
@@ -16,5 +16,17 @@ describe('githubUserEndpoint', () => {
   it('should return github user endpoint href', () => {
     const endPoint: URL = githubUserEndpoint()
     expect(endPoint.href).to.eq("https://api.github.com/user")
+  })
+})
+
+describe('githubAuthorizeEndpoint', () => {
+  it('should return github authorize endpoint href', () => {
+    const sessionId = "1234"
+    const state = "stateValue"
+    const endPoint: ResultType<URL> = githubAuthorizeEndpoint(sessionId, state)
+    expect(endPoint.Status).to.eq(Status.Ok)
+    if (endPoint.Status === Status.Ok) {
+      expect(endPoint.data.href).to.eq("https://github.com/login/oauth/authorize?client_id=test-client-id&state=eyJzZXNzaW9uSWQiOiIxMjM0IiwicmVmZXJlciI6InN0YXRlVmFsdWUifQ%3D%3D")
+    }
   })
 })

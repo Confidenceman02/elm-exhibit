@@ -4,9 +4,9 @@ import { URL } from "url";
 import {errorResponse, successResponse} from "./response";
 import { v4 as uuidv4 } from "uuid"
 import {initTempSession} from "./redis/actions";
+import redisClient from "./redis/client"
 
 const gitHubClientId: string | undefined = process.env.GITHUB_CLIENT_ID
-const githubAuthorizeEndpoint: URL = new URL("https://github.com/login/oauth/authorize")
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const { referer } = event.headers
