@@ -40,13 +40,11 @@ export async function createUser(gitUser: GithubUserData, client: IPromisifiedRe
   return (!!setUserReference && !!setUser)
 }
 
-// export async function userExists(gitUserId: number): Promise<boolean> {
-//   if (redisClientResult.Status === Status.Ok) {
-//     const client = redisClientResult.data
-//     const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUserId.toString())
-//   }
-//   return false
-// }
+export async function userExists(gitUserId: number, client: IPromisifiedRedis): Promise<boolean> {
+  const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUserId.toString())
+  const user = await client.EXISTSAsync(userReferenceKey)
+  return !!user
+}
 
 export async function getUser(gitUserId: number, client: IPromisifiedRedis): Promise<ResultType<User>> {
   const userReferenceKey = generatePermanentDBKey(PermanentDBTag.User, gitUserId.toString())

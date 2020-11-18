@@ -7,7 +7,7 @@ import {
   getUser,
   initSession,
   initTempSession,
-  tempSessionExists
+  tempSessionExists, userExists
 } from "../../functions/redis/actions";
 import {TempSession} from "../../functions/redis/types";
 import {GithubUserData} from "../../functions/types";
@@ -61,6 +61,21 @@ describe('actions', () => {
       await createUser(gitUserData, client)
       const user = await getUser(gitUserData.id, client)
       expect(user).to.deep.eq({Status: Status.Ok, data: { username: 'Confidenceman02', userId: 2345, avatarUrl: 'www.bs.com' } })
+    })
+  })
+  describe('userExists', () => {
+    it('should find a user', async () => {
+      const gitUserData: GithubUserData = { login: "Confidenceman02", id: 2345, avatar_url: 'www.bs.com' }
+      await createUser(gitUserData, client)
+      const user = await userExists(gitUserData.id, client)
+      expect(user).to.be.true
+    })
+    describe('when there is no user', () => {
+      it('should not find a user', async () => {
+        const gitUserData: GithubUserData = { login: "Confidenceman02", id: 2345, avatar_url: 'www.bs.com' }
+        const user = await userExists(gitUserData.id, client)
+        expect(user).to.be.false
+      })
     })
   })
   describe('getSession', () => {
