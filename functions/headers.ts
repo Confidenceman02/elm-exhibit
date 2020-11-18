@@ -16,6 +16,7 @@ export function withAuth(oauthToken: string) {
 
 export function withSessionCookie(session: UserSession) {
   return {
-    "Set-Cookie": `session_id=${session.sessionId}; Secure; HttpOnly`
+    // TODO: add secure only for production env
+    "Set-Cookie": `session_id=${session.sessionId}; HttpOnly`
   }
 }
