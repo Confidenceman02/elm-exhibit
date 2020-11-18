@@ -29,6 +29,9 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
       const responseData = await response.json()
       // get user github info
       const githubUserResponse = await fetch(githubUserEndpoint().href, { headers: { ...acceptJson, ...withAuth(responseData.access_token) } })
+      if (!githubUserResponse.ok) {
+        return errorResponse(noIdea)
+      }
       const parsedGithubUserResponse: GithubUserData = await githubUserResponse.json()
       // initiate a session
       const initiatedSession: boolean = await initSession(sessionId, parsedGithubUserResponse, client)
