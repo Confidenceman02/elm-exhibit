@@ -141,7 +141,7 @@ describe("successBody", () => {
         body: JSON.stringify(tag),
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": "session_id=S1234; Secure; HttpOnly"
+          "Set-Cookie": "session_id=S1234; HttpOnly"
         }
       }
       expect(successResponse(tag)).to.deep.eq(expected)
