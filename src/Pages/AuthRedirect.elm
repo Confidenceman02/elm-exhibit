@@ -13,6 +13,7 @@ import Ports exposing (decodeRefererFromStateParam)
 import Session
 import Styles.Color exposing (exColorColt100)
 import Styles.Grid as Grid
+import Url
 
 
 type Msg
@@ -142,14 +143,23 @@ update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
         DecodedRefererString decodedReferer ->
-            ( { model | referer = Just <| GithubAuth.toReferer decodedReferer }, Cmd.none )
+            let
+                referer =
+                    case Url.fromString decodedReferer of
+                        Just url ->
+                            Just (GithubAuth.toReferer url)
+
+                        Nothing ->
+                            Nothing
+            in
+            ( { model | referer = referer }, Cmd.none )
 
         SessionLoggedIn sessionResult ->
             let
                 ( _, session ) =
                     Session.fromResult sessionResult
             in
-            ( { model | context = Context.updateSession session model.context }, Cmd.none ) |> Debug.log "SESSION LOGGED IN"
+            ( { model | context = Context.updateSession session model.context }, Cmd.none )
 
 
 subscriptions : Sub Msg

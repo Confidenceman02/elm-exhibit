@@ -139,7 +139,7 @@ decodeResponseString decoder response =
                 Ok decodedBody ->
                     Ok decodedBody
 
-                Err err ->
+                Err _ ->
                     Err KeineAhnung
 
         _ ->

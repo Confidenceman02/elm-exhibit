@@ -1,5 +1,6 @@
 module GithubAuth exposing (CallBackParams, Referer, callBackParamsParser, callBackParamsToUrlParams, refererToString, stateStringFromParams, toReferer)
 
+import Url exposing (Url)
 import Url.Builder as UrlBuilder exposing (QueryParameter)
 import Url.Parser.Query as Query exposing (Parser)
 
@@ -17,7 +18,7 @@ type State
 
 
 type Referer
-    = Referer String
+    = Referer Url
 
 
 stateStringFromParams : CallBackParams -> String
@@ -41,14 +42,14 @@ toState state =
     State state
 
 
-toReferer : String -> Referer
+toReferer : Url -> Referer
 toReferer s =
     Referer s
 
 
 refererToString : Referer -> String
 refererToString (Referer r) =
-    r
+    Url.toString r
 
 
 callBackParamsParser : Parser (Maybe CallBackParams)
