@@ -93,7 +93,7 @@ mapTagToSessionSuccess tag =
             Decode.map SessionRefreshed Viewer.credDecoder
 
         "SessionGranted" ->
-            Decode.map SessionGranted Viewer.credDecoder
+            Decode.map SessionGranted (Decode.field "session" Viewer.credDecoder)
 
         "Redirecting" ->
             Decode.map Redirecting redirectingDecoder

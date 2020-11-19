@@ -144,8 +144,12 @@ update model msg =
         DecodedRefererString decodedReferer ->
             ( { model | referer = Just <| GithubAuth.toReferer decodedReferer }, Cmd.none )
 
-        SessionLoggedIn result ->
-            ( model, Cmd.none ) |> Debug.log "SESSION LOGGED IN"
+        SessionLoggedIn sessionResult ->
+            let
+                ( _, session ) =
+                    Session.fromResult sessionResult
+            in
+            ( { model | context = Context.updateSession session model.context }, Cmd.none ) |> Debug.log "SESSION LOGGED IN"
 
 
 subscriptions : Sub Msg

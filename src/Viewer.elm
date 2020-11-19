@@ -14,7 +14,7 @@ type Cred
 
 type alias Credentials =
     { username : String
-    , userId : String
+    , userId : Int
     , avatarUrl : String
     }
 
@@ -28,7 +28,7 @@ credentialsDecoder : Decoder Credentials
 credentialsDecoder =
     Decode.succeed Credentials
         |> required "username" Decode.string
-        |> required "userId" Decode.string
+        |> required "userId" Decode.int
         |> required "avatarUrl" Decode.string
 
 
