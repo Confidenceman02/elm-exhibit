@@ -2,6 +2,7 @@ module Pages.AuthRedirect exposing (Model, Msg, init, subscriptions, update, vie
 
 import Browser.Navigation as Nav
 import Components.ExhibitPane as ExhibitPane
+import Components.Link as Link
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
@@ -57,7 +58,7 @@ paneView model =
     let
         ( paneContent, interstitialVariant ) =
             if Session.hasFailed model.context.session then
-                ( loggingInPaneContent model, Interstitial.bummer )
+                ( loginFailedContent, Interstitial.bummer )
 
             else
                 ( loggingInPaneContent model, Interstitial.signingIn )
@@ -73,6 +74,19 @@ paneView model =
                 ]
             ]
         ]
+
+
+loginFailedContent : List (Styled.Html msg)
+loginFailedContent =
+    [ div [ StyledAttribs.css [ Css.width (Css.pct 75) ] ]
+        [ Paragraph.view
+            (Paragraph.default
+                |> Paragraph.style Paragraph.Intro
+            )
+            [ text "We couldn't seem to log you in, please try again later." ]
+        ]
+    , Link.view (Link.default |> Link.href "/") (Link.stringBody "Back to home")
+    ]
 
 
 loggingInPaneContent : Model -> List (Styled.Html msg)
