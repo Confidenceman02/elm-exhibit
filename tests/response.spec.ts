@@ -80,7 +80,7 @@ describe("errorResponse", () => {
       })
     })
     describe("LoginFailed", () => {
-      const tag: SessionErrorBody = { tag: "LogInFailed" }
+      const tag: SessionErrorBody = { tag: "LoginFailed" }
       it("should return error response body", () => {
         const expected =
             {

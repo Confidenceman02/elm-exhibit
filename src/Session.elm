@@ -63,6 +63,9 @@ fromResult result =
         Ok (Redirecting meta) ->
             ( Nav.load meta.location, LoggingIn )
 
+        Err LoginFailed ->
+            ( Cmd.none, Failed )
+
         _ ->
             ( Cmd.none, Guest )
 
@@ -74,6 +77,7 @@ toSessionId id =
 
 type SessionError
     = RefreshFailed
+    | LoginFailed
     | KeineAhnung
 
 
@@ -120,6 +124,9 @@ mapTagToSessionError tag =
     case tag of
         "RefreshFailed" ->
             Decode.succeed RefreshFailed
+
+        "LoginFailed" ->
+            Decode.succeed LoginFailed
 
         _ ->
             Decode.succeed KeineAhnung

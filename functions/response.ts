@@ -36,7 +36,7 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
       return StatusCodes.NOT_FOUND
     case "RefreshFailed":
       return StatusCodes.NOT_FOUND
-    case "LogInFailed":
+    case "LoginFailed":
       return StatusCodes.INTERNAL_SERVER_ERROR
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR

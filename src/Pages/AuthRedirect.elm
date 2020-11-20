@@ -169,16 +169,20 @@ update model msg =
                     Session.fromResult sessionResult
 
                 redirectCmd =
-                    case model.referer of
-                        Just referer ->
-                            let
-                                refererUrl =
-                                    GithubAuth.refererToUrl referer
-                            in
-                            Nav.pushUrl model.context.navKey refererUrl.path
+                    if Session.hasFailed session then
+                        Cmd.none
 
-                        Nothing ->
-                            Nav.pushUrl model.context.navKey "/"
+                    else
+                        case model.referer of
+                            Just referer ->
+                                let
+                                    refererUrl =
+                                        GithubAuth.refererToUrl referer
+                                in
+                                Nav.pushUrl model.context.navKey refererUrl.path
+
+                            Nothing ->
+                                Nav.pushUrl model.context.navKey "/"
             in
             ( { model | context = Context.updateSession session model.context }, redirectCmd )
 

@@ -47,11 +47,11 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
         if (createdUser) {
           return successResponse({ tag: "SessionGranted", session: session.data})
         }
-        return errorResponse({ tag: "LogInFailed" })
+        return errorResponse({ tag: "LoginFailed" })
       }
-      return errorResponse({ tag: "LogInFailed" })
+      return errorResponse({ tag: "LoginFailed" })
     }
-    return errorResponse({ tag: "LogInFailed" })
+    return errorResponse({ tag: "LoginFailed" })
   } catch (e) {
     console.log(e)
     return errorResponse(noIdea)
