@@ -5,12 +5,14 @@ module Session exposing
     , SessionSuccess
     , callBack
     , fromResult
+    , hasFailed
     , init
     , isGuest
     , isIdle
     , isLoggedIn
     , isLoggingIn
     , isRefreshing
+    , loggingIn
     , login
     , refresh
     , toSessionId
@@ -32,6 +34,7 @@ type Session
     | Idle
     | LoggingIn
     | Refreshing
+    | Failed
 
 
 type SessionId
@@ -41,6 +44,11 @@ type SessionId
 init : Session
 init =
     Idle
+
+
+loggingIn : Session
+loggingIn =
+    LoggingIn
 
 
 fromResult : Result SessionError SessionSuccess -> ( Cmd msg, Session )
@@ -244,6 +252,16 @@ isLoggingIn : Session -> Bool
 isLoggingIn sesh =
     case sesh of
         LoggingIn ->
+            True
+
+        _ ->
+            False
+
+
+hasFailed : Session -> Bool
+hasFailed sesh =
+    case sesh of
+        Failed ->
             True
 
         _ ->
