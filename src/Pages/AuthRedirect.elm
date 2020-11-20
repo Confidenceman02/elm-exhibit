@@ -1,5 +1,6 @@
 module Pages.AuthRedirect exposing (Model, Msg, init, subscriptions, update, view)
 
+import Browser.Navigation as Nav
 import Components.ExhibitPane as ExhibitPane
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
@@ -53,21 +54,29 @@ init context maybeAuthParams =
 
 paneView : Model -> Styled.Html msg
 paneView model =
+    let
+        ( paneContent, interstitialVariant ) =
+            if Session.hasFailed model.context.session then
+                ( loggingInPaneContent model, Interstitial.bummer )
+
+            else
+                ( loggingInPaneContent model, Interstitial.signingIn )
+    in
     paneWrapper
         [ pane
             [ ExhibitPane.view ExhibitPane.default
                 [ Interstitial.view
-                    (Interstitial.signingIn
+                    (interstitialVariant
                         |> Interstitial.content
-                            (paneContent model)
+                            paneContent
                     )
                 ]
             ]
         ]
 
 
-paneContent : Model -> List (Styled.Html msg)
-paneContent model =
+loggingInPaneContent : Model -> List (Styled.Html msg)
+loggingInPaneContent model =
     let
         resolvedReferer =
             case model.referer of
@@ -158,8 +167,20 @@ update model msg =
             let
                 ( _, session ) =
                     Session.fromResult sessionResult
+
+                redirectCmd =
+                    case model.referer of
+                        Just referer ->
+                            let
+                                refererUrl =
+                                    GithubAuth.refererToUrl referer
+                            in
+                            Nav.pushUrl model.context.navKey refererUrl.path
+
+                        Nothing ->
+                            Nav.pushUrl model.context.navKey "/"
             in
-            ( { model | context = Context.updateSession session model.context }, Cmd.none )
+            ( { model | context = Context.updateSession session model.context }, redirectCmd )
 
 
 subscriptions : Sub Msg

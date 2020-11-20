@@ -48,7 +48,7 @@ init _ url navKey =
             case route of
                 Just r ->
                     if Route.isAuthGithubRedirect r then
-                        ( Cmd.none, Session.init )
+                        ( Cmd.none, Session.loggingIn )
 
                     else
                         Session.refresh RefreshedSession
