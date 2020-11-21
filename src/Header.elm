@@ -142,22 +142,32 @@ sessionActionView sesh =
         ((not <| Session.isRefreshing sesh)
             && (not <| Session.isIdle sesh)
         )
-        (div [ StyledAttribs.css [ Css.top (Css.px 0), Css.right (Css.px 2), Css.marginRight Grid.halfGrid, Css.position Css.absolute, Css.marginTop (Css.px 5) ] ]
-            [ Button.view
-                (Button.wrapper
-                    [ span [ StyledAttribs.css [ Css.alignItems Css.center, Css.displayFlex ] ]
-                        [ resolveText
-                        , case sesh of
-                            Session.LoggedIn viewer ->
-                                viewerAvatar viewer
+        (div
+            [ StyledAttribs.css
+                [ Css.top (Css.px 0)
+                , Css.right (Css.px 2)
+                , Css.height (Css.px navHeight)
+                , Css.displayFlex
+                , Css.alignItems Css.center
+                , Css.marginRight Grid.halfGrid
+                , Css.position Css.absolute
+                ]
+            ]
+            [ case sesh of
+                Session.LoggedIn viewer ->
+                    viewerAvatar viewer
 
-                            _ ->
-                                GithubLogo.view GithubLogo.default
-                        ]
-                    ]
-                    |> withSessionAction
-                )
-                ""
+                _ ->
+                    Button.view
+                        (Button.wrapper
+                            [ span [ StyledAttribs.css [ Css.alignItems Css.center, Css.displayFlex ] ]
+                                [ resolveText
+                                , GithubLogo.view GithubLogo.default
+                                ]
+                            ]
+                            |> withSessionAction
+                        )
+                        ""
             ]
         )
 
@@ -165,11 +175,13 @@ sessionActionView sesh =
 viewerAvatar : Viewer -> Styled.Html msg
 viewerAvatar viewer =
     img
-        [ StyledAttribs.css
+        [ StyledAttribs.alt (Viewer.getUsername viewer)
+        , StyledAttribs.css
             [ Css.borderRadius (Css.px 17)
             , Css.height (Css.px 33)
             , Css.width (Css.px 33)
             , Css.border3 (Css.px 1) Css.solid exColorSky700
+            , Css.marginRight Grid.halfGrid
             ]
         , StyledAttribs.src (Viewer.getAvatarUrl viewer)
         ]

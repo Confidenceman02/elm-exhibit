@@ -1,4 +1,4 @@
-module Viewer exposing (Cred, Viewer, credDecoder, getAvatarUrl, init)
+module Viewer exposing (Cred, Viewer, credDecoder, getAvatarUrl, getUsername, init)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -40,3 +40,8 @@ credDecoder =
 getAvatarUrl : Viewer -> String
 getAvatarUrl (Viewer (Cred creds)) =
     creds.avatarUrl
+
+
+getUsername : Viewer -> String
+getUsername (Viewer (Cred creds)) =
+    creds.username
