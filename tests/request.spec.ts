@@ -2,7 +2,7 @@ import {parseCookie} from "../functions/request";
 import {expect} from "chai"
 import {Status} from "../lib/result";
 
-describe.only("parseCookie", () => {
+describe("parseCookie", () => {
   describe("when there is a valid cookie", () => {
     const cookie = "session_id=12345;"
     it("returns a cookie object", () => {
