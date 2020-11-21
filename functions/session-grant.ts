@@ -6,19 +6,29 @@ import {initTempSession} from "./redis/actions";
 import redisClient from "./redis/client"
 import {Status} from "../lib/result";
 import {githubAuthorizeEndpoint} from "./endpoint";
+import Cookie from "cookie"
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
-  const { referer } = event.headers
+  const { referer, cookie } = event.headers
   const sessionId = uuidv4()
   const authEndpoint = githubAuthorizeEndpoint(sessionId, referer)
-  if (redisClient.Status === Status.Ok && authEndpoint.Status === Status.Ok) {
+  if (redisClient.Status === Status.Ok) {
     const client = redisClient.data
-    // save temporary session meta
-    const tempSession = await initTempSession({ sessionId, referer }, client )
+    try {
+      // check for cookie
+      if (cookie) {
+        const parsedCookie =
+        //  retrieve session
+      }
+      // save temporary session meta
+      const tempSession = await initTempSession({ sessionId, referer }, client )
 
-    if (tempSession) {
-      return successResponse({ tag: "Redirecting", location: authEndpoint.data.href })
+      if (tempSession) {
+        return successResponse({ tag: "Redirecting", location: authEndpoint.data.href })
+      }
+    } catch (e) {
+      return errorResponse({ tag: "LoginFailed" })
     }
   }
-  return errorResponse({ tag: "LogInFailed" })
+  return errorResponse({ tag: "LoginFailed" })
 }

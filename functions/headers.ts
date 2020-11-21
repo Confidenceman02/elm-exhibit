@@ -4,6 +4,8 @@ export const jsonHeaders = {
   "Content-Type": "application/json"
 }
 
+export const sessionIdCookieKey = "session_id"
+
 export const acceptJson = {
   "Accept": "application/json"
 }
@@ -17,6 +19,6 @@ export function withAuth(oauthToken: string) {
 export function withSessionCookie(session: UserSession) {
   return {
     // TODO: add secure only for production env
-    "Set-Cookie": `session_id=${session.sessionId}; HttpOnly`
+    "Set-Cookie": `${sessionIdCookieKey}=${session.sessionId}; HttpOnly`
   }
 }
