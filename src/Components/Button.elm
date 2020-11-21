@@ -80,7 +80,7 @@ view (Config config) label =
                 IconButton _ ->
                     iconStyles
 
-                Wrapper content ->
+                Wrapper _ ->
                     wrapperStyles
 
         resolveButtonBody =
@@ -103,7 +103,7 @@ view (Config config) label =
                     content
     in
     button
-        ([ StyledAttribs.css resolveStyles ] ++ eventAttribs)
+        ([ StyledAttribs.type_ "button", StyledAttribs.css resolveStyles ] ++ eventAttribs)
         resolveButtonBody
 
 

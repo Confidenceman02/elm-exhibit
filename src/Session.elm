@@ -1,10 +1,11 @@
 module Session exposing
-    ( Session
+    ( Session(..)
     , SessionError
     , SessionId
     , SessionSuccess
     , callBack
     , fromResult
+    , getViewer
     , hasFailed
     , init
     , isGuest
@@ -273,3 +274,13 @@ hasFailed sesh =
 
         _ ->
             False
+
+
+getViewer : Session -> Maybe Viewer
+getViewer sesh =
+    case sesh of
+        LoggedIn viewer ->
+            Just viewer
+
+        _ ->
+            Nothing

@@ -8,7 +8,7 @@ import Components.Heading as Heading
 import Components.Link as Link
 import Css as Css
 import Effect exposing (Effect)
-import Html.Styled as Styled exposing (div, h1, span, text)
+import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Package exposing (Package)
@@ -16,6 +16,7 @@ import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Styles.Common exposing (absoluteCenterHorizontal)
 import Styles.Grid as Grid
+import Viewer exposing (Viewer)
 
 
 navHeight : Float
@@ -110,17 +111,22 @@ sessionActionView : Session -> Styled.Html Msg
 sessionActionView sesh =
     let
         resolveText =
-            if Session.isLoggedIn sesh then
-                "Logged in"
+            if Session.isGuest sesh || Session.isLoggingIn sesh then
+                span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ]
+                    [ Heading.view (Heading.h5 |> Heading.inline True)
+                        (if Session.isGuest sesh then
+                            "Log in with Github"
 
-            else if Session.isGuest sesh then
-                "Log in with Github"
+                         else if Session.isLoggingIn sesh then
+                            "Logging in"
 
-            else if Session.isLoggingIn sesh then
-                "Logging in"
+                         else
+                            ""
+                        )
+                    ]
 
             else
-                ""
+                text ""
 
         withSessionAction config =
             if Session.isLoggedIn sesh then
@@ -140,15 +146,34 @@ sessionActionView sesh =
             [ Button.view
                 (Button.wrapper
                     [ span [ StyledAttribs.css [ Css.alignItems Css.center, Css.displayFlex ] ]
-                        [ span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ] [ Heading.view (Heading.h5 |> Heading.inline True) resolveText ]
-                        , GithubLogo.view GithubLogo.default
+                        [ resolveText
+                        , case sesh of
+                            Session.LoggedIn viewer ->
+                                viewerAvatar viewer
+
+                            _ ->
+                                GithubLogo.view GithubLogo.default
                         ]
                     ]
                     |> withSessionAction
                 )
-                resolveText
+                ""
             ]
         )
+
+
+viewerAvatar : Viewer -> Styled.Html msg
+viewerAvatar viewer =
+    img
+        [ StyledAttribs.css
+            [ Css.borderRadius (Css.px 17)
+            , Css.height (Css.px 33)
+            , Css.width (Css.px 33)
+            , Css.border3 (Css.px 1) Css.solid exColorSky700
+            ]
+        , StyledAttribs.src (Viewer.getAvatarUrl viewer)
+        ]
+        []
 
 
 nav : Configuration -> Styled.Html msg
