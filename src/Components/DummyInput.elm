@@ -1,0 +1,71 @@
+module Components.DummyInput exposing (Config, default, view)
+
+import Html.Styled as Styled exposing (input)
+import Html.Styled.Attributes exposing (id, readonly, style, tabindex, value)
+import Html.Styled.Events exposing (onBlur, onFocus)
+
+
+type Config msg
+    = Config (Configuration msg)
+
+
+type alias Configuration msg =
+    { variant : Variant
+    , onFocus : Maybe msg
+    , onBlur : Maybe msg
+    }
+
+
+type Variant
+    = Default
+
+
+
+-- VARIANT
+
+
+default : Config msg
+default =
+    Config defaults
+
+
+defaults : Configuration msg
+defaults =
+    { variant = Default
+    , onFocus = Nothing
+    , onBlur = Nothing
+    }
+
+
+view : Config msg -> String -> Styled.Html msg
+view (Config config) uniqueId =
+    let
+        withOnfocus msg =
+            onFocus msg
+
+        withOnBlur msg =
+            onBlur msg
+
+        attribs =
+            List.filterMap identity
+                [ Maybe.map withOnfocus config.onFocus
+                , Maybe.map withOnBlur config.onBlur
+                ]
+    in
+    input
+        ([ style "label" "dummyInput"
+         , style "background" "0"
+         , style "border" "0"
+         , style "font-size" "inherit"
+         , style "outline" "0"
+         , style "padding" "0"
+         , style "width" "1px"
+         , style "color" "transparent"
+         , readonly True
+         , value ""
+         , tabindex 0
+         , id ("dummy-input-" ++ uniqueId)
+         ]
+            ++ attribs
+        )
+        []
