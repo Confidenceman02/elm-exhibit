@@ -125,6 +125,7 @@ view model =
                     examplesModel.package
                     examplesModel.context.session
                     ExamplesPage.toHeaderMsg
+                    examplesModel.headerState
                 )
                 GotExamplesMsg
                 (ExamplesPage.view examplesModel)

@@ -1,7 +1,22 @@
-module Header exposing (Config, HeaderEffect(..), Msg, example, home, navBottomBorder, navHeight, session, update, view)
+module Header exposing
+    ( Config
+    , HeaderEffect(..)
+    , Msg
+    , State
+    , example
+    , home
+    , initState
+    , navBottomBorder
+    , navHeight
+    , session
+    , state
+    , update
+    , view
+    )
 
 import Author exposing (Author)
 import Components.Button as Button
+import Components.DummyInput as DummyInput
 import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
@@ -41,11 +56,22 @@ type Variant
 type Msg
     = SignIn
     | SignOut
+    | MenuFocused
+
+
+type State
+    = State State_
+
+
+type alias State_ =
+    { menuOpen : Bool
+    }
 
 
 type alias Configuration =
     { variant : Variant
     , session : Maybe Session
+    , state : State
     }
 
 
@@ -60,6 +86,7 @@ defaultConfig : Configuration
 defaultConfig =
     { variant = Home
     , session = Nothing
+    , state = initState
     }
 
 
@@ -85,6 +112,11 @@ session sesh (Config config) =
 home : Config
 home =
     Config { defaultConfig | variant = Home }
+
+
+state : State -> Config -> Config
+state s (Config config) =
+    Config { config | state = s }
 
 
 view : Config -> Styled.Html Msg
@@ -155,7 +187,7 @@ sessionActionView sesh =
             ]
             [ case sesh of
                 Session.LoggedIn viewer ->
-                    viewerAvatar viewer
+                    div [] [ DummyInput.view (DummyInput.default |> DummyInput.onFocus MenuFocused) "123", viewerAvatar viewer ]
 
                 _ ->
                     Button.view
@@ -265,14 +297,26 @@ isExample v =
 
 
 
+-- STATE
+
+
+initState : State
+initState =
+    State { menuOpen = False }
+
+
+
 -- UPDATE
 
 
-update : Msg -> Effect HeaderEffect
-update msg =
+update : State -> Msg -> Effect HeaderEffect
+update s msg =
     case msg of
         SignIn ->
             Effect.single SignInEffect
 
         SignOut ->
             Effect.single SignOutEffect
+
+        MenuFocused ->
+            Effect.none
