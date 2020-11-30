@@ -39,6 +39,7 @@ type alias Model =
     , descriptionPanel : DescriptionPanel
     , viewPanel : ViewPanel
     , context : Context
+    , headerState : Header.State
     }
 
 
@@ -96,6 +97,7 @@ init author package context =
       , descriptionPanel = Closed
       , viewPanel = Idle
       , context = context
+      , headerState = Header.initState
       }
     , Example.fetch CompletedLoadExamples author package
     )
@@ -596,6 +598,6 @@ update msg model =
         HeaderMsg headerMsg ->
             let
                 headerEffect =
-                    Header.update headerMsg
+                    Header.update model.headerState headerMsg
             in
             ( model, Cmd.none, Effect.map HeaderEffect headerEffect )
