@@ -1,8 +1,8 @@
-module Components.DummyInput exposing (Config, default, view)
+module Components.DummyInput exposing (Config, default, onFocus, view)
 
 import Html.Styled as Styled exposing (input)
 import Html.Styled.Attributes exposing (id, readonly, style, tabindex, value)
-import Html.Styled.Events exposing (onBlur, onFocus)
+import Html.Styled.Events as Events
 
 
 type Config msg
@@ -37,14 +37,23 @@ defaults =
     }
 
 
+
+-- MODIFIERS
+
+
+onFocus : msg -> Config msg -> Config msg
+onFocus msg (Config config) =
+    Config { config | onFocus = Just msg }
+
+
 view : Config msg -> String -> Styled.Html msg
 view (Config config) uniqueId =
     let
         withOnfocus msg =
-            onFocus msg
+            Events.onFocus msg
 
         withOnBlur msg =
-            onBlur msg
+            Events.onBlur msg
 
         attribs =
             List.filterMap identity
