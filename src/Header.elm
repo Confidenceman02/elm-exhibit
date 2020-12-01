@@ -56,7 +56,8 @@ type Variant
 type Msg
     = SignIn
     | SignOut
-    | MenuFocused
+    | MenuTriggerFocused
+    | MenuTriggerBlurred
 
 
 type State
@@ -64,13 +65,13 @@ type State
 
 
 type alias State_ =
-    { navMenu : Maybe NavMenu
+    { navMenu : NavMenu
     }
 
 
-type alias NavMenu =
-    { focus : MenuFocus
-    }
+type NavMenu
+    = Idle
+    | Focused
 
 
 type MenuFocus
@@ -145,12 +146,12 @@ view (Config config) =
         [ div [ StyledAttribs.css absoluteCenterHorizontal ]
             [ nav config
             ]
-        , viewMaybe sessionActionView config.session
+        , viewMaybe (sessionActionView config.state) config.session
         ]
 
 
-sessionActionView : Session -> Styled.Html Msg
-sessionActionView sesh =
+sessionActionView : State -> Session -> Styled.Html Msg
+sessionActionView (State state_) sesh =
     let
         resolveText =
             if Session.isGuest sesh || Session.isLoggingIn sesh then
@@ -197,7 +198,24 @@ sessionActionView sesh =
             ]
             [ case sesh of
                 Session.LoggedIn viewer ->
-                    div [] [ DummyInput.view (DummyInput.default |> DummyInput.onFocus MenuFocused) "123", viewerAvatar viewer ]
+                    let
+                        focusTriggerStyles =
+                            case state_.navMenu of
+                                Focused ->
+                                    [ Css.outline3 (Css.px 1) Css.solid exColorWhite ]
+
+                                Idle ->
+                                    []
+                    in
+                    div [ StyledAttribs.css ([ Css.displayFlex ] ++ focusTriggerStyles) ]
+                        [ DummyInput.view
+                            (DummyInput.default
+                                |> DummyInput.onFocus MenuTriggerFocused
+                                |> DummyInput.onBlur MenuTriggerBlurred
+                            )
+                            "123"
+                        , viewerAvatar viewer
+                        ]
 
                 _ ->
                     Button.view
@@ -299,13 +317,7 @@ appTitle =
 
 initState : State
 initState =
-    State { navMenu = Nothing }
-
-
-initNavMenu : NavMenu
-initNavMenu =
-    { focus = MenuTrigger
-    }
+    State { navMenu = Idle }
 
 
 
@@ -321,9 +333,16 @@ update state_ msg =
         SignOut ->
             ( state_, Cmd.none, Effect.single SignOutEffect )
 
-        MenuFocused ->
+        MenuTriggerFocused ->
             let
                 (State s) =
                     state_
             in
-            ( State { s | navMenu = Just initNavMenu }, Cmd.none, Effect.none )
+            ( State { s | navMenu = Focused }, Cmd.none, Effect.none )
+
+        MenuTriggerBlurred ->
+            let
+                (State s) =
+                    state_
+            in
+            ( State { s | navMenu = Idle }, Cmd.none, Effect.none )
