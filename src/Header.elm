@@ -64,8 +64,18 @@ type State
 
 
 type alias State_ =
-    { menuOpen : Bool
+    { navMenu : Maybe NavMenu
     }
+
+
+type alias NavMenu =
+    { focus : MenuFocus
+    }
+
+
+type MenuFocus
+    = MenuTrigger
+    | MenuList
 
 
 type alias Configuration =
@@ -284,39 +294,36 @@ appTitle =
 
 
 -- HELPERS
-
-
-isExample : Variant -> Bool
-isExample v =
-    case v of
-        Example _ _ ->
-            True
-
-        _ ->
-            False
-
-
-
 -- STATE
 
 
 initState : State
 initState =
-    State { menuOpen = False }
+    State { navMenu = Nothing }
+
+
+initNavMenu : NavMenu
+initNavMenu =
+    { focus = MenuTrigger
+    }
 
 
 
 -- UPDATE
 
 
-update : State -> Msg -> Effect HeaderEffect
-update s msg =
+update : State -> Msg -> ( State, Cmd Msg, Effect HeaderEffect )
+update state_ msg =
     case msg of
         SignIn ->
-            Effect.single SignInEffect
+            ( state_, Cmd.none, Effect.single SignInEffect )
 
         SignOut ->
-            Effect.single SignOutEffect
+            ( state_, Cmd.none, Effect.single SignOutEffect )
 
         MenuFocused ->
-            Effect.none
+            let
+                (State s) =
+                    state_
+            in
+            ( State { s | navMenu = Just initNavMenu }, Cmd.none, Effect.none )

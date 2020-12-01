@@ -597,7 +597,7 @@ update msg model =
 
         HeaderMsg headerMsg ->
             let
-                headerEffect =
+                ( headerState, headerCmds, headerEffect ) =
                     Header.update model.headerState headerMsg
             in
-            ( model, Cmd.none, Effect.map HeaderEffect headerEffect )
+            ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
