@@ -1,7 +1,8 @@
-module Components.DummyInput exposing (Config, default, onFocus, view)
+module Components.DummyInput exposing (Config, default, onBlur, onFocus, view)
 
+import Css
 import Html.Styled as Styled exposing (input)
-import Html.Styled.Attributes exposing (id, readonly, style, tabindex, value)
+import Html.Styled.Attributes exposing (css, id, readonly, style, tabindex, value)
 import Html.Styled.Events as Events
 
 
@@ -46,6 +47,11 @@ onFocus msg (Config config) =
     Config { config | onFocus = Just msg }
 
 
+onBlur : msg -> Config msg -> Config msg
+onBlur msg (Config config) =
+    Config { config | onBlur = Just msg }
+
+
 view : Config msg -> String -> Styled.Html msg
 view (Config config) uniqueId =
     let
@@ -74,6 +80,7 @@ view (Config config) uniqueId =
          , value ""
          , tabindex 0
          , id ("dummy-input-" ++ uniqueId)
+         , css [ Css.position Css.absolute ]
          ]
             ++ attribs
         )
