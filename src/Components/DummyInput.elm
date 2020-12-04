@@ -1,9 +1,10 @@
-module Components.DummyInput exposing (Config, default, onBlur, onFocus, view)
+module Components.DummyInput exposing (Config, default, onBlur, onFocus, preventKeydownOn, view)
 
 import Css
 import Html.Styled as Styled exposing (input)
 import Html.Styled.Attributes exposing (css, id, readonly, style, tabindex, value)
-import Html.Styled.Events as Events
+import Html.Styled.Events as Events exposing (preventDefaultOn)
+import Json.Decode as Decode
 
 
 type Config msg
@@ -14,6 +15,7 @@ type alias Configuration msg =
     { variant : Variant
     , onFocus : Maybe msg
     , onBlur : Maybe msg
+    , preventKeydownOn : List (Decode.Decoder msg)
     }
 
 
@@ -35,6 +37,7 @@ defaults =
     { variant = Default
     , onFocus = Nothing
     , onBlur = Nothing
+    , preventKeydownOn = []
     }
 
 
@@ -52,6 +55,11 @@ onBlur msg (Config config) =
     Config { config | onBlur = Just msg }
 
 
+preventKeydownOn : List (Decode.Decoder msg) -> Config msg -> Config msg
+preventKeydownOn decoders (Config config) =
+    Config { config | preventKeydownOn = decoders }
+
+
 view : Config msg -> String -> Styled.Html msg
 view (Config config) uniqueId =
     let
@@ -66,6 +74,13 @@ view (Config config) uniqueId =
                 [ Maybe.map withOnfocus config.onFocus
                 , Maybe.map withOnBlur config.onBlur
                 ]
+                ++ [ preventOn ]
+
+        preventOn =
+            preventDefaultOn "keydown" <|
+                Decode.map
+                    (\m -> ( m, True ))
+                    (Decode.oneOf config.preventKeydownOn)
     in
     input
         ([ style "label" "dummyInput"
