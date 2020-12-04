@@ -23,6 +23,7 @@ import Components.Heading as Heading
 import Components.Link as Link
 import Css as Css
 import Effect exposing (Effect)
+import EventsExtra
 import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
@@ -58,6 +59,7 @@ type Msg
     | SignOut
     | MenuTriggerFocused
     | MenuTriggerBlurred
+    | DisplayMenu
 
 
 type State
@@ -212,8 +214,9 @@ sessionActionView (State state_) sesh =
                             (DummyInput.default
                                 |> DummyInput.onFocus MenuTriggerFocused
                                 |> DummyInput.onBlur MenuTriggerBlurred
+                                |> DummyInput.preventKeydownOn [ EventsExtra.isEnter DisplayMenu, EventsExtra.isSpace DisplayMenu ]
                             )
-                            "123"
+                            "menuTrigger"
                         , viewerAvatar viewer
                         ]
 
@@ -346,3 +349,6 @@ update state_ msg =
                     state_
             in
             ( State { s | navMenu = Idle }, Cmd.none, Effect.none )
+
+        DisplayMenu ->
+            ( state_, Cmd.none, Effect.none )
