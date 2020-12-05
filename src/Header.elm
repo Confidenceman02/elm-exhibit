@@ -211,6 +211,7 @@ sessionActionView (State state_) sesh =
                         [ StyledAttribs.css
                             ([ Css.displayFlex
                              , Css.marginRight Grid.halfGrid
+                             , Css.position Css.relative
                              ]
                                 ++ focusTriggerStyles
                             )
@@ -227,7 +228,17 @@ sessionActionView (State state_) sesh =
                             )
                             "menuTrigger"
                         , viewerAvatar viewer
-                        , viewIf (state_.menu == MenuListFocused) (div [ StyledAttribs.css [ Css.position Css.absolute ] ] [ Styled.map MenuMsgs MenuList.view ])
+                        , viewIf (state_.menu == MenuListFocused)
+                            (span
+                                [ StyledAttribs.css
+                                    [ Css.position Css.absolute
+                                    , Css.height (Css.pct 100)
+                                    , Css.backgroundColor exColorWhite
+                                    , Css.right (Css.px 0)
+                                    ]
+                                ]
+                                [ Styled.map MenuMsgs MenuList.view ]
+                            )
                         ]
 
                 _ ->
