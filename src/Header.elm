@@ -21,6 +21,7 @@ import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
 import Components.Link as Link
+import Components.MenuList as MenuList
 import Css as Css
 import Effect exposing (Effect)
 import EventsExtra
@@ -60,6 +61,7 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | DisplayMenu
+    | MenuMsgs MenuList.Msg
 
 
 type State
@@ -67,18 +69,14 @@ type State
 
 
 type alias State_ =
-    { navMenu : NavMenu
+    { menu : Menu
     }
 
 
-type NavMenu
+type Menu
     = Idle
-    | Focused
-
-
-type MenuFocus
-    = MenuTrigger
-    | MenuList
+    | TriggerFocused
+    | MenuListFocused
 
 
 type alias Configuration =
@@ -202,22 +200,34 @@ sessionActionView (State state_) sesh =
                 Session.LoggedIn viewer ->
                     let
                         focusTriggerStyles =
-                            case state_.navMenu of
-                                Focused ->
+                            case state_.menu of
+                                TriggerFocused ->
                                     [ Css.outline3 (Css.px 1) Css.solid exColorWhite ]
 
-                                Idle ->
+                                _ ->
                                     []
                     in
-                    div [ StyledAttribs.css ([ Css.displayFlex ] ++ focusTriggerStyles) ]
+                    div
+                        [ StyledAttribs.css
+                            ([ Css.displayFlex
+                             , Css.marginRight Grid.halfGrid
+                             ]
+                                ++ focusTriggerStyles
+                            )
+                        ]
                         [ DummyInput.view
                             (DummyInput.default
                                 |> DummyInput.onFocus MenuTriggerFocused
                                 |> DummyInput.onBlur MenuTriggerBlurred
-                                |> DummyInput.preventKeydownOn [ EventsExtra.isEnter DisplayMenu, EventsExtra.isSpace DisplayMenu ]
+                                |> DummyInput.preventKeydownOn
+                                    [ EventsExtra.isEnter DisplayMenu
+                                    , EventsExtra.isSpace DisplayMenu
+                                    , EventsExtra.isDownArrow DisplayMenu
+                                    ]
                             )
                             "menuTrigger"
                         , viewerAvatar viewer
+                        , viewIf (state_.menu == MenuListFocused) (div [ StyledAttribs.css [ Css.position Css.absolute ] ] [ Styled.map MenuMsgs MenuList.view ])
                         ]
 
                 _ ->
@@ -244,7 +254,6 @@ viewerAvatar viewer =
             , Css.height (Css.px 33)
             , Css.width (Css.px 33)
             , Css.border3 (Css.px 1) Css.solid exColorSky700
-            , Css.marginRight Grid.halfGrid
             ]
         , StyledAttribs.src (Viewer.getAvatarUrl viewer)
         ]
@@ -320,7 +329,7 @@ appTitle =
 
 initState : State
 initState =
-    State { navMenu = Idle }
+    State { menu = Idle }
 
 
 
@@ -341,14 +350,22 @@ update state_ msg =
                 (State s) =
                     state_
             in
-            ( State { s | navMenu = Focused }, Cmd.none, Effect.none )
+            ( State { s | menu = TriggerFocused }, Cmd.none, Effect.none )
 
         MenuTriggerBlurred ->
             let
                 (State s) =
                     state_
             in
-            ( State { s | navMenu = Idle }, Cmd.none, Effect.none )
+            ( State { s | menu = Idle }, Cmd.none, Effect.none )
 
         DisplayMenu ->
+            let
+                (State s) =
+                    state_
+            in
+            -- It would be better to ask the Menulist to focus and set this value then
+            ( State { s | menu = MenuListFocused }, Cmd.none, Effect.none )
+
+        MenuMsgs _ ->
             ( state_, Cmd.none, Effect.none )
