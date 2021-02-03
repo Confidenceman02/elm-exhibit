@@ -232,12 +232,26 @@ sessionActionView (State state_) sesh =
                             (span
                                 [ StyledAttribs.css
                                     [ Css.position Css.absolute
-                                    , Css.height (Css.pct 100)
-                                    , Css.backgroundColor exColorWhite
                                     , Css.right (Css.px 0)
+                                    , Css.top (Css.px avatarHeight)
+                                    , Css.zIndex (Css.int 100)
+                                    , Css.marginTop Grid.halfGrid
                                     ]
                                 ]
-                                [ Styled.map MenuMsgs MenuList.view ]
+                                [ Styled.map MenuMsgs
+                                    (MenuList.view
+                                        (MenuList.default
+                                            |> MenuList.sections
+                                                [ MenuList.section
+                                                    [ MenuList.action { label = "Something", item = "SomethingElse" }
+                                                    , MenuList.action { label = "Else", item = "else" }
+                                                    , MenuList.action { label = "Entirely", item = "Entirely" }
+                                                    , MenuList.navigation { label = "Google", href = "https://www.google.com" }
+                                                    ]
+                                                ]
+                                        )
+                                    )
+                                ]
                             )
                         ]
 
