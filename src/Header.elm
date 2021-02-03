@@ -46,6 +46,11 @@ navBottomBorder =
     2
 
 
+avatarHeight : Float
+avatarHeight =
+    33
+
+
 type Config
     = Config Configuration
 
@@ -276,7 +281,7 @@ viewerAvatar viewer =
         [ StyledAttribs.alt (Viewer.getUsername viewer)
         , StyledAttribs.css
             [ Css.borderRadius (Css.px 17)
-            , Css.height (Css.px 33)
+            , Css.height (Css.px avatarHeight)
             , Css.width (Css.px 33)
             , Css.border3 (Css.px 1) Css.solid exColorSky700
             ]
