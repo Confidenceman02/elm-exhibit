@@ -51,6 +51,11 @@ avatarHeight =
     33
 
 
+menuListTriggerId : String
+menuListTriggerId =
+    "headerMenuListTrigger"
+
+
 type Config
     = Config Configuration
 
@@ -75,13 +80,13 @@ type State
 
 type alias State_ =
     { menu : Menu
+    , menuListState : MenuList.State
     }
 
 
 type Menu
     = Idle
     | TriggerFocused
-    | MenuListFocused
 
 
 type alias Configuration =
@@ -231,33 +236,32 @@ sessionActionView (State state_) sesh =
                                     , EventsExtra.isDownArrow DisplayMenu
                                     ]
                             )
-                            "menuTrigger"
+                            menuListTriggerId
                         , viewerAvatar viewer
-                        , viewIf (state_.menu == MenuListFocused)
-                            (span
-                                [ StyledAttribs.css
-                                    [ Css.position Css.absolute
-                                    , Css.right (Css.px 0)
-                                    , Css.top (Css.px avatarHeight)
-                                    , Css.zIndex (Css.int 100)
-                                    , Css.marginTop Grid.halfGrid
-                                    ]
+                        , span
+                            [ StyledAttribs.css
+                                [ Css.position Css.absolute
+                                , Css.right (Css.px 0)
+                                , Css.top (Css.px avatarHeight)
+                                , Css.zIndex (Css.int 100)
+                                , Css.marginTop Grid.halfGrid
                                 ]
-                                [ Styled.map MenuMsgs
-                                    (MenuList.view
-                                        (MenuList.default
-                                            |> MenuList.sections
-                                                [ MenuList.section
-                                                    [ MenuList.action { label = "Something", item = "SomethingElse" }
-                                                    , MenuList.action { label = "Else", item = "else" }
-                                                    , MenuList.action { label = "Entirely", item = "Entirely" }
-                                                    , MenuList.navigation { label = "Google", href = "https://www.google.com" }
-                                                    ]
+                            ]
+                            [ Styled.map MenuMsgs
+                                (MenuList.view
+                                    (MenuList.default
+                                        |> MenuList.state state_.menuListState
+                                        |> MenuList.sections
+                                            [ MenuList.section
+                                                [ MenuList.action { label = "Something", item = "SomethingElse" }
+                                                , MenuList.action { label = "Else", item = "else" }
+                                                , MenuList.action { label = "Entirely", item = "Entirely" }
+                                                , MenuList.navigation { label = "Google", href = "https://www.google.com" }
                                                 ]
-                                        )
+                                            ]
                                     )
-                                ]
-                            )
+                                )
+                            ]
                         ]
 
                 _ ->
@@ -284,6 +288,7 @@ viewerAvatar viewer =
             , Css.height (Css.px avatarHeight)
             , Css.width (Css.px 33)
             , Css.border3 (Css.px 1) Css.solid exColorSky700
+            , Css.cursor Css.pointer
             ]
         , StyledAttribs.src (Viewer.getAvatarUrl viewer)
         ]
@@ -359,7 +364,7 @@ appTitle =
 
 initState : State
 initState =
-    State { menu = Idle }
+    State { menu = Idle, menuListState = MenuList.initialState }
 
 
 
@@ -395,7 +400,7 @@ update state_ msg =
                     state_
             in
             -- It would be better to ask the Menulist to focus and set this value then
-            ( State { s | menu = MenuListFocused }, Cmd.none, Effect.none )
+            ( State { s | menuListState = MenuList.show s.menuListState }, Cmd.none, Effect.none )
 
         MenuMsgs _ ->
             ( state_, Cmd.none, Effect.none )
