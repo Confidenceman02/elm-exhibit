@@ -121,10 +121,17 @@ type Section item
     = Section (List (ListItem item))
 
 
+type alias ItemStyles =
+    { onHoverBackgroundColor : Css.Color
+    , onHoverColor : Css.Color
+    }
+
+
 type alias Configuration item =
     { sections : List (Section item)
     , zIndex : Int
     , state : State
+    , styles : ItemStyles
     }
 
 
@@ -133,6 +140,7 @@ defaults =
     { sections = []
     , zIndex = 0
     , state = initialState
+    , styles = { onHoverBackgroundColor = Css.hex "#5FABDC", onHoverColor = Css.hex "#FFFFFF" }
     }
 
 
@@ -201,7 +209,7 @@ view (Config config) =
                     , Css.height (Css.pct 100)
                     , Css.backgroundColor exColorWhite
                     , Css.zIndex (Css.int config.zIndex)
-                    , Css.borderRadius Border.exBorderRadius
+                    , Css.borderRadius (Css.px 6)
                     , Css.border3 (Css.px 1) Css.solid Color.exColorBorder
                     , Css.backgroundClip Css.paddingBox
                     , Css.marginTop (Css.px 2)
@@ -220,28 +228,33 @@ view (Config config) =
 
 renderSections : Configuration item -> List (Styled.Html Msg)
 renderSections config =
-    List.foldr renderSection [] config.sections
+    List.foldr (renderSection config.styles) [] config.sections
 
 
-renderSection : Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
-renderSection (Section menuItems) accumViews =
+renderSection : ItemStyles -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
+renderSection itemStyles (Section menuItems) accumViews =
     let
         buildView item =
             case item of
                 Navigation config ->
-                    a [ StyledAttribs.href config.href, listItemContainerStyles ] [ text config.label ]
+                    a
+                        [ StyledAttribs.href config.href
+                        , StyledAttribs.css (listItemContainerStyles itemStyles ++ navigationListItemStyles itemStyles)
+                        , StyledAttribs.tabindex 0
+                        ]
+                        [ text config.label ]
 
                 Action config ->
-                    div [ listItemContainerStyles ] [ text config.label ]
+                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] [ text config.label ]
 
                 CustomNavigation href configs ->
-                    a [ StyledAttribs.href href, listItemContainerStyles ] <| List.map renderBaseConfiguration configs
+                    a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
                 CustomAction configs ->
-                    div [ listItemContainerStyles ] <| List.map renderCustomAction configs
+                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderCustomAction configs
 
                 Custom configs ->
-                    div [ listItemContainerStyles ] <| List.map renderBaseConfiguration configs
+                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
         buildViews items builtViews =
             case items of
@@ -280,12 +293,34 @@ show (State_ s) =
 -- STYLES
 
 
-listItemContainerStyles : Styled.Attribute msg
-listItemContainerStyles =
-    StyledAttribs.css
-        [ Css.padding4 (Css.px 4) (Css.px 8) (Css.px 4) (Css.px 16)
-        , Css.whiteSpace Css.noWrap
-        , Css.textOverflow Css.ellipsis
-        , Css.overflow Css.hidden
-        , Css.display Css.block
-        ]
+listItemContainerStyles : ItemStyles -> List Css.Style
+listItemContainerStyles itemStyles =
+    [ Css.padding4 (Css.px 4) (Css.px 8) (Css.px 4) (Css.px 16)
+    , Css.whiteSpace Css.noWrap
+    , Css.textOverflow Css.ellipsis
+    , Css.overflow Css.hidden
+    , Css.display Css.block
+    , Css.position Css.relative
+    , Css.hover (listItemFocusHoverStyles itemStyles)
+    ]
+
+
+pointerStyles : List Css.Style
+pointerStyles =
+    [ Css.cursor Css.pointer
+    ]
+
+
+navigationListItemStyles : ItemStyles -> List Css.Style
+navigationListItemStyles itemStyles =
+    [ Css.outline Css.none
+    , Css.textDecoration Css.none
+    , Css.focus (listItemFocusHoverStyles itemStyles)
+    ]
+
+
+listItemFocusHoverStyles : ItemStyles -> List Css.Style
+listItemFocusHoverStyles itemStyles =
+    [ Css.backgroundColor itemStyles.onHoverBackgroundColor
+    , Css.color itemStyles.onHoverColor
+    ]
