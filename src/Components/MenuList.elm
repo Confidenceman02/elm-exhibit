@@ -3,8 +3,6 @@ module Components.MenuList exposing (Msg, State, action, default, initialState, 
 import Css
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
-import Styles.Border as Border
-import Styles.Color as Color exposing (exColorWhite)
 
 
 type Config item
@@ -121,9 +119,20 @@ type Section item
     = Section (List (ListItem item))
 
 
+type alias Styling =
+    { hoverStyles : HoverFocusStyles
+    , focusStyles : HoverFocusStyles
+    }
+
+
+type HoverFocusStyles
+    = Styled ItemStyles
+    | UnStyled
+
+
 type alias ItemStyles =
-    { onHoverBackgroundColor : Css.Color
-    , onHoverColor : Css.Color
+    { backgroundColor : Css.Color
+    , color : Css.Color
     }
 
 
@@ -131,7 +140,7 @@ type alias Configuration item =
     { sections : List (Section item)
     , zIndex : Int
     , state : State
-    , styles : ItemStyles
+    , styling : Styling
     }
 
 
@@ -140,7 +149,10 @@ defaults =
     { sections = []
     , zIndex = 0
     , state = initialState
-    , styles = { onHoverBackgroundColor = Css.hex "#5FABDC", onHoverColor = Css.hex "#FFFFFF" }
+    , styling =
+        { hoverStyles = Styled { backgroundColor = Css.hex "#5FABDC", color = Css.hex "#FFFFFF" }
+        , focusStyles = Styled { backgroundColor = Css.hex "#5FABDC", color = Css.hex "#FFFFFF" }
+        }
     }
 
 
@@ -207,10 +219,10 @@ view (Config config) =
                 [ StyledAttribs.css
                     [ Css.width (Css.px 150)
                     , Css.height (Css.pct 100)
-                    , Css.backgroundColor exColorWhite
+                    , Css.backgroundColor (Css.hex "#FFFFFF")
                     , Css.zIndex (Css.int config.zIndex)
                     , Css.borderRadius (Css.px 6)
-                    , Css.border3 (Css.px 1) Css.solid Color.exColorBorder
+                    , Css.border3 (Css.px 1) Css.solid (Css.hex "#FFFFFF")
                     , Css.backgroundClip Css.paddingBox
                     , Css.marginTop (Css.px 2)
                     , Css.paddingBottom (Css.px 4)
@@ -228,33 +240,33 @@ view (Config config) =
 
 renderSections : Configuration item -> List (Styled.Html Msg)
 renderSections config =
-    List.foldr (renderSection config.styles) [] config.sections
+    List.foldr (renderSection config.styling) [] config.sections
 
 
-renderSection : ItemStyles -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
-renderSection itemStyles (Section menuItems) accumViews =
+renderSection : Styling -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
+renderSection styling (Section menuItems) accumViews =
     let
         buildView item =
             case item of
                 Navigation config ->
                     a
                         [ StyledAttribs.href config.href
-                        , StyledAttribs.css (listItemContainerStyles itemStyles ++ navigationListItemStyles itemStyles)
+                        , StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ navigationListItemStyles)
                         , StyledAttribs.tabindex 0
                         ]
                         [ text config.label ]
 
                 Action config ->
-                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] [ text config.label ]
+                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] [ text config.label ]
 
                 CustomNavigation href configs ->
-                    a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
+                    a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
                 CustomAction configs ->
-                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderCustomAction configs
+                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderCustomAction configs
 
                 Custom configs ->
-                    div [ StyledAttribs.css (listItemContainerStyles itemStyles ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
+                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
         buildViews items builtViews =
             case items of
@@ -293,15 +305,14 @@ show (State_ s) =
 -- STYLES
 
 
-listItemContainerStyles : ItemStyles -> List Css.Style
-listItemContainerStyles itemStyles =
+listItemContainerStyles : List Css.Style
+listItemContainerStyles =
     [ Css.padding4 (Css.px 4) (Css.px 8) (Css.px 4) (Css.px 16)
     , Css.whiteSpace Css.noWrap
     , Css.textOverflow Css.ellipsis
     , Css.overflow Css.hidden
     , Css.display Css.block
     , Css.position Css.relative
-    , Css.hover (listItemFocusHoverStyles itemStyles)
     ]
 
 
@@ -311,16 +322,34 @@ pointerStyles =
     ]
 
 
-navigationListItemStyles : ItemStyles -> List Css.Style
-navigationListItemStyles itemStyles =
+navigationListItemStyles : List Css.Style
+navigationListItemStyles =
     [ Css.outline Css.none
     , Css.textDecoration Css.none
-    , Css.focus (listItemFocusHoverStyles itemStyles)
     ]
 
 
-listItemFocusHoverStyles : ItemStyles -> List Css.Style
-listItemFocusHoverStyles itemStyles =
-    [ Css.backgroundColor itemStyles.onHoverBackgroundColor
-    , Css.color itemStyles.onHoverColor
+resolveFocusHoverStyles : HoverFocusStyles -> List Css.Style
+resolveFocusHoverStyles hoverFocusStyles =
+    case hoverFocusStyles of
+        Styled itemStyles ->
+            [ Css.backgroundColor itemStyles.backgroundColor
+            , Css.color itemStyles.color
+            ]
+
+        _ ->
+            []
+
+
+listItemFocusHoverStyles : Styling -> List Css.Style
+listItemFocusHoverStyles styling =
+    let
+        hoverStyling =
+            styling.hoverStyles
+
+        focusStyling =
+            styling.focusStyles
+    in
+    [ Css.hover (resolveFocusHoverStyles hoverStyling)
+    , Css.focus (resolveFocusHoverStyles focusStyling)
     ]
