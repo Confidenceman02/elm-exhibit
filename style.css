@@ -15,11 +15,11 @@ h1 {
  outline: none;
 }
 
-.focus-visible {
+.focus-visible:not(a) {
  outline: none;
 }
 
-.focus-visible::after {
+.focus-visible:not(a)::after {
  content: "";
  border-radius: 6px;
  border-width: 2px;
