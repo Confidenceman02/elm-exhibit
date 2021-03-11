@@ -3,6 +3,7 @@ module Components.MenuList exposing (Msg, State, action, default, initialState, 
 import Css
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
+import List.Extra as ListX
 
 
 type Config item
@@ -11,6 +12,15 @@ type Config item
 
 type State
     = State_ StateData
+
+
+
+-- CONSTANTS
+
+
+menuListItemSuffix : String
+menuListItemSuffix =
+    "menu-list-item"
 
 
 
@@ -240,24 +250,29 @@ view (Config config) =
 
 renderSections : Configuration item -> List (Styled.Html Msg)
 renderSections config =
-    List.foldr (renderSection config.styling) [] config.sections
+    ListX.indexedFoldr (renderSection config.styling) [] config.sections
 
 
-renderSection : Styling -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
-renderSection styling (Section menuItems) accumViews =
+renderSection : Styling -> Int -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
+renderSection styling sectionIndex (Section menuItems) accumViews =
     let
-        buildView item =
+        buildView item itemIndex =
             case item of
                 Navigation config ->
                     a
                         [ StyledAttribs.href config.href
+                        , StyledAttribs.id (buildItemId sectionIndex itemIndex)
                         , StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ navigationListItemStyles)
                         , StyledAttribs.tabindex 0
                         ]
                         [ text config.label ]
 
                 Action config ->
-                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] [ text config.label ]
+                    div
+                        [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles)
+                        , StyledAttribs.id (buildItemId sectionIndex itemIndex)
+                        ]
+                        [ text config.label ]
 
                 CustomNavigation href configs ->
                     a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
@@ -268,18 +283,18 @@ renderSection styling (Section menuItems) accumViews =
                 Custom configs ->
                     div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
-        buildViews items builtViews =
+        buildViews items builtViews itemCount =
             case items of
                 [] ->
                     builtViews
 
                 head :: [] ->
-                    builtViews ++ [ buildView head ]
+                    builtViews ++ [ buildView head itemCount ]
 
                 headItem :: tailItems ->
-                    buildViews tailItems (builtViews ++ [ buildView headItem ])
+                    buildViews tailItems (builtViews ++ [ buildView headItem itemCount ]) (itemCount + 1)
     in
-    buildViews menuItems accumViews
+    buildViews menuItems accumViews 0
 
 
 renderBaseConfiguration : BaseConfiguration -> Styled.Html Msg
@@ -299,6 +314,11 @@ renderCustomAction customActionConfig =
 show : State -> State
 show (State_ s) =
     State_ { s | step = Visible }
+
+
+buildItemId : Int -> Int -> String
+buildItemId sectionIndex itemIndex =
+    "S" ++ String.fromInt sectionIndex ++ "I" ++ String.fromInt itemIndex ++ "-" ++ menuListItemSuffix
 
 
 
