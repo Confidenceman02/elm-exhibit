@@ -9,7 +9,7 @@ import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
 import Pages.AuthRedirect as AuthRedirectPage
-import Pages.Example as ExamplesPage
+import Pages.Example as ExamplePage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
@@ -21,7 +21,7 @@ type Msg
     = Noop
     | ClickedLink Browser.UrlRequest
     | ChangedUrl Url
-    | GotExamplesMsg ExamplesPage.Msg
+    | GotExampleMsg ExamplePage.Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
     | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
@@ -29,7 +29,7 @@ type Msg
 
 
 type Model
-    = Examples ExamplesPage.Model
+    = Example ExamplePage.Model
     | Home HomePage.Model
     | NotFound Context
     | AuthRedirect AuthRedirectPage.Model
@@ -69,9 +69,9 @@ changeRouteTo maybeRoute context =
         Just (Route.Examples author package) ->
             let
                 ( model, cmds ) =
-                    ExamplesPage.init author package context
+                    ExamplePage.init author package context
             in
-            ( Examples model, Cmd.batch [ Cmd.map GotExamplesMsg cmds ] )
+            ( Example model, Cmd.batch [ Cmd.map GotExampleMsg cmds ] )
 
         -- TODO: Create home page
         Just Route.Home ->
@@ -92,7 +92,7 @@ changeRouteTo maybeRoute context =
 toContext : Model -> Context
 toContext model =
     case model of
-        Examples m ->
+        Example m ->
             m.context
 
         Home m ->
@@ -118,17 +118,17 @@ view model =
             }
     in
     case model of
-        Examples examplesModel ->
+        Example examplesModel ->
             viewPage
                 (Page.Examples
                     examplesModel.author
                     examplesModel.package
                     examplesModel.context.session
-                    ExamplesPage.toHeaderMsg
+                    ExamplePage.toHeaderMsg
                     examplesModel.headerState
                 )
-                GotExamplesMsg
-                (ExamplesPage.view examplesModel)
+                GotExampleMsg
+                (ExamplePage.view examplesModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
@@ -143,9 +143,9 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model ) of
-        ( GotExamplesMsg examplesMsg, Examples examples ) ->
-            ExamplesPage.update examplesMsg examples
-                |> updateWithEffect Examples GotExamplesMsg exampleEffectHandler
+        ( GotExampleMsg examplesMsg, Example examples ) ->
+            ExamplePage.update examplesMsg examples
+                |> updateWithEffect Example GotExampleMsg exampleEffectHandler
 
         ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
             let
@@ -165,7 +165,7 @@ update msg model =
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) (toContext model)
 
-        ( RefreshedSession result, Examples m ) ->
+        ( RefreshedSession result, Example m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -173,9 +173,9 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Examples updatedModel, sessionCmd )
+            ( Example updatedModel, sessionCmd )
 
-        ( SessionAuthorizing result, Examples m ) ->
+        ( SessionAuthorizing result, Example m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -183,7 +183,7 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Examples updatedModel, sessionCmd )
+            ( Example updatedModel, sessionCmd )
 
         _ ->
             ( model, Cmd.none )
@@ -213,14 +213,14 @@ subscriptions model =
             Sub.none
 
 
-exampleEffectHandler : Effect.Handler ExamplesPage.Model ExamplesPage.Effect Msg
+exampleEffectHandler : Effect.Handler ExamplePage.Model ExamplePage.Effect Msg
 exampleEffectHandler model effect =
     case effect of
-        ExamplesPage.HeaderEffect headerEffect ->
+        ExamplePage.HeaderEffect headerEffect ->
             headerEffectHandler model headerEffect
 
 
-headerEffectHandler : Effect.Handler ExamplesPage.Model Header.HeaderEffect Msg
+headerEffectHandler : Effect.Handler ExamplePage.Model Header.HeaderEffect Msg
 headerEffectHandler model effect =
     case effect of
         Header.SignInEffect ->
