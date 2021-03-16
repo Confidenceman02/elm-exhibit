@@ -226,17 +226,18 @@ sessionActionView (State state_) sesh =
                                 ++ focusTriggerStyles
                             )
                         ]
-                        [ DummyInput.view
-                            (DummyInput.default
-                                |> DummyInput.onFocus MenuTriggerFocused
-                                |> DummyInput.onBlur MenuTriggerBlurred
-                                |> DummyInput.preventKeydownOn
-                                    [ EventsExtra.isEnter DisplayMenu
-                                    , EventsExtra.isSpace DisplayMenu
-                                    , EventsExtra.isDownArrow DisplayMenu
-                                    ]
-                            )
-                            menuListTriggerId
+                        [ Styled.fromUnstyled <|
+                            DummyInput.view
+                                (DummyInput.default
+                                    |> DummyInput.onFocus MenuTriggerFocused
+                                    |> DummyInput.onBlur MenuTriggerBlurred
+                                    |> DummyInput.preventKeydownOn
+                                        [ EventsExtra.isEnter DisplayMenu
+                                        , EventsExtra.isSpace DisplayMenu
+                                        , EventsExtra.isDownArrow DisplayMenu
+                                        ]
+                                )
+                                menuListTriggerId
                         , viewerAvatar viewer
                         , span
                             [ StyledAttribs.css

@@ -1,9 +1,8 @@
 module Components.DummyInput exposing (Config, default, onBlur, onFocus, preventKeydownOn, view)
 
-import Css
-import Html.Styled as Styled exposing (input)
-import Html.Styled.Attributes exposing (css, id, readonly, style, tabindex, value)
-import Html.Styled.Events as Events exposing (preventDefaultOn)
+import Html exposing (Html, input)
+import Html.Attributes exposing (id, readonly, style, tabindex, value)
+import Html.Events as Events exposing (preventDefaultOn)
 import Json.Decode as Decode
 
 
@@ -15,7 +14,7 @@ type alias Configuration msg =
     { variant : Variant
     , onFocus : Maybe msg
     , onBlur : Maybe msg
-    , preventKeydownOn : List (Decode.Decoder msg)
+    , preventKeydownOnOneOf : List (Decode.Decoder msg)
     }
 
 
@@ -37,7 +36,7 @@ defaults =
     { variant = Default
     , onFocus = Nothing
     , onBlur = Nothing
-    , preventKeydownOn = []
+    , preventKeydownOnOneOf = []
     }
 
 
@@ -57,10 +56,10 @@ onBlur msg (Config config) =
 
 preventKeydownOn : List (Decode.Decoder msg) -> Config msg -> Config msg
 preventKeydownOn decoders (Config config) =
-    Config { config | preventKeydownOn = decoders }
+    Config { config | preventKeydownOnOneOf = decoders }
 
 
-view : Config msg -> String -> Styled.Html msg
+view : Config msg -> String -> Html msg
 view (Config config) uniqueId =
     let
         withOnfocus msg =
@@ -80,7 +79,7 @@ view (Config config) uniqueId =
             preventDefaultOn "keydown" <|
                 Decode.map
                     (\m -> ( m, True ))
-                    (Decode.oneOf config.preventKeydownOn)
+                    (Decode.oneOf config.preventKeydownOnOneOf)
     in
     input
         ([ style "label" "dummyInput"
@@ -95,7 +94,7 @@ view (Config config) uniqueId =
          , value ""
          , tabindex 0
          , id ("dummy-input-" ++ uniqueId)
-         , css [ Css.position Css.absolute ]
+         , style "position" "absolute"
          ]
             ++ attribs
         )
