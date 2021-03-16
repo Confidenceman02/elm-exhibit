@@ -1,9 +1,11 @@
-module Components.MenuList exposing (Msg, State, action, default, initialState, navigation, section, sections, show, state, view, zIndex)
+module Components.MenuList exposing (Msg, State, action, default, initialState, navigation, section, sections, show, state, subscriptions, update, view, zIndex)
 
+import Browser.Events as BrowserEvents
 import Css
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
 import List.Extra as ListX
+import Time
 
 
 type Config item
@@ -197,13 +199,14 @@ state s (Config config) =
 
 type Msg
     = None
+    | MakeVisible Time.Posix
 
 
-subscription : State -> Sub Msg
-subscription (State_ s) =
+subscriptions : State -> Sub Msg
+subscriptions (State_ s) =
     case s.step of
         BecomingVisible Triggered ->
-            Sub.none
+            BrowserEvents.onAnimationFrame MakeVisible
 
         BecomingInvisible Triggered ->
             Sub.none
@@ -213,8 +216,13 @@ subscription (State_ s) =
 
 
 update : Msg -> State -> ( State, Cmd Msg )
-update msg s =
-    ( s, Cmd.none )
+update msg ((State_ state_) as s) =
+    case msg of
+        MakeVisible timeNow ->
+            ( State_ { state_ | step = Visible }, Cmd.none )
+
+        _ ->
+            ( s, Cmd.none )
 
 
 view : Config item -> Styled.Html Msg

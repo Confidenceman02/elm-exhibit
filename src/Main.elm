@@ -209,6 +209,9 @@ subscriptions model =
         AuthRedirect _ ->
             Sub.map GotAuthGithubRedirectMsg AuthRedirectPage.subscriptions
 
+        Example m ->
+            Sub.map GotExampleMsg (ExamplePage.subscriptions m)
+
         _ ->
             Sub.none
 

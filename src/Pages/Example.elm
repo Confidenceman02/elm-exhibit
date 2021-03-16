@@ -1,4 +1,4 @@
-module Pages.Example exposing (Effect(..), Model, Msg, init, toContext, toHeaderMsg, update, view)
+module Pages.Example exposing (Effect(..), Model, Msg, init, subscriptions, toContext, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -601,3 +601,8 @@ update msg model =
                     Header.update model.headerState headerMsg
             in
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions m =
+    Sub.map HeaderMsg (Header.subscriptions m.headerState)

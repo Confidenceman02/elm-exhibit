@@ -10,6 +10,7 @@ module Header exposing
     , navHeight
     , session
     , state
+    , subscriptions
     , update
     , view
     )
@@ -71,7 +72,7 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | DisplayMenu
-    | MenuMsgs MenuList.Msg
+    | MenuListMsgs MenuList.Msg
 
 
 type State
@@ -248,7 +249,7 @@ sessionActionView (State state_) sesh =
                                 , Css.marginTop Grid.halfGrid
                                 ]
                             ]
-                            [ Styled.map MenuMsgs
+                            [ Styled.map MenuListMsgs
                                 (MenuList.view
                                     (MenuList.default
                                         |> MenuList.state state_.menuListState
@@ -372,8 +373,17 @@ initState =
 -- UPDATE
 
 
+subscriptions : State -> Sub Msg
+subscriptions (State state_) =
+    Sub.map MenuListMsgs (MenuList.subscriptions state_.menuListState)
+
+
 update : State -> Msg -> ( State, Cmd Msg, Effect HeaderEffect )
 update state_ msg =
+    let
+        (State s) =
+            state_
+    in
     case msg of
         SignIn ->
             ( state_, Cmd.none, Effect.single SignInEffect )
@@ -382,26 +392,18 @@ update state_ msg =
             ( state_, Cmd.none, Effect.single SignOutEffect )
 
         MenuTriggerFocused ->
-            let
-                (State s) =
-                    state_
-            in
             ( State { s | menu = TriggerFocused }, Cmd.none, Effect.none )
 
         MenuTriggerBlurred ->
-            let
-                (State s) =
-                    state_
-            in
             ( State { s | menu = Idle }, Cmd.none, Effect.none )
 
         DisplayMenu ->
-            let
-                (State s) =
-                    state_
-            in
             -- It would be better to ask the Menulist to focus and set this value then
             ( State { s | menuListState = MenuList.show s.menuListState }, Cmd.none, Effect.none )
 
-        MenuMsgs _ ->
-            ( state_, Cmd.none, Effect.none )
+        MenuListMsgs menuListMsg ->
+            let
+                ( menuListState, menuListCmd ) =
+                    MenuList.update menuListMsg s.menuListState
+            in
+            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsgs menuListCmd, Effect.none )
