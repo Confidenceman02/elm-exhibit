@@ -206,6 +206,7 @@ subscriptions : State -> Sub Msg
 subscriptions (State_ s) =
     case s.step of
         BecomingVisible Triggered ->
+            -- We are not worrying about animation at the moment, just make visible
             BrowserEvents.onAnimationFrame MakeVisible
 
         BecomingInvisible Triggered ->
@@ -218,7 +219,7 @@ subscriptions (State_ s) =
 update : Msg -> State -> ( State, Cmd Msg )
 update msg ((State_ state_) as s) =
     case msg of
-        MakeVisible timeNow ->
+        MakeVisible _ ->
             ( State_ { state_ | step = Visible }, Cmd.none )
 
         _ ->
@@ -321,7 +322,7 @@ renderCustomAction customActionConfig =
 
 show : State -> State
 show (State_ s) =
-    State_ { s | step = Visible }
+    State_ { s | step = BecomingVisible Triggered }
 
 
 buildItemId : Int -> Int -> String
