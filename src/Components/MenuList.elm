@@ -3,7 +3,9 @@ module Components.MenuList exposing
     , State
     , action
     , default
+    , hide
     , initialState
+    , isShowing
     , navigation
     , section
     , sections
@@ -235,6 +237,7 @@ state s (Config config) =
 type Msg
     = None
     | MakeVisible Time.Posix
+    | MakeInvisible Time.Posix
     | ListItemFocused Int Int
 
 
@@ -246,7 +249,7 @@ subscriptions (State_ s) =
             BrowserEvents.onAnimationFrame MakeVisible
 
         BecomingInvisible Triggered ->
-            Sub.none
+            BrowserEvents.onAnimationFrame MakeInvisible
 
         _ ->
             Sub.none
@@ -257,6 +260,9 @@ update msg ((State_ state_) as s) =
     case msg of
         MakeVisible _ ->
             ( State_ { state_ | step = Visible }, Cmd.none )
+
+        MakeInvisible _ ->
+            ( State_ { state_ | step = Invisible }, Cmd.none )
 
         ListItemFocused sectionIndex itemIndex ->
             ( s, Cmd.none )
@@ -365,6 +371,24 @@ renderCustomAction customActionConfig =
 show : State -> State
 show (State_ s) =
     State_ { s | step = BecomingVisible Triggered }
+
+
+hide : State -> State
+hide (State_ s) =
+    State_ { s | step = BecomingInvisible Triggered }
+
+
+isShowing : State -> Bool
+isShowing (State_ s) =
+    case s.step of
+        Visible ->
+            True
+
+        BecomingVisible _ ->
+            True
+
+        _ ->
+            False
 
 
 buildItemId : Int -> Int -> String

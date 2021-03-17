@@ -71,7 +71,7 @@ type Msg
     | SignOut
     | MenuTriggerFocused
     | MenuTriggerBlurred
-    | DisplayMenu
+    | ToggleMenu
     | MenuListMsgs MenuList.Msg
 
 
@@ -233,9 +233,10 @@ sessionActionView (State state_) sesh =
                                     |> DummyInput.onFocus MenuTriggerFocused
                                     |> DummyInput.onBlur MenuTriggerBlurred
                                     |> DummyInput.preventKeydownOn
-                                        [ EventsExtra.isEnter DisplayMenu
-                                        , EventsExtra.isSpace DisplayMenu
-                                        , EventsExtra.isDownArrow DisplayMenu
+                                        [ EventsExtra.isEnter ToggleMenu
+                                        , EventsExtra.isSpace ToggleMenu
+
+                                        --, EventsExtra.isDownArrow ToggleMenu
                                         ]
                                 )
                                 menuListTriggerId
@@ -397,9 +398,16 @@ update state_ msg =
         MenuTriggerBlurred ->
             ( State { s | menu = Idle }, Cmd.none, Effect.none )
 
-        DisplayMenu ->
-            -- It would be better to ask the Menulist to focus and set this value then
-            ( State { s | menuListState = MenuList.show s.menuListState }, Cmd.none, Effect.none )
+        ToggleMenu ->
+            let
+                menuListAction =
+                    if MenuList.isShowing s.menuListState then
+                        MenuList.hide s.menuListState
+
+                    else
+                        MenuList.show s.menuListState
+            in
+            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
 
         MenuListMsgs menuListMsg ->
             let
