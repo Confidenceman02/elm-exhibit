@@ -20,9 +20,11 @@ module Components.MenuList exposing
 import Browser.Events as BrowserEvents
 import Css
 import DummyInput
+import EventsExtra
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
+import Json.Decode as Decode
 import List.Extra as ListX
 import Time
 
@@ -239,6 +241,7 @@ type Msg
     | MakeVisible Time.Posix
     | MakeInvisible Time.Posix
     | ListItemFocused Int Int
+    | EscapeKeyDowned
 
 
 subscriptions : State -> Sub Msg
@@ -266,6 +269,9 @@ update msg ((State_ state_) as s) =
 
         ListItemFocused sectionIndex itemIndex ->
             ( s, Cmd.none )
+
+        EscapeKeyDowned ->
+            ( State_ { state_ | step = BecomingInvisible Triggered }, Cmd.none )
 
         None ->
             ( s, Cmd.none )
@@ -319,6 +325,11 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                         , StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ navigationListItemStyles)
                         , StyledAttribs.tabindex 0
                         , Events.onFocus (ListItemFocused sectionIndex itemIndex)
+                        , Events.preventDefaultOn "keydown"
+                            (Decode.map
+                                (\m -> ( m, True ))
+                                (EventsExtra.isEscape EscapeKeyDowned)
+                            )
                         ]
                         [ text config.label ]
 
@@ -331,6 +342,7 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                             DummyInput.view
                                 (DummyInput.default
                                     |> DummyInput.onFocus (ListItemFocused sectionIndex itemIndex)
+                                    |> DummyInput.preventKeydownOn [ EventsExtra.isEscape EscapeKeyDowned ]
                                 )
                                 (buildDummyInputId sectionIndex itemIndex)
                         , text config.label
