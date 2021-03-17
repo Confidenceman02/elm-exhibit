@@ -28,6 +28,7 @@ import Effect exposing (Effect)
 import EventsExtra
 import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Package exposing (Package)
 import Session exposing (Session)
@@ -224,9 +225,11 @@ sessionActionView (State state_) sesh =
                             ([ Css.displayFlex
                              , Css.marginRight Grid.halfGrid
                              , Css.position Css.relative
+                             , Css.cursor Css.pointer
                              ]
                                 ++ focusTriggerStyles
                             )
+                        , Events.onClick ToggleMenu
                         ]
                         [ Styled.fromUnstyled <|
                             DummyInput.view
@@ -293,7 +296,6 @@ viewerAvatar viewer =
             , Css.height (Css.px avatarHeight)
             , Css.width (Css.px 33)
             , Css.border3 (Css.px 1) Css.solid exColorSky700
-            , Css.cursor Css.pointer
             ]
         , StyledAttribs.src (Viewer.getAvatarUrl viewer)
         ]
