@@ -1,9 +1,26 @@
-module Components.MenuList exposing (Msg, State, action, default, initialState, navigation, section, sections, show, state, subscriptions, update, view, zIndex)
+module Components.MenuList exposing
+    ( Msg
+    , State
+    , action
+    , default
+    , initialState
+    , navigation
+    , section
+    , sections
+    , show
+    , state
+    , subscriptions
+    , update
+    , view
+    , zIndex
+    )
 
 import Browser.Events as BrowserEvents
+import Components.DummyInput as DummyInput
 import Css
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Events as Events
 import List.Extra as ListX
 import Time
 
@@ -25,12 +42,30 @@ menuListItemSuffix =
     "menu-list-item"
 
 
+dummyInputSuffix : String
+dummyInputSuffix =
+    "menu-list-dummy-input"
+
+
+type alias SectionPosition =
+    Int
+
+
+type alias ItemPosition =
+    Int
+
+
 
 -- STATE
 
 
+type FocusedListItem
+    = FocusedListItem SectionPosition ItemPosition
+
+
 type alias StateData =
     { step : Step
+    , focusedListItem : Maybe FocusedListItem
     }
 
 
@@ -48,7 +83,7 @@ type Step
 
 initialState : State
 initialState =
-    State_ { step = Invisible }
+    State_ { step = Invisible, focusedListItem = Nothing }
 
 
 
@@ -200,6 +235,7 @@ state s (Config config) =
 type Msg
     = None
     | MakeVisible Time.Posix
+    | ListItemFocused Int Int
 
 
 subscriptions : State -> Sub Msg
@@ -222,7 +258,10 @@ update msg ((State_ state_) as s) =
         MakeVisible _ ->
             ( State_ { state_ | step = Visible }, Cmd.none )
 
-        _ ->
+        ListItemFocused sectionIndex itemIndex ->
+            ( s, Cmd.none )
+
+        None ->
             ( s, Cmd.none )
 
 
@@ -273,15 +312,18 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                         , StyledAttribs.id (buildItemId sectionIndex itemIndex)
                         , StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ navigationListItemStyles)
                         , StyledAttribs.tabindex 0
+                        , Events.onFocus (ListItemFocused sectionIndex itemIndex)
                         ]
                         [ text config.label ]
 
                 Action config ->
                     div
-                        [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles)
+                        [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles ++ listItemFocusWithinStyles styling)
                         , StyledAttribs.id (buildItemId sectionIndex itemIndex)
                         ]
-                        [ text config.label ]
+                        [ Styled.fromUnstyled <| DummyInput.view DummyInput.default (buildDummyInputId sectionIndex itemIndex)
+                        , text config.label
+                        ]
 
                 CustomNavigation href configs ->
                     a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
@@ -328,6 +370,11 @@ show (State_ s) =
 buildItemId : Int -> Int -> String
 buildItemId sectionIndex itemIndex =
     "S" ++ String.fromInt sectionIndex ++ "I" ++ String.fromInt itemIndex ++ "-" ++ menuListItemSuffix
+
+
+buildDummyInputId : Int -> Int -> String
+buildDummyInputId sectionIndex itemIndex =
+    "S" ++ String.fromInt sectionIndex ++ "I" ++ String.fromInt itemIndex ++ "-" ++ dummyInputSuffix
 
 
 
@@ -382,3 +429,8 @@ listItemFocusHoverStyles styling =
     [ Css.hover (resolveFocusHoverStyles hoverStyling)
     , Css.focus (resolveFocusHoverStyles focusStyling)
     ]
+
+
+listItemFocusWithinStyles : Styling -> List Css.Style
+listItemFocusWithinStyles styling =
+    [ Css.pseudoClass "focus-within" (resolveFocusHoverStyles styling.focusStyles) ]
