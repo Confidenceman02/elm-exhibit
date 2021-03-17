@@ -1,4 +1,4 @@
-module Components.DummyInput exposing (Config, default, onBlur, onFocus, preventKeydownOn, view)
+module DummyInput exposing (Config, default, onBlur, onFocus, preventKeydownOn, view)
 
 import Html exposing (Html, input)
 import Html.Attributes exposing (id, readonly, style, tabindex, value)

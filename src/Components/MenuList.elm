@@ -18,8 +18,8 @@ module Components.MenuList exposing
     )
 
 import Browser.Events as BrowserEvents
-import Components.DummyInput as DummyInput
 import Css
+import DummyInput
 import Html.Styled as Styled exposing (a, div, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
@@ -327,7 +327,12 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                         [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles ++ listItemFocusWithinStyles styling)
                         , StyledAttribs.id (buildItemId sectionIndex itemIndex)
                         ]
-                        [ Styled.fromUnstyled <| DummyInput.view DummyInput.default (buildDummyInputId sectionIndex itemIndex)
+                        [ Styled.fromUnstyled <|
+                            DummyInput.view
+                                (DummyInput.default
+                                    |> DummyInput.onFocus (ListItemFocused sectionIndex itemIndex)
+                                )
+                                (buildDummyInputId sectionIndex itemIndex)
                         , text config.label
                         ]
 

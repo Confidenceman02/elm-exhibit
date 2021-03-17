@@ -17,13 +17,13 @@ module Header exposing
 
 import Author exposing (Author)
 import Components.Button as Button
-import Components.DummyInput as DummyInput
 import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
 import Components.Link as Link
 import Components.MenuList as MenuList
 import Css as Css
+import DummyInput
 import Effect exposing (Effect)
 import EventsExtra
 import Html.Styled as Styled exposing (div, h1, img, span, text)
