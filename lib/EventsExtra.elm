@@ -1,4 +1,4 @@
-module EventsExtra exposing (isDownArrow, isEnter, isSpace, onEnter, onSpace)
+module EventsExtra exposing (isDownArrow, isEnter, isEscape, isSpace, onEnter, onSpace)
 
 import Html.Styled as Styled
 import Html.Styled.Events exposing (keyCode, preventDefaultOn)
@@ -119,6 +119,11 @@ isSpace msg =
 isEnter : msg -> Decode.Decoder msg
 isEnter msg =
     keyCode |> Decode.andThen (isCode Enter msg)
+
+
+isEscape : msg -> Decode.Decoder msg
+isEscape msg =
+    keyCode |> Decode.andThen (isCode Escape msg)
 
 
 isDownArrow : msg -> Decode.Decoder msg

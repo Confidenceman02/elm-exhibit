@@ -72,6 +72,7 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | ToggleMenu
+    | HideMenu
     | MenuListMsgs MenuList.Msg
 
 
@@ -235,6 +236,7 @@ sessionActionView (State state_) sesh =
                                     |> DummyInput.preventKeydownOn
                                         [ EventsExtra.isEnter ToggleMenu
                                         , EventsExtra.isSpace ToggleMenu
+                                        , EventsExtra.isEscape HideMenu
 
                                         --, EventsExtra.isDownArrow ToggleMenu
                                         ]
@@ -259,7 +261,7 @@ sessionActionView (State state_) sesh =
                                                 [ MenuList.action { label = "Something", item = "SomethingElse" }
                                                 , MenuList.action { label = "Else", item = "else" }
                                                 , MenuList.action { label = "Entirely", item = "Entirely" }
-                                                , MenuList.navigation { label = "Google", href = "https://www.google.com" }
+                                                , MenuList.navigation { label = "Home", href = "/" }
                                                 ]
                                             ]
                                     )
@@ -408,6 +410,9 @@ update state_ msg =
                         MenuList.show s.menuListState
             in
             ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+
+        HideMenu ->
+            ( State { s | menuListState = MenuList.hide s.menuListState }, Cmd.none, Effect.none )
 
         MenuListMsgs menuListMsg ->
             let
