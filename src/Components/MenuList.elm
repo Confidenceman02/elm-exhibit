@@ -282,10 +282,10 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | step = Visible }, Cmd.none )
 
         MakeInvisible _ ->
-            ( State_ { state_ | step = Invisible }, Cmd.none )
+            ( State_ { state_ | step = Invisible, focusedListItem = Nothing }, Cmd.none )
 
         ListItemFocused sectionIndex itemIndex ->
-            ( s, Cmd.none )
+            ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none )
 
         EscapeKeyDowned ->
             ( State_ { state_ | step = BecomingInvisible Triggered }, Cmd.none )
