@@ -37,6 +37,14 @@ type State
     = State_ StateData
 
 
+type alias SectionPosition =
+    Int
+
+
+type alias ItemPosition =
+    Int
+
+
 
 -- CONSTANTS
 
@@ -49,14 +57,6 @@ menuListItemSuffix =
 dummyInputSuffix : String
 dummyInputSuffix =
     "menu-list-dummy-input"
-
-
-type alias SectionPosition =
-    Int
-
-
-type alias ItemPosition =
-    Int
 
 
 
@@ -236,15 +236,20 @@ state s (Config config) =
     Config { config | state = s }
 
 
-type Msg
+type Msg item
     = None
     | MakeVisible Time.Posix
     | MakeInvisible Time.Posix
     | ListItemFocused Int Int
+    | ActionItemClicked_ item
     | EscapeKeyDowned
 
 
-subscriptions : State -> Sub Msg
+type Actions item
+    = ActionItemClicked item
+
+
+subscriptions : State -> Sub (Msg item)
 subscriptions ((State_ s) as state_) =
     Sub.batch
         [ visibilitySubscriptions state_
@@ -252,7 +257,7 @@ subscriptions ((State_ s) as state_) =
         ]
 
 
-browserEventSubscriptions : State -> Sub Msg
+browserEventSubscriptions : State -> Sub (Msg item)
 browserEventSubscriptions ((State_ s) as state_) =
     if isShowing state_ && (s.focusedListItem == Nothing) then
         BrowserEvents.onKeyDown (EventsExtra.isEscape EscapeKeyDowned)
@@ -261,7 +266,7 @@ browserEventSubscriptions ((State_ s) as state_) =
         Sub.none
 
 
-visibilitySubscriptions : State -> Sub Msg
+visibilitySubscriptions : State -> Sub (Msg item)
 visibilitySubscriptions (State_ s) =
     case s.step of
         BecomingVisible Triggered ->
@@ -275,26 +280,29 @@ visibilitySubscriptions (State_ s) =
             Sub.none
 
 
-update : Msg -> State -> ( State, Cmd Msg )
+update : Msg item -> State -> ( State, Cmd (Msg item), Maybe (Actions item) )
 update msg ((State_ state_) as s) =
     case msg of
         MakeVisible _ ->
-            ( State_ { state_ | step = Visible }, Cmd.none )
+            ( State_ { state_ | step = Visible }, Cmd.none, Nothing )
 
         MakeInvisible _ ->
-            ( State_ { state_ | step = Invisible, focusedListItem = Nothing }, Cmd.none )
+            ( State_ { state_ | step = Invisible, focusedListItem = Nothing }, Cmd.none, Nothing )
 
         ListItemFocused sectionIndex itemIndex ->
-            ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none )
+            ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none, Nothing )
 
         EscapeKeyDowned ->
-            ( State_ { state_ | step = BecomingInvisible Triggered }, Cmd.none )
+            ( State_ { state_ | step = BecomingInvisible Triggered }, Cmd.none, Nothing )
+
+        ActionItemClicked_ item ->
+            ( s, Cmd.none, Just (ActionItemClicked item) )
 
         None ->
-            ( s, Cmd.none )
+            ( s, Cmd.none, Nothing )
 
 
-view : Config item -> Styled.Html Msg
+view : Config item -> Styled.Html (Msg item)
 view (Config config) =
     let
         (State_ s) =
@@ -325,12 +333,12 @@ view (Config config) =
             text ""
 
 
-renderSections : Configuration item -> List (Styled.Html Msg)
+renderSections : Configuration item -> List (Styled.Html (Msg item))
 renderSections config =
     ListX.indexedFoldr (renderSection config.styling) [] config.sections
 
 
-renderSection : Styling -> Int -> Section item -> List (Styled.Html Msg) -> List (Styled.Html Msg)
+renderSection : Styling -> Int -> Section item -> List (Styled.Html (Msg item)) -> List (Styled.Html (Msg item))
 renderSection styling sectionIndex (Section menuItems) accumViews =
     let
         buildView item itemIndex =
@@ -354,6 +362,7 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                     div
                         [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles ++ listItemFocusWithinStyles styling)
                         , StyledAttribs.id (buildItemId sectionIndex itemIndex)
+                        , Events.onClick (ActionItemClicked_ config.item)
                         ]
                         [ Styled.fromUnstyled <|
                             DummyInput.view
@@ -388,12 +397,12 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
     buildViews menuItems accumViews 0
 
 
-renderBaseConfiguration : BaseConfiguration -> Styled.Html Msg
+renderBaseConfiguration : BaseConfiguration -> Styled.Html (Msg item)
 renderBaseConfiguration customNavConfig =
     Styled.node customNavConfig.tag [ StyledAttribs.css customNavConfig.styles ] [ text customNavConfig.content ]
 
 
-renderCustomAction : CustomActionConfiguration item BaseConfiguration -> Styled.Html Msg
+renderCustomAction : CustomActionConfiguration item BaseConfiguration -> Styled.Html (Msg item)
 renderCustomAction customActionConfig =
     Styled.node customActionConfig.tag [ StyledAttribs.css customActionConfig.styles ] [ text customActionConfig.content ]
 

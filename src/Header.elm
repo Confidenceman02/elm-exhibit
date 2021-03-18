@@ -74,7 +74,7 @@ type Msg
     | MenuTriggerBlurred
     | ToggleMenu
     | HideMenu
-    | MenuListMsgs MenuList.Msg
+    | MenuListMsgs (MenuList.Msg String)
 
 
 type State
@@ -438,7 +438,7 @@ update state_ msg =
 
         MenuListMsgs menuListMsg ->
             let
-                ( menuListState, menuListCmd ) =
+                ( menuListState, menuListCmd, _ ) =
                     MenuList.update menuListMsg s.menuListState
             in
             ( State { s | menuListState = menuListState }, Cmd.map MenuListMsgs menuListCmd, Effect.none )
