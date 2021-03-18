@@ -394,7 +394,7 @@ renderSection styling sectionIndex (Section menuItems) accumViews =
                 headItem :: tailItems ->
                     buildViews tailItems (builtViews ++ [ buildView headItem itemCount ]) (itemCount + 1)
     in
-    buildViews menuItems accumViews 0
+    buildViews menuItems [] 1 ++ accumViews
 
 
 renderBaseConfiguration : BaseConfiguration -> Styled.Html (Msg item)
