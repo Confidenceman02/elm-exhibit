@@ -219,6 +219,25 @@ sessionActionView (State state_) sesh =
 
                                 _ ->
                                     []
+
+                        withBeforeElement =
+                            if MenuList.isShowing state_.menuListState then
+                                [ Css.before
+                                    [ Css.position Css.fixed
+                                    , Css.top (Css.px 0)
+                                    , Css.right (Css.px 0)
+                                    , Css.bottom (Css.px 0)
+                                    , Css.left (Css.px 0)
+                                    , Css.zIndex (Css.int 80)
+                                    , Css.display Css.block
+                                    , Css.cursor Css.default
+                                    , Css.property "content" "' '"
+                                    , Css.property "background" "transparent"
+                                    ]
+                                ]
+
+                            else
+                                []
                     in
                     div
                         [ StyledAttribs.css
@@ -228,6 +247,7 @@ sessionActionView (State state_) sesh =
                              , Css.cursor Css.pointer
                              ]
                                 ++ focusTriggerStyles
+                                ++ withBeforeElement
                             )
                         , Events.onClick ToggleMenu
                         ]
