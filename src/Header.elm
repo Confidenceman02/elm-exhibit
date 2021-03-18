@@ -286,6 +286,9 @@ sessionActionView (State state_) sesh =
                                                 , MenuList.action { label = "Entirely", item = "Entirely" }
                                                 , MenuList.navigation { label = "Home", href = "/" }
                                                 ]
+                                            , MenuList.section
+                                                [ MenuList.action { label = "Sign out", item = "SignOut" }
+                                                ]
                                             ]
                                     )
                                 )
