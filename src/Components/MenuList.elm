@@ -245,7 +245,24 @@ type Msg
 
 
 subscriptions : State -> Sub Msg
-subscriptions (State_ s) =
+subscriptions ((State_ s) as state_) =
+    Sub.batch
+        [ visibilitySubscriptions state_
+        , browserEventSubscriptions state_
+        ]
+
+
+browserEventSubscriptions : State -> Sub Msg
+browserEventSubscriptions ((State_ s) as state_) =
+    if isShowing state_ && (s.focusedListItem == Nothing) then
+        BrowserEvents.onKeyDown (EventsExtra.isEscape EscapeKeyDowned)
+
+    else
+        Sub.none
+
+
+visibilitySubscriptions : State -> Sub Msg
+visibilitySubscriptions (State_ s) =
     case s.step of
         BecomingVisible Triggered ->
             -- We are not worrying about animation at the moment, just make visible
