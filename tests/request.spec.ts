@@ -1,4 +1,4 @@
-import {parseCookie} from "../functions/request";
+import {parseCookie, resolveReferer} from "../functions/request";
 import {expect} from "chai"
 import {Status} from "../lib/result";
 
@@ -19,5 +19,12 @@ describe("parseCookie", () => {
     it("returns error result", () => {
       expect(parseCookie(undefined)).to.deep.eq({Status: Status.Err})
     })
+  })
+
+})
+
+describe("resolveReferer", () => {
+  it("returns the localhost backup referer when there is no referer", () => {
+    expect(resolveReferer(undefined)).to.eq("http://localhost:8888")
   })
 })

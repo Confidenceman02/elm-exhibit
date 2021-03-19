@@ -6,32 +6,7 @@ import {getSession, initTempSession} from "./redis/actions";
 import redisClient from "./redis/client"
 import {Status} from "../lib/result";
 import {githubAuthorizeEndpoint} from "./endpoint";
-import {parseCookie} from "./request";
-
-const NODE_ENV: undefined | string = process.env.NODE_ENV
-
-function resolveBackupReferer (): string {
-  if (NODE_ENV) {
-    switch(NODE_ENV) {
-      case "development":
-        return "http://localhost:8888"
-      case "production":
-        return "https://elm-exhibit.com"
-      default:
-        return "http://localhost:8888"
-    }
-  } else {
-    return "http://localhost:8888"
-  }
-}
-
-function resolveReferer (referer: undefined | string): string {
-  if (referer) {
-    return referer
-  } else {
-    return resolveBackupReferer()
-  }
-}
+import {parseCookie, resolveReferer} from "./request";
 
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const { referer, cookie } = event.headers

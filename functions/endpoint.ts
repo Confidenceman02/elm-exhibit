@@ -1,11 +1,11 @@
 import {Result, ResultType} from "../lib/result";
 import { URL } from "url";
-
-const GITHUB_OAUTH_LOGIN_ENDPOINT =  "https://github.com/login/oauth/access_token"
-const GITHUB_OAUTH_AUTHORIZE_ENDPOINT = "https://github.com/login/oauth/authorize"
-const GITHUB_USER_ENDPOINT =  "https://api.github.com/user"
-const GITHUB_CLIENT_ID: string | undefined = process.env.GITHUB_CLIENT_ID
-const GITHUB_CLIENT_SECRET: string | undefined = process.env.GITHUB_CLIENT_SECRET
+import {
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_OAUTH_AUTHORIZE_ENDPOINT,
+  GITHUB_OAUTH_LOGIN_ENDPOINT, GITHUB_USER_ENDPOINT
+} from "./env";
 
 export function githubLoginEndpoint(code: string): ResultType<URL> {
   const endpointUrl: URL = new URL(GITHUB_OAUTH_LOGIN_ENDPOINT)

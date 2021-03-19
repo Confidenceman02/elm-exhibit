@@ -1,6 +1,5 @@
 import {StatusCodes} from "http-status-codes";
 import {UserSession} from "./redis/schema";
-import {sessionIdCookieKey} from "./headers";
 
 export type NoIdea = { tag: "KeineAhnung" }
 
