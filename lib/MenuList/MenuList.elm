@@ -1,4 +1,4 @@
-module Components.MenuList exposing
+module MenuList.MenuList exposing
     ( Msg
     , State
     , action
@@ -26,6 +26,7 @@ import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Json.Decode as Decode
 import List.Extra as ListX
+import MenuList.Divider as Divider
 import Time
 
 
@@ -383,18 +384,27 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                 Custom configs ->
                     div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
-        buildViews items builtViews itemCount =
+        buildViews items builtViews itemIndex =
             case items of
                 [] ->
                     builtViews
 
                 head :: [] ->
-                    builtViews ++ [ buildView head itemCount ]
+                    builtViews ++ [ buildView head itemIndex ]
 
                 headItem :: tailItems ->
-                    buildViews tailItems (builtViews ++ [ buildView headItem itemCount ]) (itemCount + 1)
+                    buildViews tailItems (builtViews ++ [ buildView headItem itemIndex ]) (itemIndex + 1)
+
+        withDivider =
+            if sectionIndex + 1 < sectionCounts then
+                [ Divider.view ]
+
+            else
+                []
     in
-    buildViews menuItems [] 0 ++ accumViews
+    buildViews menuItems [] 0
+        ++ withDivider
+        ++ accumViews
 
 
 renderBaseConfiguration : BaseConfiguration -> Styled.Html (Msg item)

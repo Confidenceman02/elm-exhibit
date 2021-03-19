@@ -21,7 +21,6 @@ import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
 import Components.Link as Link
-import Components.MenuList as MenuList
 import Css as Css
 import DummyInput
 import Effect exposing (Effect)
@@ -30,6 +29,7 @@ import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
+import MenuList.MenuList as MenuList
 import Package exposing (Package)
 import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
