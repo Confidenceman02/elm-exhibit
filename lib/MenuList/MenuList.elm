@@ -1,5 +1,6 @@
 module MenuList.MenuList exposing
-    ( Msg
+    ( Actions(..)
+    , Msg
     , State
     , action
     , default

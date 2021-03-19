@@ -29,7 +29,7 @@ import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
-import MenuList.MenuList as MenuList
+import MenuList.MenuList as MenuList exposing (Actions(..))
 import Package exposing (Package)
 import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
@@ -442,7 +442,15 @@ update state_ msg =
 
         MenuListMsg menuListMsg ->
             let
-                ( menuListState, menuListCmd, _ ) =
+                ( menuListState, menuListCmd, menuListAction ) =
                     MenuList.update menuListMsg s.menuListState
+
+                effect =
+                    case menuListAction of
+                        Just (ActionItemClicked SignOutAction) ->
+                            Effect.single SignOutEffect
+
+                        Nothing ->
+                            Effect.none
             in
-            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsg menuListCmd, Effect.none )
+            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsg menuListCmd, effect )
