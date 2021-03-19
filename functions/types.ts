@@ -19,7 +19,7 @@ export type SessionErrorBody =
   | NoIdea
 
 export type SessionSuccessBody =
-  { tag: "SessionRefreshed" }
+  { tag: "SessionRefreshed", session: UserSession }
   | { tag: "Redirecting", location: string }
   | { tag: "SessionGranted", session: UserSession }
 
