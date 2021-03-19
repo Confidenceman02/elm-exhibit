@@ -103,7 +103,7 @@ mapTagToSessionSuccess : String -> Decoder SessionSuccess
 mapTagToSessionSuccess tag =
     case tag of
         "SessionRefreshed" ->
-            Decode.map SessionRefreshed Viewer.credDecoder
+            Decode.map SessionRefreshed (Decode.field "session" Viewer.credDecoder)
 
         "SessionGranted" ->
             Decode.map SessionGranted (Decode.field "session" Viewer.credDecoder)
