@@ -318,7 +318,7 @@ view (Config config) =
                     , Css.backgroundColor (Css.hex "#FFFFFF")
                     , Css.zIndex (Css.int config.zIndex)
                     , Css.borderRadius (Css.px 6)
-                    , Css.border3 (Css.px 1) Css.solid (Css.hex "#FFFFFF")
+                    , Css.border3 (Css.px 1) Css.solid (Css.hex "#E6E6E6")
                     , Css.backgroundClip Css.paddingBox
                     , Css.marginTop (Css.px 2)
                     , Css.paddingBottom (Css.px 4)
