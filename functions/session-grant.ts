@@ -8,10 +8,36 @@ import {Status} from "../lib/result";
 import {githubAuthorizeEndpoint} from "./endpoint";
 import {parseCookie} from "./request";
 
+const NODE_ENV: undefined | string = process.env.NODE_ENV
+
+function resolveBackupReferer (): string {
+  if (NODE_ENV) {
+    switch(NODE_ENV) {
+      case "development":
+        return "http://localhost:8888"
+      case "production":
+        return "https://elm-exhibit.com"
+      default:
+        return "http://localhost:8888"
+    }
+  } else {
+    return "http://localhost:8888"
+  }
+}
+
+function resolveReferer (referer: undefined | string): string {
+  if (referer) {
+    return referer
+  } else {
+    return resolveBackupReferer()
+  }
+}
+
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const { referer, cookie } = event.headers
   const sessionId = uuidv4()
-  const authEndpoint = githubAuthorizeEndpoint(sessionId, referer)
+  const resolvedReferer: string = resolveReferer(referer)
+  const authEndpoint = githubAuthorizeEndpoint(sessionId, resolvedReferer)
   if (redisClient.Status === Status.Ok) {
     const client = redisClient.data
     try {
@@ -25,7 +51,7 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
         }
       }
       // save temporary session meta
-      const tempSession = await initTempSession({ sessionId, referer }, client )
+      const tempSession = await initTempSession({ sessionId, referer: resolvedReferer }, client )
 
       if (tempSession && authEndpoint.Status === Status.Ok) {
         return successResponse({ tag: "Redirecting", location: authEndpoint.data.href })
