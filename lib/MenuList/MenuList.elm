@@ -335,11 +335,11 @@ view (Config config) =
 
 renderSections : Configuration item -> List (Styled.Html (Msg item))
 renderSections config =
-    ListX.indexedFoldr (renderSection config.styling) [] config.sections
+    ListX.indexedFoldr (renderSection config.styling (List.length config.sections)) [] config.sections
 
 
-renderSection : Styling -> Int -> Section item -> List (Styled.Html (Msg item)) -> List (Styled.Html (Msg item))
-renderSection styling sectionIndex (Section menuItems) accumViews =
+renderSection : Styling -> Int -> Int -> Section item -> List (Styled.Html (Msg item)) -> List (Styled.Html (Msg item))
+renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews =
     let
         buildView item itemIndex =
             case item of
