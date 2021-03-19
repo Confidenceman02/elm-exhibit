@@ -74,7 +74,11 @@ type Msg
     | MenuTriggerBlurred
     | ToggleMenu
     | HideMenu
-    | MenuListMsgs (MenuList.Msg String)
+    | MenuListMsg (MenuList.Msg MenuListAction)
+
+
+type MenuListAction
+    = SignOutAction
 
 
 type State
@@ -275,19 +279,16 @@ sessionActionView (State state_) sesh =
                                 , Css.marginTop Grid.halfGrid
                                 ]
                             ]
-                            [ Styled.map MenuListMsgs
+                            [ Styled.map MenuListMsg
                                 (MenuList.view
                                     (MenuList.default
                                         |> MenuList.state state_.menuListState
                                         |> MenuList.sections
                                             [ MenuList.section
-                                                [ MenuList.action { label = "Something", item = "SomethingElse" }
-                                                , MenuList.action { label = "Else", item = "else" }
-                                                , MenuList.action { label = "Entirely", item = "Entirely" }
-                                                , MenuList.navigation { label = "Home", href = "/" }
+                                                [ MenuList.navigation { label = "Home", href = "/" }
                                                 ]
                                             , MenuList.section
-                                                [ MenuList.action { label = "Sign out", item = "SignOut" }
+                                                [ MenuList.action { label = "Sign out", item = SignOutAction }
                                                 ]
                                             ]
                                     )
@@ -403,7 +404,7 @@ initState =
 
 subscriptions : State -> Sub Msg
 subscriptions (State state_) =
-    Sub.map MenuListMsgs (MenuList.subscriptions state_.menuListState)
+    Sub.map MenuListMsg (MenuList.subscriptions state_.menuListState)
 
 
 update : State -> Msg -> ( State, Cmd Msg, Effect HeaderEffect )
@@ -439,9 +440,9 @@ update state_ msg =
         HideMenu ->
             ( State { s | menuListState = MenuList.hide s.menuListState }, Cmd.none, Effect.none )
 
-        MenuListMsgs menuListMsg ->
+        MenuListMsg menuListMsg ->
             let
                 ( menuListState, menuListCmd, _ ) =
                     MenuList.update menuListMsg s.menuListState
             in
-            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsgs menuListCmd, Effect.none )
+            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsg menuListCmd, Effect.none )
