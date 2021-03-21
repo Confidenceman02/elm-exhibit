@@ -16,12 +16,15 @@ export type ExampleSuccessBody =
 export type SessionErrorBody =
   { tag: "RefreshFailed" }
   | { tag: "LoginFailed" }
+  | { tag: "SessionNotFound" }
+  | { tag: "MissingCookie" }
   | NoIdea
 
 export type SessionSuccessBody =
   { tag: "SessionRefreshed", session: UserSession }
   | { tag: "Redirecting", location: string }
   | { tag: "SessionGranted", session: UserSession }
+  | { tag: "SessionDestroyed" }
 
 export type ErrorBody = ExampleErrorBody | SessionErrorBody
 
