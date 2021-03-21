@@ -64,7 +64,16 @@ fromResult result =
         Ok (Redirecting meta) ->
             ( Nav.load meta.location, LoggingIn )
 
+        Ok SessionDestroyed ->
+            ( Cmd.none, Guest )
+
         Err LoginFailed ->
+            ( Cmd.none, Failed )
+
+        Err SessionNotFound ->
+            ( Cmd.none, Failed )
+
+        Err MissingCookie ->
             ( Cmd.none, Failed )
 
         _ ->
@@ -79,6 +88,8 @@ toSessionId id =
 type SessionError
     = RefreshFailed
     | LoginFailed
+    | SessionNotFound
+    | MissingCookie
     | KeineAhnung
 
 
@@ -86,6 +97,7 @@ type SessionSuccess
     = SessionRefreshed Cred
     | Redirecting RedirectBody
     | SessionGranted Cred
+    | SessionDestroyed
 
 
 type alias RedirectBody =
@@ -111,6 +123,9 @@ mapTagToSessionSuccess tag =
         "Redirecting" ->
             Decode.map Redirecting redirectingDecoder
 
+        "SessionDestroyed" ->
+            Decode.succeed SessionDestroyed
+
         _ ->
             Decode.fail "Could not decode session success tag"
 
@@ -128,6 +143,12 @@ mapTagToSessionError tag =
 
         "LoginFailed" ->
             Decode.succeed LoginFailed
+
+        "SessionNotFound" ->
+            Decode.succeed SessionNotFound
+
+        "MissingCookie" ->
+            Decode.succeed MissingCookie
 
         _ ->
             Decode.succeed KeineAhnung
