@@ -27,6 +27,12 @@ export async function getSession(sessionId: string, client: IPromisifiedRedis): 
   return Result<UserSession>().Ok(userSession)
 }
 
+export async function destroySession(sessionId: string, client: IPromisifiedRedis): Promise<boolean> {
+  const key = generateExpirableDBKey(ExpirableDBTag.Session, sessionId)
+  const fieldsDestroyed: number = await client.HDELAsync(key)
+  return 0 < fieldsDestroyed
+}
+
 export async function tempSessionExists(tempSesh: TempSession, client: IPromisifiedRedis): Promise<boolean> {
   const dbKey = generateExpirableDBKey(ExpirableDBTag.TempSession, tempSesh.sessionId)
   const keyExists = await client.EXISTSAsync(dbKey)
