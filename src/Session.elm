@@ -161,7 +161,7 @@ errorBodyDecoder =
 
 
 decodeResponseString : Decoder a -> Response String -> Result SessionError a
-decodeResponseString decoder response =
+decodeResponseString successDecoder response =
     case response of
         Http.BadStatus_ _ body ->
             case Decode.decodeString errorBodyDecoder body of
@@ -172,7 +172,7 @@ decodeResponseString decoder response =
                     Err KeineAhnung
 
         Http.GoodStatus_ metadata body ->
-            case Decode.decodeString decoder body of
+            case Decode.decodeString successDecoder body of
                 Ok decodedBody ->
                     Ok decodedBody
 
@@ -206,6 +206,16 @@ login : (Result SessionError SessionSuccess -> msg) -> ( Cmd msg, Session )
 login toMsg =
     ( Api.get
         (Endpoint.lambdaUrl [ "session-grant" ] [])
+        toMsg
+        (decodeResponseString successBodyDecoder)
+    , LoggingIn
+    )
+
+
+logOut : (Result SessionError SessionSuccess -> msg) -> ( Cmd msg, Session )
+logOut toMsg =
+    ( Api.get
+        (Endpoint.lambdaUrl [ "session-destroy" ] [])
         toMsg
         (decodeResponseString successBodyDecoder)
     , LoggingIn
