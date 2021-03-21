@@ -175,9 +175,10 @@ describe("successBody", () => {
         body: JSON.stringify(tag),
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": "session_id=S1234; Max-Age=0 HttpOnly"
+          "Set-Cookie": "session_id=\"\"; Max-Age=0 HttpOnly"
         }
       }
+      expect(successResponse(tag)).to.deep.eq(expected)
     })
   })
 })

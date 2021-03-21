@@ -57,6 +57,8 @@ function resolveStatusCodeFromSuccessBody(successBody: SuccessBody): StatusCodes
       return StatusCodes.OK
     case "Redirecting":
       return StatusCodes.OK
+    case "SessionDestroyed":
+      return StatusCodes.OK
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR
   }
