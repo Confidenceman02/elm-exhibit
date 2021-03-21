@@ -1,6 +1,6 @@
 import {StatusCodes} from "http-status-codes";
 import {ErrorBody, NoIdea, ResponseBody, SuccessBody, TaggedResponseBody} from "./types";
-import {jsonHeaders, withSessionCookie} from "./headers";
+import {jsonHeaders, withExpireSessionCookie, withSetSessionCookie} from "./headers";
 
 export function errorResponse(error: ErrorBody): ResponseBody {
   return {
@@ -38,6 +38,10 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
       return StatusCodes.NOT_FOUND
     case "LoginFailed":
       return StatusCodes.INTERNAL_SERVER_ERROR
+    case "SessionNotFound":
+      return StatusCodes.NOT_FOUND
+    case "MissingCookie":
+      return StatusCodes.BAD_REQUEST
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR
   }
@@ -61,7 +65,9 @@ function resolveStatusCodeFromSuccessBody(successBody: SuccessBody): StatusCodes
 function resolveHeadersFromTaggedResponseBody(taggedBody: TaggedResponseBody) {
   switch (taggedBody.tag) {
     case "SessionGranted":
-      return { ...jsonHeaders, ...withSessionCookie(taggedBody.session) }
+      return { ...jsonHeaders, ...withSetSessionCookie(taggedBody.session) }
+    case "SessionDestroyed":
+      return { ...jsonHeaders, ...withExpireSessionCookie()}
     default:
       return { ...jsonHeaders }
   }
