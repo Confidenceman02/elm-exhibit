@@ -11,17 +11,20 @@ import {parseCookie} from "./request";
 // by user action.
 export async function handler(event: APIGatewayEvent, context: Context): Promise<ResponseBody> {
   const { cookie } = event.headers
-  const cookieResult = parseCookie(cookie)
 
-  if (cookieResult.Status === Status.Ok) {
-    if (redisClient.Status === Status.Ok) {
-      const sessionResult = await getSession(cookieResult.data.session_id, redisClient.data)
-      if (sessionResult.Status === Status.Ok) {
-        return successResponse({ tag: "SessionRefreshed", session: sessionResult.data })
-      }
-      return errorResponse({ tag: "RefreshFailed"})
-    }
+  if (redisClient.Status === Status.Err) {
     return errorResponse({ tag: "LoginFailed" })
   }
-  return errorResponse({ tag: "RefreshFailed"})
+
+  const cookieResult = parseCookie(cookie)
+  if (cookieResult.Status === Status.Err) {
+    return errorResponse({ tag: "RefreshFailed"})
+  }
+
+  const sessionResult = await getSession(cookieResult.data.session_id, redisClient.data)
+  if (sessionResult.Status === Status.Err) {
+    return errorResponse({ tag: "RefreshFailed"})
+  }
+
+  return successResponse({ tag: "SessionRefreshed", session: sessionResult.data })
 }
