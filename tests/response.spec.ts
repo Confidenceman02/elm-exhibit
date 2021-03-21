@@ -8,87 +8,103 @@ describe("errorResponse", () => {
     describe("ExampleBuildFailed", () => {
       const tag: ExampleErrorBody = { tag: "ExampleBuildFailed" }
       it("should return error response body", () => {
-        const expected =
-          {
-            statusCode: StatusCodes.BAD_REQUEST,
-            body: JSON.stringify(tag),
-            headers: {"Content-Type": "application/json"}
-          }
+        const expected = {
+          statusCode: StatusCodes.BAD_REQUEST,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       });
     })
     describe("AuthorNotFound", () => {
       const tag: ExampleErrorBody = { tag: "AuthorNotFound", foundAuthor: "Some Author"}
       it("should return error response body", () => {
-        const expected =
-          {
-            statusCode: StatusCodes.NOT_FOUND,
-            body: JSON.stringify(tag),
-            headers: {"Content-Type": "application/json"}
-          }
+        const expected = {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
     })
     describe("PackageNotFound", () => {
       const tag: ExampleErrorBody = { tag: "PackageNotFound" }
       it("should return error response body", () => {
-        const expected =
-          {
-            statusCode: StatusCodes.NOT_FOUND,
-            body: JSON.stringify(tag),
-            headers: {"Content-Type": "application/json"}
-          }
+        const expected = {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
     })
     describe("AuthorAndPackageNotFound", () => {
       const tag: ExampleErrorBody = { tag: "AuthorAndPackageNotFound" }
       it("should return error response body", () => {
-        const expected =
-            {
-              statusCode: StatusCodes.NOT_FOUND,
-              body: JSON.stringify(tag),
-              headers: {"Content-Type": "application/json"}
-            }
+        const expected = {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
     })
     describe("KaineAhnung", () => {
       const tag: ExampleErrorBody = { tag: "KeineAhnung" }
       it("should return error response body", () => {
-        const expected =
-            {
-              statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-              body: JSON.stringify(tag),
-              headers: {"Content-Type": "application/json"}
-            }
+        const expected = {
+          statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
     })
   })
+
   describe("SessionErrorBody", () => {
     describe("RefreshFailed", () => {
       const tag: SessionErrorBody = { tag: "RefreshFailed" }
       it("should return error response body", () => {
-        const expected =
-          {
-            statusCode: StatusCodes.NOT_FOUND,
-            body: JSON.stringify(tag),
-            headers: {"Content-Type": "application/json"}
-          }
+        const expected = {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
       })
     })
     describe("LoginFailed", () => {
       const tag: SessionErrorBody = { tag: "LoginFailed" }
       it("should return error response body", () => {
-        const expected =
-            {
-              statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-              body: JSON.stringify(tag),
-              headers: {"Content-Type": "application/json"}
-            }
+        const expected = {
+          statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
         expect(errorResponse(tag)).to.deep.eq(expected)
+      })
+    })
+    describe("SessionNotFound", () => {
+      const tag: SessionErrorBody = { tag: "SessionNotFound" }
+
+      it("should return error response body", () => {
+        const expected = {
+          statusCode: StatusCodes.NOT_FOUND,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
+      })
+    })
+    describe("MissingCookie", () => {
+      const tag: SessionErrorBody = { tag: "MissingCookie" }
+
+      it("should return error response body", () => {
+        const expected = {
+          statusCode: StatusCodes.BAD_REQUEST,
+          body: JSON.stringify(tag),
+          headers: {"Content-Type": "application/json"}
+        }
       })
     })
   })
@@ -110,7 +126,10 @@ describe("successBody", () => {
     })
   })
   describe("SessionRefreshed", () => {
-    const tag: SessionSuccessBody = { tag: "SessionRefreshed" }
+    const tag: SessionSuccessBody = {
+      tag: "SessionRefreshed",
+      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: 1234, sessionId: "S1234" }
+    }
     it("should return success response", () => {
       const expected = {
         statusCode: StatusCodes.OK,
@@ -134,7 +153,8 @@ describe("successBody", () => {
   describe("SessionGranted", () => {
     const tag: SessionSuccessBody = {
       tag: "SessionGranted",
-      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: 1234, sessionId: "S1234" }}
+      session: { username: "confidenceman02", avatarUrl: "www.avatarurl.com", userId: 1234, sessionId: "S1234" }
+    }
     it("should return a success response", () => {
       const expected = {
         statusCode: StatusCodes.OK,
@@ -145,6 +165,19 @@ describe("successBody", () => {
         }
       }
       expect(successResponse(tag)).to.deep.eq(expected)
+    })
+  })
+  describe("SessionDestroyed", () => {
+    const tag: SessionSuccessBody = { tag: "SessionDestroyed" }
+    it("should return a success response with expired headers", () => {
+      const expected = {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(tag),
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": "session_id=S1234; Max-Age=0 HttpOnly"
+        }
+      }
     })
   })
 })
