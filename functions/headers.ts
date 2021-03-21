@@ -16,9 +16,16 @@ export function withAuth(oauthToken: string) {
   }
 }
 
-export function withSessionCookie(session: UserSession) {
+export function withSetSessionCookie(session: UserSession) {
   return {
     // TODO: add secure only for production env
     "Set-Cookie": `${sessionIdCookieKey}=${session.sessionId}; HttpOnly`
+  }
+}
+
+export function withExpireSessionCookie() {
+  return {
+    // TODO: add secure only for production env
+    "Set-Cookie": `${sessionIdCookieKey}=""; Max-Age=0 HttpOnly`,
   }
 }
