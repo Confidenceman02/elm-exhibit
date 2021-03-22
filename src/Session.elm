@@ -13,6 +13,7 @@ module Session exposing
     , isLoggedIn
     , isLoggingIn
     , isRefreshing
+    , logOut
     , loggingIn
     , login
     , refresh
@@ -34,6 +35,7 @@ type Session
     | Guest
     | Idle
     | LoggingIn
+    | LoggingOut
     | Refreshing
     | Failed
 
@@ -218,7 +220,7 @@ logOut toMsg =
         (Endpoint.lambdaUrl [ "session-destroy" ] [])
         toMsg
         (decodeResponseString successBodyDecoder)
-    , LoggingIn
+    , LoggingOut
     )
 
 

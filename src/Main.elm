@@ -25,6 +25,7 @@ type Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
     | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
+    | SessionDestroying (Result Session.SessionError Session.SessionSuccess)
     | GotAuthGithubRedirectMsg AuthRedirectPage.Msg
 
 
@@ -185,6 +186,16 @@ update msg model =
             in
             ( Example updatedModel, sessionCmd )
 
+        ( SessionDestroying result, Example m ) ->
+            let
+                updatedModel =
+                    { m | context = Context.updateSession updatedSession m.context }
+
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
+            in
+            ( Example updatedModel, sessionCmd )
+
         _ ->
             ( model, Cmd.none )
 
@@ -237,7 +248,14 @@ headerEffectHandler model effect =
             ( { model | context = updatedContext }, sessionCmd )
 
         Header.SignOutEffect ->
-            ( model, Cmd.none )
+            let
+                ( sessionCmd, session ) =
+                    Session.logOut SessionDestroying
+
+                updatedContext =
+                    Context.updateSession session model.context
+            in
+            ( { model | context = updatedContext }, sessionCmd )
 
 
 main : Program Encode.Value Model Msg
