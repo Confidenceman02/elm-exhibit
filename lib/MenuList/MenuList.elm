@@ -35,8 +35,8 @@ type Config item
     = Config (Configuration item)
 
 
-type State
-    = State_ StateData
+type State item
+    = State_ (StateData item)
 
 
 type alias SectionPosition =
@@ -69,9 +69,10 @@ type FocusedListItem
     = FocusedListItem SectionPosition ItemPosition
 
 
-type alias StateData =
+type alias StateData item =
     { step : Step
     , focusedListItem : Maybe FocusedListItem
+    , sections : List (Section item)
     }
 
 
@@ -87,9 +88,9 @@ type Step
     | BecomingInvisible StepLifecycle
 
 
-initialState : State
+initialState : State item
 initialState =
-    State_ { step = Invisible, focusedListItem = Nothing }
+    State_ { step = Invisible, focusedListItem = Nothing, sections = [] }
 
 
 
@@ -190,17 +191,15 @@ type alias ItemStyles =
 
 
 type alias Configuration item =
-    { sections : List (Section item)
-    , zIndex : Int
-    , state : State
+    { zIndex : Int
+    , state : State item
     , styling : Styling
     }
 
 
 defaults : Configuration item
 defaults =
-    { sections = []
-    , zIndex = 0
+    { zIndex = 0
     , state = initialState
     , styling =
         { hoverStyles = Styled { backgroundColor = Css.hex "#5FABDC", color = Css.hex "#FFFFFF" }
@@ -218,9 +217,9 @@ default =
 -- MODIFIERS
 
 
-sections : List (Section item) -> Config item -> Config item
-sections sectionList (Config config) =
-    Config { config | sections = sectionList }
+sections : List (Section item) -> State item -> State item
+sections sectionList (State_ s) =
+    State_ { s | sections = sectionList }
 
 
 section : List (ListItem item) -> Section item
@@ -233,7 +232,7 @@ zIndex indx (Config config) =
     Config { config | zIndex = indx }
 
 
-state : State -> Config item -> Config item
+state : State item -> Config item -> Config item
 state s (Config config) =
     Config { config | state = s }
 
@@ -251,7 +250,7 @@ type Actions item
     = ActionItemClicked item
 
 
-subscriptions : State -> Sub (Msg item)
+subscriptions : State item -> Sub (Msg item)
 subscriptions ((State_ s) as state_) =
     Sub.batch
         [ visibilitySubscriptions state_
@@ -259,7 +258,7 @@ subscriptions ((State_ s) as state_) =
         ]
 
 
-browserEventSubscriptions : State -> Sub (Msg item)
+browserEventSubscriptions : State item -> Sub (Msg item)
 browserEventSubscriptions ((State_ s) as state_) =
     if isShowing state_ && (s.focusedListItem == Nothing) then
         BrowserEvents.onKeyDown (EventsExtra.isEscape EscapeKeyDowned)
@@ -268,7 +267,7 @@ browserEventSubscriptions ((State_ s) as state_) =
         Sub.none
 
 
-visibilitySubscriptions : State -> Sub (Msg item)
+visibilitySubscriptions : State item -> Sub (Msg item)
 visibilitySubscriptions (State_ s) =
     case s.step of
         BecomingVisible Triggered ->
@@ -282,7 +281,7 @@ visibilitySubscriptions (State_ s) =
             Sub.none
 
 
-update : Msg item -> State -> ( State, Cmd (Msg item), Maybe (Actions item) )
+update : Msg item -> State item -> ( State item, Cmd (Msg item), Maybe (Actions item) )
 update msg ((State_ state_) as s) =
     case msg of
         MakeVisible _ ->
@@ -337,7 +336,11 @@ view (Config config) =
 
 renderSections : Configuration item -> List (Styled.Html (Msg item))
 renderSections config =
-    ListX.indexedFoldr (renderSection config.styling (List.length config.sections)) [] config.sections
+    let
+        (State_ s) =
+            config.state
+    in
+    ListX.indexedFoldr (renderSection config.styling (List.length s.sections)) [] s.sections
 
 
 renderSection : Styling -> Int -> Int -> Section item -> List (Styled.Html (Msg item)) -> List (Styled.Html (Msg item))
@@ -422,17 +425,17 @@ renderCustomAction customActionConfig =
 -- HELPERS
 
 
-show : State -> State
+show : State item -> State item
 show (State_ s) =
     State_ { s | step = BecomingVisible Triggered }
 
 
-hide : State -> State
+hide : State item -> State item
 hide (State_ s) =
     State_ { s | step = BecomingInvisible Triggered }
 
 
-isShowing : State -> Bool
+isShowing : State item -> Bool
 isShowing (State_ s) =
     case s.step of
         Visible ->

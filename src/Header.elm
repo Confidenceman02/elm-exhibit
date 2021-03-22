@@ -87,7 +87,7 @@ type State
 
 type alias State_ =
     { menu : Menu
-    , menuListState : MenuList.State
+    , menuListState : MenuList.State MenuListAction
     }
 
 
@@ -283,14 +283,6 @@ sessionActionView (State state_) sesh =
                                 (MenuList.view
                                     (MenuList.default
                                         |> MenuList.state state_.menuListState
-                                        |> MenuList.sections
-                                            [ MenuList.section
-                                                [ MenuList.navigation { label = "Home", href = "/" }
-                                                ]
-                                            , MenuList.section
-                                                [ MenuList.action { label = "Sign out", item = SignOutAction }
-                                                ]
-                                            ]
                                     )
                                 )
                             ]
@@ -395,7 +387,19 @@ appTitle =
 
 initState : State
 initState =
-    State { menu = Idle, menuListState = MenuList.initialState }
+    State
+        { menu = Idle
+        , menuListState =
+            MenuList.initialState
+                |> MenuList.sections
+                    [ MenuList.section
+                        [ MenuList.navigation { label = "Home", href = "/" }
+                        ]
+                    , MenuList.section
+                        [ MenuList.action { label = "Sign out", item = SignOutAction }
+                        ]
+                    ]
+        }
 
 
 
