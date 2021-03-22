@@ -61,6 +61,7 @@
     "elm-hot": "^1.1.6",
     "elm-test": "^0.19.1-revision6",
     "eslint": "^7.21.0",
-    "node-elm-compiler": "^5.0.5"
+    "node-elm-compiler": "^5.0.5",
+    "prettier": "^2.2.1"
   }
 }
