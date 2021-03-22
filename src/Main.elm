@@ -15,6 +15,7 @@ import Pages.NotFound as NotFoundPage
 import Route as Route exposing (Route)
 import Session
 import Url exposing (Url)
+import Viewer
 
 
 type Msg
@@ -249,8 +250,16 @@ headerEffectHandler model effect =
 
         Header.SignOutEffect ->
             let
+                viewer =
+                    Session.getViewer model.context.session
+
                 ( sessionCmd, session ) =
-                    Session.logOut SessionDestroying
+                    case viewer of
+                        Just v ->
+                            Session.logOut SessionDestroying (Viewer.credentials v)
+
+                        _ ->
+                            ( Cmd.none, model.context.session )
 
                 updatedContext =
                     Context.updateSession session model.context

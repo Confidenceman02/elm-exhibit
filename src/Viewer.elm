@@ -1,4 +1,4 @@
-module Viewer exposing (Cred, Viewer, credDecoder, getAvatarUrl, getUsername, init)
+module Viewer exposing (Cred, Viewer, credDecoder, credentials, getAvatarUrl, getUsername, init)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -22,6 +22,11 @@ type alias Credentials =
 init : Cred -> Viewer
 init cred =
     Viewer cred
+
+
+credentials : Viewer -> Cred
+credentials (Viewer creds) =
+    creds
 
 
 credentialsDecoder : Decoder Credentials

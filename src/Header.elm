@@ -215,46 +215,8 @@ sessionActionView (State state_) sesh =
             ]
             [ case sesh of
                 Session.LoggedIn viewer ->
-                    let
-                        focusTriggerStyles =
-                            case state_.menu of
-                                TriggerFocused ->
-                                    [ Css.outline3 (Css.px 1) Css.solid exColorWhite ]
-
-                                _ ->
-                                    []
-
-                        withBeforeElement =
-                            if MenuList.isShowing state_.menuListState then
-                                [ Css.before
-                                    [ Css.position Css.fixed
-                                    , Css.top (Css.px 0)
-                                    , Css.right (Css.px 0)
-                                    , Css.bottom (Css.px 0)
-                                    , Css.left (Css.px 0)
-                                    , Css.zIndex (Css.int 80)
-                                    , Css.display Css.block
-                                    , Css.cursor Css.default
-                                    , Css.property "content" "' '"
-                                    , Css.property "background" "transparent"
-                                    ]
-                                ]
-
-                            else
-                                []
-                    in
-                    div
-                        [ StyledAttribs.css
-                            ([ Css.displayFlex
-                             , Css.marginRight Grid.halfGrid
-                             , Css.position Css.relative
-                             , Css.cursor Css.pointer
-                             ]
-                                ++ focusTriggerStyles
-                                ++ withBeforeElement
-                            )
-                        , Events.onClick ToggleMenu
-                        ]
+                    menuListContainer state_
+                        sesh
                         [ Styled.fromUnstyled <|
                             DummyInput.view
                                 (DummyInput.default
@@ -288,6 +250,9 @@ sessionActionView (State state_) sesh =
                             ]
                         ]
 
+                Session.LoggingOut viewer ->
+                    menuListContainer state_ sesh [ viewerAvatar viewer ]
+
                 _ ->
                     Button.view
                         (Button.wrapper
@@ -301,6 +266,62 @@ sessionActionView (State state_) sesh =
                         ""
             ]
         )
+
+
+menuListContainer : State_ -> Session -> List (Styled.Html Msg) -> Styled.Html Msg
+menuListContainer state_ sesh content =
+    let
+        withAddedStyles =
+            case sesh of
+                Session.LoggedIn _ ->
+                    withBeforeElement state_ ++ focusTriggerStyles state_
+
+                _ ->
+                    []
+    in
+    div
+        [ StyledAttribs.css
+            ([ Css.displayFlex
+             , Css.marginRight Grid.halfGrid
+             , Css.position Css.relative
+             , Css.cursor Css.pointer
+             ]
+                ++ withAddedStyles
+            )
+        , Events.onClick ToggleMenu
+        ]
+        content
+
+
+focusTriggerStyles : State_ -> List Css.Style
+focusTriggerStyles state_ =
+    case state_.menu of
+        TriggerFocused ->
+            [ Css.outline3 (Css.px 1) Css.solid exColorWhite ]
+
+        _ ->
+            []
+
+
+withBeforeElement : State_ -> List Css.Style
+withBeforeElement state_ =
+    if MenuList.isShowing state_.menuListState then
+        [ Css.before
+            [ Css.position Css.fixed
+            , Css.top (Css.px 0)
+            , Css.right (Css.px 0)
+            , Css.bottom (Css.px 0)
+            , Css.left (Css.px 0)
+            , Css.zIndex (Css.int 80)
+            , Css.display Css.block
+            , Css.cursor Css.default
+            , Css.property "content" "' '"
+            , Css.property "background" "transparent"
+            ]
+        ]
+
+    else
+        []
 
 
 viewerAvatar : Viewer -> Styled.Html msg

@@ -35,7 +35,7 @@ type Session
     | Guest
     | Idle
     | LoggingIn
-    | LoggingOut
+    | LoggingOut Viewer
     | Refreshing
     | Failed
 
@@ -214,13 +214,13 @@ login toMsg =
     )
 
 
-logOut : (Result SessionError SessionSuccess -> msg) -> ( Cmd msg, Session )
-logOut toMsg =
+logOut : (Result SessionError SessionSuccess -> msg) -> Cred -> ( Cmd msg, Session )
+logOut toMsg creds =
     ( Api.get
         (Endpoint.lambdaUrl [ "session-destroy" ] [])
         toMsg
         (decodeResponseString successBodyDecoder)
-    , LoggingOut
+    , LoggingOut <| Viewer.init creds
     )
 
 
