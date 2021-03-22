@@ -1,15 +1,25 @@
-import {StatusCodes} from "http-status-codes";
-import {ErrorBody, NoIdea, ResponseBody, SuccessBody, TaggedResponseBody} from "./types";
-import {jsonHeaders, withExpireSessionCookie, withSetSessionCookie} from "./headers";
+import { StatusCodes } from "http-status-codes";
+import {
+  ErrorBody,
+  NoIdea,
+  ResponseBody,
+  SuccessBody,
+  TaggedResponseBody,
+} from "./types";
+import {
+  jsonHeaders,
+  withExpireSessionCookie,
+  withSetSessionCookie,
+} from "./headers";
 
 export function errorResponse(error: ErrorBody): ResponseBody {
   return {
     statusCode: resolveStatusCodeFromErrorBody(error),
     body: JSON.stringify(error),
     headers: {
-     ...jsonHeaders
-    }
-  }
+      ...jsonHeaders,
+    },
+  };
 }
 
 export function successResponse(body: SuccessBody): ResponseBody {
@@ -17,60 +27,62 @@ export function successResponse(body: SuccessBody): ResponseBody {
     statusCode: resolveStatusCodeFromSuccessBody(body),
     body: JSON.stringify(body),
     headers: {
-      ...resolveHeadersFromTaggedResponseBody(body)
-    }
-  }
+      ...resolveHeadersFromTaggedResponseBody(body),
+    },
+  };
 }
 
-export const noIdea: NoIdea = { tag: "KeineAhnung" }
+export const noIdea: NoIdea = { tag: "KeineAhnung" };
 
 function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
   switch (error.tag) {
     case "ExampleBuildFailed":
-      return StatusCodes.BAD_REQUEST
+      return StatusCodes.BAD_REQUEST;
     case "AuthorNotFound":
-      return StatusCodes.NOT_FOUND
+      return StatusCodes.NOT_FOUND;
     case "PackageNotFound":
-      return StatusCodes.NOT_FOUND
+      return StatusCodes.NOT_FOUND;
     case "AuthorAndPackageNotFound":
-      return StatusCodes.NOT_FOUND
+      return StatusCodes.NOT_FOUND;
     case "RefreshFailed":
-      return StatusCodes.NOT_FOUND
+      return StatusCodes.NOT_FOUND;
     case "LoginFailed":
-      return StatusCodes.INTERNAL_SERVER_ERROR
+      return StatusCodes.INTERNAL_SERVER_ERROR;
     case "SessionNotFound":
-      return StatusCodes.NOT_FOUND
+      return StatusCodes.NOT_FOUND;
     case "MissingCookie":
-      return StatusCodes.BAD_REQUEST
+      return StatusCodes.BAD_REQUEST;
     default:
-      return StatusCodes.INTERNAL_SERVER_ERROR
+      return StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }
 
-function resolveStatusCodeFromSuccessBody(successBody: SuccessBody): StatusCodes {
+function resolveStatusCodeFromSuccessBody(
+  successBody: SuccessBody
+): StatusCodes {
   switch (successBody.tag) {
     case "ExamplesFetched":
-      return StatusCodes.OK
+      return StatusCodes.OK;
     case "SessionRefreshed":
-      return StatusCodes.OK
+      return StatusCodes.OK;
     case "SessionGranted":
-      return StatusCodes.OK
+      return StatusCodes.OK;
     case "Redirecting":
-      return StatusCodes.OK
+      return StatusCodes.OK;
     case "SessionDestroyed":
-      return StatusCodes.OK
+      return StatusCodes.OK;
     default:
-      return StatusCodes.INTERNAL_SERVER_ERROR
+      return StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }
 
 function resolveHeadersFromTaggedResponseBody(taggedBody: TaggedResponseBody) {
   switch (taggedBody.tag) {
     case "SessionGranted":
-      return { ...jsonHeaders, ...withSetSessionCookie(taggedBody.session) }
+      return { ...jsonHeaders, ...withSetSessionCookie(taggedBody.session) };
     case "SessionDestroyed":
-      return { ...jsonHeaders, ...withExpireSessionCookie()}
+      return { ...jsonHeaders, ...withExpireSessionCookie() };
     default:
-      return { ...jsonHeaders }
+      return { ...jsonHeaders };
   }
 }

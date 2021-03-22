@@ -12,6 +12,7 @@
     "moduleResolution": "Node",
     "esModuleInterop": false,
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["functions/**/*", "tests/**/*.spec.ts", "tests/mocha.env.ts", "lib/**/*"],
   "exclude": ["node_modules"]

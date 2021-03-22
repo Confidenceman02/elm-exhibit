@@ -1,9 +1,9 @@
-import {RedisClient} from "redis";
+import { RedisClient } from "redis";
 
-export type DBTag = PermanentDBTag | ExpirableDBTag
+export type DBTag = PermanentDBTag | ExpirableDBTag;
 
 export enum PermanentDBTag {
-  User
+  User,
 }
 
 export enum ExpirableDBTag {
@@ -11,14 +11,13 @@ export enum ExpirableDBTag {
   Session,
 }
 
-export type Seconds = number
+export type Seconds = number;
 
 export interface IPromisifiedRedis extends RedisClient {
-  [x:string]: any
+  [x: string]: any;
 }
 
 export interface TempSession {
-    sessionId: string,
-    referer: string
+  sessionId: string;
+  referer: string;
 }
-
