@@ -10,6 +10,7 @@ module MenuList.MenuList exposing
     , navigation
     , section
     , sections
+    , setReturnFocusTarget
     , show
     , state
     , subscriptions
@@ -18,6 +19,7 @@ module MenuList.MenuList exposing
     , zIndex
     )
 
+import Browser.Dom as BrowserDom
 import Browser.Events as BrowserEvents
 import Css
 import DummyInput
@@ -28,6 +30,7 @@ import Html.Styled.Events as Events
 import Json.Decode as Decode
 import List.Extra as ListX
 import MenuList.Divider as Divider
+import Task
 import Time
 
 
@@ -69,10 +72,15 @@ type FocusedListItem
     = FocusedListItem SectionPosition ItemPosition
 
 
+type ReturnFocusTarget
+    = ReturnFocusTarget String
+
+
 type alias StateData item =
     { step : Step
     , focusedListItem : Maybe FocusedListItem
     , sections : List (Section item)
+    , returnFocusTarget : Maybe ReturnFocusTarget
     }
 
 
@@ -81,16 +89,25 @@ type StepLifecycle
     | Resolving
 
 
+type Transition
+    = BecomingVisible StepLifecycle
+    | BecomingInvisible StepLifecycle
+
+
 type Step
     = Visible
     | Invisible
-    | BecomingVisible StepLifecycle
-    | BecomingInvisible StepLifecycle
+    | TransitionStep Transition
 
 
 initialState : State item
 initialState =
-    State_ { step = Invisible, focusedListItem = Nothing, sections = [] }
+    State_
+        { step = Invisible
+        , returnFocusTarget = Nothing
+        , focusedListItem = Nothing
+        , sections = []
+        }
 
 
 
@@ -253,7 +270,7 @@ type Actions item
 subscriptions : State item -> Sub (Msg item)
 subscriptions ((State_ s) as state_) =
     Sub.batch
-        [ visibilitySubscriptions state_
+        [ stepSubscriptions state_
         , browserEventSubscriptions state_
         ]
 
@@ -267,14 +284,14 @@ browserEventSubscriptions ((State_ s) as state_) =
         Sub.none
 
 
-visibilitySubscriptions : State item -> Sub (Msg item)
-visibilitySubscriptions (State_ s) =
+stepSubscriptions : State item -> Sub (Msg item)
+stepSubscriptions (State_ s) =
     case s.step of
-        BecomingVisible Triggered ->
+        TransitionStep (BecomingVisible Triggered) ->
             -- We are not worrying about animation at the moment, just make visible
             BrowserEvents.onAnimationFrame MakeVisible
 
-        BecomingInvisible Triggered ->
+        TransitionStep (BecomingInvisible Triggered) ->
             BrowserEvents.onAnimationFrame MakeInvisible
 
         _ ->
@@ -294,7 +311,16 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none, Nothing )
 
         EscapeKeyDowned ->
-            ( State_ { state_ | step = BecomingInvisible Triggered }, Cmd.none, Nothing )
+            let
+                withReturnFocusTarget =
+                    case state_.returnFocusTarget of
+                        Just targetId ->
+                            Task.attempt (\_ -> None) <| BrowserDom.focus (returnFocusToString targetId)
+
+                        _ ->
+                            Cmd.none
+            in
+            ( State_ { state_ | step = TransitionStep <| BecomingInvisible Triggered }, withReturnFocusTarget, Nothing )
 
         ActionItemClicked_ item ->
             ( s, Cmd.none, Just (ActionItemClicked item) )
@@ -427,12 +453,12 @@ renderCustomAction customActionConfig =
 
 show : State item -> State item
 show (State_ s) =
-    State_ { s | step = BecomingVisible Triggered }
+    State_ { s | step = TransitionStep <| BecomingVisible Triggered }
 
 
 hide : State item -> State item
 hide (State_ s) =
-    State_ { s | step = BecomingInvisible Triggered }
+    State_ { s | step = TransitionStep <| BecomingInvisible Triggered }
 
 
 isShowing : State item -> Bool
@@ -441,11 +467,21 @@ isShowing (State_ s) =
         Visible ->
             True
 
-        BecomingVisible _ ->
+        TransitionStep (BecomingVisible _) ->
             True
 
         _ ->
             False
+
+
+setReturnFocusTarget : String -> ReturnFocusTarget
+setReturnFocusTarget s =
+    ReturnFocusTarget s
+
+
+returnFocusToString : ReturnFocusTarget -> String
+returnFocusToString (ReturnFocusTarget id) =
+    id
 
 
 buildItemId : Int -> Int -> String
