@@ -4,7 +4,6 @@ module Header exposing
     , Msg
     , State
     , example
-    , home
     , initState
     , navBottomBorder
     , navHeight
@@ -73,6 +72,7 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | ToggleMenu
+    | FocusMenu
     | HideMenu
     | MenuListMsg (MenuList.Msg MenuListAction)
 
@@ -135,11 +135,6 @@ example author package =
 session : Session -> Config -> Config
 session sesh (Config config) =
     Config { config | session = Just sesh }
-
-
-home : Config
-home =
-    Config { defaultConfig | variant = Home }
 
 
 state : State -> Config -> Config
@@ -226,8 +221,7 @@ sessionActionView (State state_) sesh =
                                         [ EventsExtra.isEnter ToggleMenu
                                         , EventsExtra.isSpace ToggleMenu
                                         , EventsExtra.isEscape HideMenu
-
-                                        --, EventsExtra.isDownArrow ToggleMenu
+                                        , EventsExtra.isDownArrow FocusMenu
                                         ]
                                 )
                                 menuListTriggerId
@@ -460,6 +454,13 @@ update state_ msg =
 
                     else
                         MenuList.show s.menuListState
+            in
+            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+
+        FocusMenu ->
+            let
+                menuListAction =
+                    MenuList.showAndFocus s.menuListState
             in
             ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
 

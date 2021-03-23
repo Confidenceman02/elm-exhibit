@@ -13,6 +13,7 @@ module MenuList.MenuList exposing
     , sections
     , setReturnFocusTarget
     , show
+    , showAndFocus
     , state
     , subscriptions
     , update
@@ -87,7 +88,6 @@ type alias StateData item =
 
 type StepLifecycle
     = Triggered
-    | Resolving
 
 
 type Transition
@@ -95,8 +95,12 @@ type Transition
     | BecomingInvisible StepLifecycle
 
 
+type VisibleActions
+    = FocussingFirstItem
+
+
 type Step
-    = Visible
+    = Visible (Maybe VisibleActions)
     | Invisible
     | TransitionStep Transition
 
@@ -262,6 +266,7 @@ type Msg item
     | ListItemFocused Int Int
     | ActionItemClicked_ item
     | EscapeKeyDowned
+    | FocusFirstItem Time.Posix
 
 
 type Actions item
@@ -295,6 +300,9 @@ stepSubscriptions (State_ s) =
         TransitionStep (BecomingInvisible Triggered) ->
             BrowserEvents.onAnimationFrame MakeInvisible
 
+        Visible (Just FocussingFirstItem) ->
+            BrowserEvents.onAnimationFrame FocusFirstItem
+
         _ ->
             Sub.none
 
@@ -303,7 +311,7 @@ update : Msg item -> State item -> ( State item, Cmd (Msg item), Maybe (Actions 
 update msg ((State_ state_) as s) =
     case msg of
         MakeVisible _ ->
-            ( State_ { state_ | step = Visible }, Cmd.none, Nothing )
+            ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
 
         MakeInvisible _ ->
             ( State_ { state_ | step = Invisible, focusedListItem = Nothing }, Cmd.none, Nothing )
@@ -326,6 +334,22 @@ update msg ((State_ state_) as s) =
         ActionItemClicked_ item ->
             ( s, Cmd.none, Just (ActionItemClicked item) )
 
+        FocusFirstItem _ ->
+            let
+                firstFocusableItemPosition =
+                    getFirstItemPosition state_.sections
+
+                focusCmd =
+                    case firstFocusableItemPosition of
+                        Just ( sectionIndex, itemIndex ) ->
+                            -- TODO: Check if the focus succeeded
+                            Task.attempt (\_ -> None) <| BrowserDom.focus (buildItemId sectionIndex itemIndex)
+
+                        _ ->
+                            Cmd.none
+            in
+            ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
+
         None ->
             ( s, Cmd.none, Nothing )
 
@@ -337,7 +361,7 @@ view (Config config) =
             config.state
     in
     case s.step of
-        Visible ->
+        Visible _ ->
             div
                 [ StyledAttribs.css
                     [ Css.width (Css.px 150)
@@ -452,9 +476,33 @@ renderCustomAction customActionConfig =
 -- HELPERS
 
 
+{-|
+
+    Visibly render the menu list.
+
+    See showAndFocus if you want to show the menu list
+    and focus the first focusable item.
+
+-}
 show : State item -> State item
 show (State_ s) =
     State_ { s | step = TransitionStep <| BecomingVisible Triggered }
+
+
+{-|
+
+    Visibly render the menu list and focus the first focusable item.
+    If the menu is already visible the first focusable item will be focused.
+
+-}
+showAndFocus : State item -> State item
+showAndFocus ((State_ state_) as s) =
+    if isVisible s then
+        State_ { state_ | step = Visible (Just FocussingFirstItem) }
+
+    else
+        -- TODO: Handle opening and then focussing.
+        s
 
 
 hide : State item -> State item
@@ -465,7 +513,7 @@ hide (State_ s) =
 isShowing : State item -> Bool
 isShowing (State_ s) =
     case s.step of
-        Visible ->
+        Visible _ ->
             True
 
         TransitionStep (BecomingVisible _) ->
@@ -473,6 +521,49 @@ isShowing (State_ s) =
 
         _ ->
             False
+
+
+isVisible : State item -> Bool
+isVisible (State_ s) =
+    case s.step of
+        Visible _ ->
+            True
+
+        _ ->
+            False
+
+
+
+{-
+   This assumes the index 0 is always the first item which is not necessarily true.
+   What if someone renders this list above a node and the last list item is intended to
+   be the first item? e.g.
+     __________
+     | item 1 |
+     | item 2 |
+     | item 3 | - first item
+     ----------
+        NODE
+
+-}
+
+
+getFirstItemPosition : List (Section item) -> Maybe ( SectionPosition, ItemPosition )
+getFirstItemPosition allSections =
+    let
+        resolvePositions (Section items) =
+            if 0 < List.length items then
+                Just ( 0, 0 )
+
+            else
+                Nothing
+    in
+    case allSections of
+        [] ->
+            Nothing
+
+        head :: _ ->
+            resolvePositions head
 
 
 setReturnFocusTarget : ReturnFocusTarget -> State item -> State item
