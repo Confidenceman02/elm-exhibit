@@ -1,9 +1,18 @@
-module DummyInput exposing (Config, default, onBlur, onFocus, preventKeydownOn, view)
+module DummyInput exposing (Config, default, inputIdPrefix, onBlur, onFocus, preventKeydownOn, view)
 
 import Html exposing (Html, input)
 import Html.Attributes exposing (id, readonly, style, tabindex, value)
 import Html.Events as Events exposing (preventDefaultOn)
 import Json.Decode as Decode
+
+
+
+-- CONSTANTS
+
+
+inputIdPrefix : String
+inputIdPrefix =
+    "dummy-input-"
 
 
 type Config msg
@@ -93,7 +102,7 @@ view (Config config) uniqueId =
          , readonly True
          , value ""
          , tabindex 0
-         , id ("dummy-input-" ++ uniqueId)
+         , id (inputIdPrefix ++ uniqueId)
          , style "position" "absolute"
          ]
             ++ attribs

@@ -8,6 +8,7 @@ module MenuList.MenuList exposing
     , initialState
     , isShowing
     , navigation
+    , returnFocusId
     , section
     , sections
     , setReturnFocusTarget
@@ -474,8 +475,13 @@ isShowing (State_ s) =
             False
 
 
-setReturnFocusTarget : String -> ReturnFocusTarget
-setReturnFocusTarget s =
+setReturnFocusTarget : ReturnFocusTarget -> State item -> State item
+setReturnFocusTarget focusTarget (State_ state_) =
+    State_ { state_ | returnFocusTarget = Just focusTarget }
+
+
+returnFocusId : String -> ReturnFocusTarget
+returnFocusId s =
     ReturnFocusTarget s
 
 

@@ -412,6 +412,7 @@ initState =
         { menu = Idle
         , menuListState =
             MenuList.initialState
+                |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
                 |> MenuList.sections
                     [ MenuList.section
                         [ MenuList.navigation { label = "Home", href = "/" }
