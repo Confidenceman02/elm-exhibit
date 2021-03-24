@@ -86,10 +86,6 @@ type alias StateData item =
     }
 
 
-type StepLifecycle
-    = Triggered
-
-
 type VisibleActions
     = FocussingFirstItem
     | BecomingInvisible
@@ -102,6 +98,7 @@ type InvisibleActions
 type Step
     = Visible (Maybe VisibleActions)
     | Invisible (Maybe InvisibleActions)
+    | Batched (List Step)
 
 
 initialState : State item
@@ -382,6 +379,27 @@ view (Config config) =
 
         Invisible (Just BecomingVisible) ->
             menu
+
+        Batched batchedSteps ->
+            let
+                resolveView steps =
+                    case steps of
+                        [] ->
+                            text ""
+
+                        (Visible _) :: _ ->
+                            menu
+
+                        (Invisible (Just BecomingVisible)) :: _ ->
+                            menu
+
+                        (Invisible Nothing) :: _ ->
+                            text ""
+
+                        (Batched st) :: _ ->
+                            resolveView st
+            in
+            resolveView batchedSteps
 
         Invisible Nothing ->
             text ""
