@@ -90,25 +90,24 @@ type StepLifecycle
     = Triggered
 
 
-type Transition
-    = BecomingVisible StepLifecycle
-    | BecomingInvisible StepLifecycle
-
-
 type VisibleActions
     = FocussingFirstItem
+    | BecomingInvisible
+
+
+type InvisibleActions
+    = BecomingVisible
 
 
 type Step
     = Visible (Maybe VisibleActions)
-    | Invisible
-    | TransitionStep Transition
+    | Invisible (Maybe InvisibleActions)
 
 
 initialState : State item
 initialState =
     State_
-        { step = Invisible
+        { step = Invisible Nothing
         , returnFocusTarget = Nothing
         , focusedListItem = Nothing
         , sections = []
@@ -293,11 +292,11 @@ browserEventSubscriptions ((State_ s) as state_) =
 stepSubscriptions : State item -> Sub (Msg item)
 stepSubscriptions (State_ s) =
     case s.step of
-        TransitionStep (BecomingVisible Triggered) ->
+        Invisible (Just BecomingVisible) ->
             -- We are not worrying about animation at the moment, just make visible
             BrowserEvents.onAnimationFrame MakeVisible
 
-        TransitionStep (BecomingInvisible Triggered) ->
+        Visible (Just BecomingInvisible) ->
             BrowserEvents.onAnimationFrame MakeInvisible
 
         Visible (Just FocussingFirstItem) ->
@@ -314,7 +313,7 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
 
         MakeInvisible _ ->
-            ( State_ { state_ | step = Invisible, focusedListItem = Nothing }, Cmd.none, Nothing )
+            ( State_ { state_ | step = Invisible Nothing, focusedListItem = Nothing }, Cmd.none, Nothing )
 
         ListItemFocused sectionIndex itemIndex ->
             ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none, Nothing )
@@ -329,7 +328,7 @@ update msg ((State_ state_) as s) =
                         _ ->
                             Cmd.none
             in
-            ( State_ { state_ | step = TransitionStep <| BecomingInvisible Triggered }, withReturnFocusTarget, Nothing )
+            ( State_ { state_ | step = Visible (Just BecomingInvisible) }, withReturnFocusTarget, Nothing )
 
         ActionItemClicked_ item ->
             ( s, Cmd.none, Just (ActionItemClicked item) )
@@ -359,9 +358,8 @@ view (Config config) =
     let
         (State_ s) =
             config.state
-    in
-    case s.step of
-        Visible _ ->
+
+        menu =
             div
                 [ StyledAttribs.css
                     [ Css.width (Css.px 150)
@@ -377,11 +375,15 @@ view (Config config) =
                     ]
                 ]
                 (renderSections config)
+    in
+    case s.step of
+        Visible _ ->
+            menu
 
-        Invisible ->
-            text ""
+        Invisible (Just BecomingVisible) ->
+            menu
 
-        _ ->
+        Invisible Nothing ->
             text ""
 
 
@@ -486,7 +488,7 @@ renderCustomAction customActionConfig =
 -}
 show : State item -> State item
 show (State_ s) =
-    State_ { s | step = TransitionStep <| BecomingVisible Triggered }
+    State_ { s | step = Invisible (Just BecomingVisible) }
 
 
 {-|
@@ -507,16 +509,21 @@ showAndFocus ((State_ state_) as s) =
 
 hide : State item -> State item
 hide (State_ s) =
-    State_ { s | step = TransitionStep <| BecomingInvisible Triggered }
+    State_ { s | step = Visible (Just BecomingInvisible) }
 
 
+{-|
+
+    When the menu is completely visible or is becoming visible.
+
+-}
 isShowing : State item -> Bool
 isShowing (State_ s) =
     case s.step of
-        Visible _ ->
+        Visible Nothing ->
             True
 
-        TransitionStep (BecomingVisible _) ->
+        Invisible (Just BecomingVisible) ->
             True
 
         _ ->
@@ -526,7 +533,7 @@ isShowing (State_ s) =
 isVisible : State item -> Bool
 isVisible (State_ s) =
     case s.step of
-        Visible _ ->
+        Visible Nothing ->
             True
 
         _ ->
