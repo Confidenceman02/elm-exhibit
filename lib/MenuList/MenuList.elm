@@ -263,6 +263,7 @@ type Msg item
     | ActionItemClicked_ item
     | EscapeKeyDowned
     | FocusFirstItem Time.Posix
+    | ProcessBatchedSteps Time.Posix
 
 
 type Actions item
@@ -298,6 +299,9 @@ stepSubscriptions (State_ s) =
 
         Visible (Just FocussingFirstItem) ->
             BrowserEvents.onAnimationFrame FocusFirstItem
+
+        Batched _ ->
+            BrowserEvents.onAnimationFrame ProcessBatchedSteps
 
         _ ->
             Sub.none
@@ -345,6 +349,74 @@ update msg ((State_ state_) as s) =
                             Cmd.none
             in
             ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
+
+        -- NOTE: We just want to play through the steps, we are not changing the steps at all.
+        ProcessBatchedSteps _ ->
+            let
+                resolveSteps steps =
+                    case steps of
+                        [] ->
+                            -- TODO: Handle more gracefully.
+                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+
+                        (Invisible (Just BecomingVisible)) :: [] ->
+                            ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
+
+                        (Invisible Nothing) :: [] ->
+                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+
+                        (Visible (Just BecomingInvisible)) :: [] ->
+                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+
+                        --TODO: Focus first item.
+                        (Visible (Just FocussingFirstItem)) :: [] ->
+                            let
+                                firstFocusableItemPosition =
+                                    getFirstItemPosition state_.sections
+
+                                focusCmd =
+                                    case firstFocusableItemPosition of
+                                        Just ( sectionIndex, itemIndex ) ->
+                                            -- TODO: Check if the focus succeeded
+                                            Task.attempt (\_ -> None) <| BrowserDom.focus (buildItemId sectionIndex itemIndex)
+
+                                        _ ->
+                                            Cmd.none
+                            in
+                            ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
+
+                        (Visible Nothing) :: [] ->
+                            ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
+
+                        (Batched st) :: [] ->
+                            ( State_ { state_ | step = Batched st }, Cmd.none, Nothing )
+
+                        (Invisible (Just BecomingVisible)) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        (Invisible Nothing) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        (Visible (Just BecomingInvisible)) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        --TODO: Focus first item.
+                        (Visible (Just FocussingFirstItem)) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        (Visible Nothing) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        (Batched st) :: rest ->
+                            resolveSteps (st ++ rest)
+            in
+            case state_.step of
+                Batched steps ->
+                    resolveSteps steps
+
+                --TODO: Handle non batched steps
+                _ ->
+                    ( s, Cmd.none, Nothing )
 
         None ->
             ( s, Cmd.none, Nothing )
@@ -517,12 +589,18 @@ show (State_ s) =
 -}
 showAndFocus : State item -> State item
 showAndFocus ((State_ state_) as s) =
-    if isVisible s then
-        State_ { state_ | step = Visible (Just FocussingFirstItem) }
+    case state_.step of
+        Visible Nothing ->
+            State_ { state_ | step = Visible (Just FocussingFirstItem) }
 
-    else
-        -- TODO: Handle opening and then focussing.
-        s
+        (Invisible (Just BecomingVisible)) as currentStep ->
+            State_ { state_ | step = Batched [ currentStep, Visible (Just FocussingFirstItem) ] }
+
+        Invisible Nothing ->
+            State_ { state_ | step = Batched [ Invisible (Just BecomingVisible), Visible (Just FocussingFirstItem) ] }
+
+        _ ->
+            s
 
 
 hide : State item -> State item
@@ -542,16 +620,6 @@ isShowing (State_ s) =
             True
 
         Invisible (Just BecomingVisible) ->
-            True
-
-        _ ->
-            False
-
-
-isVisible : State item -> Bool
-isVisible (State_ s) =
-    case s.step of
-        Visible Nothing ->
             True
 
         _ ->
