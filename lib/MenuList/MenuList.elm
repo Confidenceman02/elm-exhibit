@@ -262,6 +262,7 @@ type Msg item
     | ActionItemClicked_ item
     | EscapeKeyDowned
     | DownArrowKeyDowned
+    | UpArrowKeyDowned
     | FocusFirstItem Time.Posix
     | ProcessBatchedSteps Time.Posix
 
@@ -271,7 +272,7 @@ type Actions item
 
 
 subscriptions : State item -> Sub (Msg item)
-subscriptions ((State_ s) as state_) =
+subscriptions state_ =
     Sub.batch
         [ stepSubscriptions state_
         , browserEventSubscriptions state_
@@ -294,8 +295,15 @@ browserEventSubscriptions ((State_ state_) as s) =
 
             else
                 Sub.none
+
+        withUpArrowSub =
+            if isShowing s && hasFocusedItem s then
+                BrowserEvents.onKeyDown (EventsExtra.isUpArrow UpArrowKeyDowned)
+
+            else
+                Sub.none
     in
-    Sub.batch [ withEscapeKeySub, withDownArrowSub ]
+    Sub.batch [ withEscapeKeySub, withDownArrowSub, withUpArrowSub ]
 
 
 stepSubscriptions : State item -> Sub (Msg item)
@@ -353,7 +361,23 @@ update msg ((State_ state_) as s) =
                         ( s, Cmd.none, Nothing )
 
                     else
-                        ( s, Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId nextFocusItemIndices state_.sections), Nothing ) |> Debug.log (resolveFocusableItemId nextFocusItemIndices state_.sections)
+                        ( s, Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId nextFocusItemIndices state_.sections), Nothing )
+
+                _ ->
+                    ( s, Cmd.none, Nothing )
+
+        UpArrowKeyDowned ->
+            case state_.focusedListItem of
+                Just (FocusedListItem focusedItemIndices) ->
+                    let
+                        previousFocusItemIndices =
+                            getPreviousItemIndices focusedItemIndices state_.sections
+                    in
+                    if focusedItemIndices == previousFocusItemIndices then
+                        ( s, Cmd.none, Nothing )
+
+                    else
+                        ( s, Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId previousFocusItemIndices state_.sections), Nothing )
 
                 _ ->
                     ( s, Cmd.none, Nothing )
@@ -378,6 +402,7 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
 
         -- NOTE: We just want to play through the steps, we are not changing the steps at all.
+        -- Theres nothing special going on now but this lets us do time tracking on animations etc.
         ProcessBatchedSteps _ ->
             let
                 resolveSteps steps =
@@ -687,14 +712,14 @@ getNextItemPosition : ( SectionIndex, ItemIndex ) -> List (Section item) -> ( Se
 getNextItemPosition ( refSectionIndex, refItemIndex ) allSections =
     -- Drop all previous sections
     let
-        removedPreviousSections =
+        targetedSections =
             if 0 < refSectionIndex then
                 List.drop refSectionIndex allSections
 
             else
                 allSections
     in
-    case removedPreviousSections of
+    case targetedSections of
         [] ->
             ( refSectionIndex, refItemIndex )
 
@@ -711,6 +736,72 @@ getNextItemPosition ( refSectionIndex, refItemIndex ) allSections =
 
             else
                 ( refSectionIndex + 1, 0 )
+
+
+getPreviousItemIndices : ( SectionIndex, ItemIndex ) -> List (Section item) -> ( SectionIndex, ItemIndex )
+getPreviousItemIndices ( refSectionIndex, refItemIndex ) allSections =
+    let
+        previousSectionIndex =
+            refSectionIndex - 1
+
+        lastSectionIndex =
+            List.length allSections - 1
+
+        maybeRefSection =
+            ListX.getAt refSectionIndex allSections
+
+        maybePreviousAndRefSection =
+            ( ListX.getAt previousSectionIndex allSections
+            , maybeRefSection
+            )
+
+        maybeLastSectionAndRefSection =
+            ( ListX.getAt lastSectionIndex allSections
+            , maybeRefSection
+            )
+    in
+    -- This means the refSection has sections before it
+    if 0 < refSectionIndex then
+        case maybePreviousAndRefSection of
+            ( Just (Section previousSectionItems), _ ) ->
+                -- This means the refItem has items before it
+                if 0 < refItemIndex then
+                    ( refSectionIndex, refItemIndex - 1 )
+
+                else
+                    ( previousSectionIndex, List.length previousSectionItems - 1 )
+
+            _ ->
+                -- Shouldn't happen.
+                ( refSectionIndex, refItemIndex )
+
+    else if 0 < lastSectionIndex then
+        -- refSection is index 0 but there are sections after it.
+        case maybeLastSectionAndRefSection of
+            ( Just (Section lastSectionItems), _ ) ->
+                if 0 < refItemIndex then
+                    ( refSectionIndex, refItemIndex - 1 )
+
+                else
+                    ( lastSectionIndex, List.length lastSectionItems - 1 )
+
+            _ ->
+                -- Shouldn't happen.
+                ( refSectionIndex, refItemIndex )
+
+    else
+        -- refSection is the only section in the list
+        case maybeRefSection of
+            Just (Section refSectionItems) ->
+                if 0 < refItemIndex then
+                    ( refSectionIndex, refItemIndex - 1 )
+
+                else
+                    ( refSectionIndex, List.length refSectionItems - 1 )
+
+            _ ->
+                -- Shouldn't happen.
+                ( refSectionIndex, refItemIndex )
 
 
 hasFocusedItem : State item -> Bool
