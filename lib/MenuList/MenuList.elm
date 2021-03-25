@@ -44,11 +44,11 @@ type State item
     = State_ (StateData item)
 
 
-type alias SectionPosition =
+type alias SectionIndex =
     Int
 
 
-type alias ItemPosition =
+type alias ItemIndex =
     Int
 
 
@@ -71,7 +71,7 @@ dummyInputSuffix =
 
 
 type FocusedListItem
-    = FocusedListItem SectionPosition ItemPosition
+    = FocusedListItem ( SectionIndex, ItemIndex )
 
 
 type ReturnFocusTarget
@@ -145,7 +145,6 @@ type ListItem item
     | Action (ActionConfiguration item)
     | CustomNavigation String (List BaseConfiguration)
     | CustomAction (List (CustomActionConfiguration item BaseConfiguration))
-    | Custom (List BaseConfiguration)
 
 
 type alias BaseConfiguration =
@@ -262,6 +261,7 @@ type Msg item
     | ListItemFocused Int Int
     | ActionItemClicked_ item
     | EscapeKeyDowned
+    | DownArrowKeyDowned
     | FocusFirstItem Time.Posix
     | ProcessBatchedSteps Time.Posix
 
@@ -317,7 +317,7 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | step = Invisible Nothing, focusedListItem = Nothing }, Cmd.none, Nothing )
 
         ListItemFocused sectionIndex itemIndex ->
-            ( State_ { state_ | focusedListItem = Just (FocusedListItem sectionIndex itemIndex) }, Cmd.none, Nothing )
+            ( State_ { state_ | focusedListItem = Just (FocusedListItem ( sectionIndex, itemIndex )) }, Cmd.none, Nothing )
 
         EscapeKeyDowned ->
             let
@@ -331,6 +331,22 @@ update msg ((State_ state_) as s) =
             in
             ( State_ { state_ | step = Visible (Just BecomingInvisible) }, withReturnFocusTarget, Nothing )
 
+        DownArrowKeyDowned ->
+            case state_.focusedListItem of
+                Just (FocusedListItem focusedItemIndices) ->
+                    let
+                        nextFocusItemIndices =
+                            getNextItemPosition focusedItemIndices state_.sections
+                    in
+                    if focusedItemIndices == nextFocusItemIndices then
+                        ( s, Cmd.none, Nothing )
+
+                    else
+                        ( s, Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId nextFocusItemIndices state_.sections), Nothing ) |> Debug.log (resolveFocusableItemId nextFocusItemIndices state_.sections)
+
+                _ ->
+                    ( s, Cmd.none, Nothing )
+
         ActionItemClicked_ item ->
             ( s, Cmd.none, Just (ActionItemClicked item) )
 
@@ -341,9 +357,9 @@ update msg ((State_ state_) as s) =
 
                 focusCmd =
                     case firstFocusableItemPosition of
-                        Just ( sectionIndex, itemIndex ) ->
+                        Just firstFocusableIndices ->
                             -- TODO: Check if the focus succeeded
-                            Task.attempt (\_ -> None) <| BrowserDom.focus (buildItemId sectionIndex itemIndex)
+                            Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId firstFocusableIndices state_.sections)
 
                         _ ->
                             Cmd.none
@@ -376,9 +392,9 @@ update msg ((State_ state_) as s) =
 
                                 focusCmd =
                                     case firstFocusableItemPosition of
-                                        Just ( sectionIndex, itemIndex ) ->
+                                        Just firstFocusableItemIndices ->
                                             -- TODO: Check if the focus succeeded
-                                            Task.attempt (\_ -> None) <| BrowserDom.focus (buildItemId sectionIndex itemIndex)
+                                            Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId firstFocusableItemIndices state_.sections)
 
                                         _ ->
                                             Cmd.none
@@ -494,14 +510,14 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                 Navigation config ->
                     a
                         [ StyledAttribs.href config.href
-                        , StyledAttribs.id (buildItemId sectionIndex itemIndex)
+                        , StyledAttribs.id (buildItemId ( sectionIndex, itemIndex ))
                         , StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ navigationListItemStyles)
                         , StyledAttribs.tabindex 0
                         , Events.onFocus (ListItemFocused sectionIndex itemIndex)
                         , Events.preventDefaultOn "keydown"
                             (Decode.map
                                 (\m -> ( m, True ))
-                                (EventsExtra.isEscape EscapeKeyDowned)
+                                (Decode.oneOf [ EventsExtra.isEscape EscapeKeyDowned, EventsExtra.isDownArrow DownArrowKeyDowned ])
                             )
                         ]
                         [ text config.label ]
@@ -509,16 +525,16 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                 Action config ->
                     div
                         [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles ++ listItemFocusWithinStyles styling)
-                        , StyledAttribs.id (buildItemId sectionIndex itemIndex)
+                        , StyledAttribs.id (buildItemId ( sectionIndex, itemIndex ))
                         , Events.onClick (ActionItemClicked_ config.item)
                         ]
                         [ Styled.fromUnstyled <|
                             DummyInput.view
                                 (DummyInput.default
                                     |> DummyInput.onFocus (ListItemFocused sectionIndex itemIndex)
-                                    |> DummyInput.preventKeydownOn [ EventsExtra.isEscape EscapeKeyDowned ]
+                                    |> DummyInput.preventKeydownOn [ EventsExtra.isEscape EscapeKeyDowned, EventsExtra.isDownArrow DownArrowKeyDowned ]
                                 )
-                                (buildDummyInputId sectionIndex itemIndex)
+                                (buildDummyInputId ( sectionIndex, itemIndex ))
                         , text config.label
                         ]
 
@@ -527,9 +543,6 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
 
                 CustomAction configs ->
                     div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderCustomAction configs
-
-                Custom configs ->
-                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
 
         buildViews items builtViews itemIndex =
             case items of
@@ -641,7 +654,7 @@ isShowing (State_ s) =
 -}
 
 
-getFirstItemPosition : List (Section item) -> Maybe ( SectionPosition, ItemPosition )
+getFirstItemPosition : List (Section item) -> Maybe ( SectionIndex, ItemIndex )
 getFirstItemPosition allSections =
     let
         resolvePositions (Section items) =
@@ -659,6 +672,36 @@ getFirstItemPosition allSections =
             resolvePositions head
 
 
+getNextItemPosition : ( SectionIndex, ItemIndex ) -> List (Section item) -> ( SectionIndex, ItemIndex )
+getNextItemPosition ( refSectionIndex, refItemIndex ) allSections =
+    -- Drop all previous sections
+    let
+        removedPreviousSections =
+            if 0 < refSectionIndex then
+                List.drop refSectionIndex allSections
+
+            else
+                allSections
+    in
+    case removedPreviousSections of
+        [] ->
+            ( refSectionIndex, refItemIndex )
+
+        (Section i) :: [] ->
+            if (refItemIndex + 1) < List.length i then
+                ( refSectionIndex, refItemIndex + 1 )
+
+            else
+                ( 0, 0 )
+
+        (Section i) :: _ ->
+            if (refItemIndex + 1) < List.length i then
+                ( refSectionIndex, refItemIndex + 1 )
+
+            else
+                ( refSectionIndex + 1, 0 )
+
+
 setReturnFocusTarget : ReturnFocusTarget -> State item -> State item
 setReturnFocusTarget focusTarget (State_ state_) =
     State_ { state_ | returnFocusTarget = Just focusTarget }
@@ -674,13 +717,43 @@ returnFocusToString (ReturnFocusTarget id) =
     id
 
 
-buildItemId : Int -> Int -> String
-buildItemId sectionIndex itemIndex =
+resolveFocusableItemId : ( SectionIndex, ItemIndex ) -> List (Section item) -> String
+resolveFocusableItemId ( sectionIndex, itemIndex ) allSections =
+    let
+        removedPreviousSections =
+            List.drop sectionIndex allSections
+    in
+    case removedPreviousSections of
+        [] ->
+            ""
+
+        (Section i) :: _ ->
+            case ListX.getAt itemIndex i of
+                Just item ->
+                    case item of
+                        Action _ ->
+                            DummyInput.inputIdPrefix ++ buildDummyInputId ( sectionIndex, itemIndex )
+
+                        CustomAction _ ->
+                            DummyInput.inputIdPrefix ++ buildDummyInputId ( sectionIndex, itemIndex )
+
+                        Navigation _ ->
+                            buildItemId ( sectionIndex, itemIndex )
+
+                        CustomNavigation _ _ ->
+                            buildItemId ( sectionIndex, itemIndex )
+
+                _ ->
+                    ""
+
+
+buildItemId : ( SectionIndex, ItemIndex ) -> String
+buildItemId ( sectionIndex, itemIndex ) =
     "S" ++ String.fromInt sectionIndex ++ "I" ++ String.fromInt itemIndex ++ "-" ++ menuListItemSuffix
 
 
-buildDummyInputId : Int -> Int -> String
-buildDummyInputId sectionIndex itemIndex =
+buildDummyInputId : ( SectionIndex, ItemIndex ) -> String
+buildDummyInputId ( sectionIndex, itemIndex ) =
     "S" ++ String.fromInt sectionIndex ++ "I" ++ String.fromInt itemIndex ++ "-" ++ dummyInputSuffix
 
 
