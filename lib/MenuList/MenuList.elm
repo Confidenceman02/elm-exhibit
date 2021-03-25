@@ -279,12 +279,23 @@ subscriptions ((State_ s) as state_) =
 
 
 browserEventSubscriptions : State item -> Sub (Msg item)
-browserEventSubscriptions ((State_ s) as state_) =
-    if isShowing state_ && (s.focusedListItem == Nothing) then
-        BrowserEvents.onKeyDown (EventsExtra.isEscape EscapeKeyDowned)
+browserEventSubscriptions ((State_ state_) as s) =
+    let
+        withEscapeKeySub =
+            if isShowing s && (state_.focusedListItem == Nothing) then
+                BrowserEvents.onKeyDown (EventsExtra.isEscape EscapeKeyDowned)
 
-    else
-        Sub.none
+            else
+                Sub.none
+
+        withDownArrowSub =
+            if isShowing s && hasFocusedItem s then
+                BrowserEvents.onKeyDown (EventsExtra.isDownArrow DownArrowKeyDowned)
+
+            else
+                Sub.none
+    in
+    Sub.batch [ withEscapeKeySub, withDownArrowSub ]
 
 
 stepSubscriptions : State item -> Sub (Msg item)
@@ -517,7 +528,7 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                         , Events.preventDefaultOn "keydown"
                             (Decode.map
                                 (\m -> ( m, True ))
-                                (Decode.oneOf [ EventsExtra.isEscape EscapeKeyDowned, EventsExtra.isDownArrow DownArrowKeyDowned ])
+                                (Decode.oneOf [ EventsExtra.isEscape EscapeKeyDowned ])
                             )
                         ]
                         [ text config.label ]
@@ -532,7 +543,7 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                             DummyInput.view
                                 (DummyInput.default
                                     |> DummyInput.onFocus (ListItemFocused sectionIndex itemIndex)
-                                    |> DummyInput.preventKeydownOn [ EventsExtra.isEscape EscapeKeyDowned, EventsExtra.isDownArrow DownArrowKeyDowned ]
+                                    |> DummyInput.preventKeydownOn [ EventsExtra.isEscape EscapeKeyDowned ]
                                 )
                                 (buildDummyInputId ( sectionIndex, itemIndex ))
                         , text config.label
@@ -700,6 +711,16 @@ getNextItemPosition ( refSectionIndex, refItemIndex ) allSections =
 
             else
                 ( refSectionIndex + 1, 0 )
+
+
+hasFocusedItem : State item -> Bool
+hasFocusedItem (State_ state_) =
+    case state_.focusedListItem of
+        Just _ ->
+            True
+
+        _ ->
+            False
 
 
 setReturnFocusTarget : ReturnFocusTarget -> State item -> State item
