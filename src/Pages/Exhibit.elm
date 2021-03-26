@@ -1,4 +1,4 @@
-module Pages.Example exposing (Effect(..), Model, Msg, init, subscriptions, toContext, toHeaderMsg, update, view)
+module Pages.Exhibit exposing (Effect(..), Model, Msg, init, subscriptions, toContext, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -114,7 +114,7 @@ view model =
                 _ ->
                     True
     in
-    { title = "examples"
+    { title = "Exhibit"
     , content =
         stageWrapper
             [ sliderLeft model, sliderCenter model, viewIf examplesExist (sliderRight model) ]

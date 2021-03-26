@@ -8,7 +8,7 @@ import Url.Parser as Parser exposing ((</>), (<?>), oneOf, s)
 
 
 type Route
-    = Examples Author Package
+    = Exhibit Author Package
     | AuthGithubRedirect (Maybe GithubAuth.CallBackParams)
     | Home
 
@@ -17,7 +17,7 @@ parser : Parser.Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home Parser.top
-        , Parser.map Examples (s "example" </> Author.urlParser </> Package.urlParser)
+        , Parser.map Exhibit (s "exhibit" </> Author.urlParser </> Package.urlParser)
         , Parser.map AuthGithubRedirect (s "auth" </> s "github" </> s "callback" <?> GithubAuth.callBackParamsParser)
         ]
 
