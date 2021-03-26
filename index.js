@@ -1,3 +1,4 @@
+// @ts-check
 import { Elm } from "./src/Main";
 
 const app = Elm.Main.init({
