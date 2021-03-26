@@ -15,6 +15,7 @@ import fetch from "node-fetch";
 import { acceptJson, withAuth } from "./headers";
 import { UserSession } from "./redis/schema";
 import redisClient from "./redis/client";
+import { URL } from "url";
 
 export async function handler(
   event: APIGatewayEvent,
