@@ -72,7 +72,8 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | ToggleMenu
-    | FocusMenu
+    | ToggleMenuAndFocusFirst
+    | ToggleMenuAndFocusLast
     | HideMenu
     | MenuListMsg (MenuList.Msg MenuListAction)
 
@@ -221,7 +222,8 @@ sessionActionView (State state_) sesh =
                                         [ EventsExtra.isEnter ToggleMenu
                                         , EventsExtra.isSpace ToggleMenu
                                         , EventsExtra.isEscape HideMenu
-                                        , EventsExtra.isDownArrow FocusMenu
+                                        , EventsExtra.isDownArrow ToggleMenuAndFocusFirst
+                                        , EventsExtra.isUpArrow ToggleMenuAndFocusLast
                                         ]
                                 )
                                 menuListTriggerId
@@ -457,10 +459,17 @@ update state_ msg =
             in
             ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
 
-        FocusMenu ->
+        ToggleMenuAndFocusFirst ->
             let
                 menuListAction =
-                    MenuList.showAndFocus s.menuListState
+                    MenuList.showAndFocusFirst s.menuListState
+            in
+            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+
+        ToggleMenuAndFocusLast ->
+            let
+                menuListAction =
+                    MenuList.showAndFocusLast s.menuListState
             in
             ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
 

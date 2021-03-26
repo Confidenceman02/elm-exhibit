@@ -13,7 +13,8 @@ module MenuList.MenuList exposing
     , sections
     , setReturnFocusTarget
     , show
-    , showAndFocus
+    , showAndFocusFirst
+    , showAndFocusLast
     , state
     , subscriptions
     , update
@@ -88,6 +89,7 @@ type alias StateData item =
 
 type VisibleActions
     = FocussingFirstItem
+    | FocussingLastItem
     | BecomingInvisible
 
 
@@ -388,7 +390,7 @@ update msg ((State_ state_) as s) =
         FocusFirstItem _ ->
             let
                 firstFocusableItemPosition =
-                    getFirstItemPosition state_.sections
+                    getFirstItemIndices state_.sections
 
                 focusCmd =
                     case firstFocusableItemPosition of
@@ -420,17 +422,32 @@ update msg ((State_ state_) as s) =
                         (Visible (Just BecomingInvisible)) :: [] ->
                             ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
 
-                        --TODO: Focus first item.
                         (Visible (Just FocussingFirstItem)) :: [] ->
                             let
-                                firstFocusableItemPosition =
-                                    getFirstItemPosition state_.sections
+                                maybeFirstFocusableItemIndices =
+                                    getFirstItemIndices state_.sections
 
                                 focusCmd =
-                                    case firstFocusableItemPosition of
+                                    case maybeFirstFocusableItemIndices of
                                         Just firstFocusableItemIndices ->
                                             -- TODO: Check if the focus succeeded
                                             Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId firstFocusableItemIndices state_.sections)
+
+                                        _ ->
+                                            Cmd.none
+                            in
+                            ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
+
+                        (Visible (Just FocussingLastItem)) :: [] ->
+                            let
+                                maybeLastFocusableItemIndices =
+                                    getLastItemIndices state_.sections
+
+                                focusCmd =
+                                    case maybeLastFocusableItemIndices of
+                                        Just lastFocusableItemIndices ->
+                                            -- TODO: Check if the focus succeeded
+                                            Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId lastFocusableItemIndices state_.sections)
 
                                         _ ->
                                             Cmd.none
@@ -454,6 +471,10 @@ update msg ((State_ state_) as s) =
 
                         --TODO: Focus first item.
                         (Visible (Just FocussingFirstItem)) :: rest ->
+                            ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
+
+                        --TODO: Focus last item.
+                        (Visible (Just FocussingLastItem)) :: rest ->
                             ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
 
                         (Visible Nothing) :: rest ->
@@ -636,8 +657,8 @@ show (State_ s) =
     If the menu is already visible the first focusable item will be focused.
 
 -}
-showAndFocus : State item -> State item
-showAndFocus ((State_ state_) as s) =
+showAndFocusFirst : State item -> State item
+showAndFocusFirst ((State_ state_) as s) =
     case state_.step of
         Visible Nothing ->
             State_ { state_ | step = Visible (Just FocussingFirstItem) }
@@ -647,6 +668,28 @@ showAndFocus ((State_ state_) as s) =
 
         Invisible Nothing ->
             State_ { state_ | step = Batched [ Invisible (Just BecomingVisible), Visible (Just FocussingFirstItem) ] }
+
+        _ ->
+            s
+
+
+{-|
+
+    Visibly render the menu list and focus the first focusable item.
+    If the menu is already visible the first focusable item will be focused.
+
+-}
+showAndFocusLast : State item -> State item
+showAndFocusLast ((State_ state_) as s) =
+    case state_.step of
+        Visible Nothing ->
+            State_ { state_ | step = Visible (Just FocussingLastItem) }
+
+        (Invisible (Just BecomingVisible)) as currentStep ->
+            State_ { state_ | step = Batched [ currentStep, Visible (Just FocussingLastItem) ] }
+
+        Invisible Nothing ->
+            State_ { state_ | step = Batched [ Invisible (Just BecomingVisible), Visible (Just FocussingLastItem) ] }
 
         _ ->
             s
@@ -690,22 +733,31 @@ isShowing (State_ s) =
 -}
 
 
-getFirstItemPosition : List (Section item) -> Maybe ( SectionIndex, ItemIndex )
-getFirstItemPosition allSections =
-    let
-        resolvePositions (Section items) =
-            if 0 < List.length items then
-                Just ( 0, 0 )
-
-            else
-                Nothing
-    in
+getFirstItemIndices : List (Section item) -> Maybe ( SectionIndex, ItemIndex )
+getFirstItemIndices allSections =
     case allSections of
         [] ->
             Nothing
 
-        head :: _ ->
-            resolvePositions head
+        _ ->
+            Just ( 0, 0 )
+
+
+getLastItemIndices : List (Section item) -> Maybe ( SectionIndex, ItemIndex )
+getLastItemIndices allSections =
+    let
+        lastSectionIndex =
+            List.length allSections - 1
+
+        lastItemIndex items =
+            List.length items - 1
+    in
+    case ListX.last allSections of
+        Just (Section i) ->
+            Just ( lastSectionIndex, lastItemIndex i )
+
+        _ ->
+            Nothing
 
 
 getNextItemPosition : ( SectionIndex, ItemIndex ) -> List (Section item) -> ( SectionIndex, ItemIndex )
