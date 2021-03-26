@@ -1,5 +1,5 @@
 import { APIGatewayEvent, Context } from "aws-lambda";
-import { GithubUserData, ResponseBody } from "./types";
+import { GithubLoginData, GithubUserData, ResponseBody } from "./types";
 import { TempSession } from "./redis/types";
 import { ResultType, Status } from "../lib/result";
 import { errorResponse, noIdea, successResponse } from "./response";
@@ -44,14 +44,15 @@ export async function handler(
     );
     const loginEndPoint: ResultType<URL> = githubLoginEndpoint(params.code);
     if (tmpSessionExists && loginEndPoint.Status === Status.Ok) {
-      const response = await fetch(loginEndPoint.data.href, {
+      const loginResponse = await fetch(loginEndPoint.data.href, {
         method: "POST",
         headers: { ...acceptJson },
       });
-      const responseData = await response.json();
+      //TODO: validate response was "ok"
+      const loginResponseData: GithubLoginData = await loginResponse.json();
       // get user github info
       const githubUserResponse = await fetch(githubUserEndpoint().href, {
-        headers: { ...acceptJson, ...withAuth(responseData.access_token) },
+        headers: { ...acceptJson, ...withAuth(loginResponseData.access_token) },
       });
       if (!githubUserResponse.ok) {
         return errorResponse(noIdea);
@@ -76,9 +77,10 @@ export async function handler(
             session: session.data,
           });
         }
-        // create user if this is their first time logging in
+        // create user if this is first time logging in
         const createdUser: boolean = await createUser(
           parsedGithubUserResponse,
+          loginResponseData,
           client
         );
         if (createdUser) {

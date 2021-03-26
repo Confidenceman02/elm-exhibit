@@ -2,12 +2,14 @@ export const UserSchemaKey = {
   username: "username",
   userId: "userId",
   avatarUrl: "avatarUrl",
+  accessToken: "accessToken",
 };
 
 export interface User {
   username: string;
   userId: number;
   avatarUrl: string;
+  accessToken: string;
 }
 
 export type UserSession = {
@@ -28,6 +30,7 @@ export function redisValueToUser(redisValue: RedisHValue<User>): User {
     username: redisValue.username,
     userId: parseInt(redisValue.userId),
     avatarUrl: redisValue.avatarUrl,
+    accessToken: redisValue.accessToken,
   };
 }
 

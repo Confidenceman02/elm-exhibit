@@ -9,7 +9,7 @@ import {
   PermanentDBTag,
   TempSession,
 } from "./types";
-import { GithubUserData } from "../types";
+import { GithubLoginData, GithubUserData } from "../types";
 import {
   RedisHValue,
   UserSession,
@@ -101,6 +101,7 @@ export async function sessionExists(
 
 export async function createUser(
   gitUser: GithubUserData,
+  loginData: GithubLoginData,
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const userReferenceKey = generatePermanentDBKey(
@@ -119,7 +120,9 @@ export async function createUser(
     UserSchemaKey.userId,
     gitUser.id,
     UserSchemaKey.avatarUrl,
-    gitUser.avatar_url
+    gitUser.avatar_url,
+    UserSchemaKey.accessToken,
+    loginData.access_token
   );
   return !!setUserReference && !!setUser;
 }
