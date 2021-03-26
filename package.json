@@ -7,7 +7,7 @@
     "dev": "bin/dev.sh",
     "build": "parcel build index.html",
     "build:lambda": "yarn netlify-lambda build functions",
-    "tsc:compile": "bin/tsc-compile.sh",
+    "ts:compile": "bin/ts-check.sh",
     "watch": "parcel watch index.html",
     "ts:test": "bin/test-ts.sh",
     "elm:test": "bin/test-elm.sh"
