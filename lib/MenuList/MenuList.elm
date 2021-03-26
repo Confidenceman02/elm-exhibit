@@ -69,6 +69,16 @@ dummyInputSuffix =
     "menu-list-dummy-input"
 
 
+defaultBoxShadow : Css.Style
+defaultBoxShadow =
+    Css.boxShadow5 (Css.px -1) (Css.px 1) (Css.px 7) (Css.px 2) defaultShadowRGBA
+
+
+defaultShadowRGBA : Css.Color
+defaultShadowRGBA =
+    Css.rgba 135 135 135 0.2
+
+
 
 -- STATE
 
@@ -526,7 +536,7 @@ view (Config config) =
         menu =
             div
                 [ StyledAttribs.css
-                    [ Css.width (Css.px 150)
+                    [ Css.width (Css.px 160)
                     , Css.height (Css.pct 100)
                     , Css.backgroundColor (Css.hex "#FFFFFF")
                     , Css.zIndex (Css.int config.zIndex)
@@ -536,6 +546,33 @@ view (Config config) =
                     , Css.marginTop (Css.px 2)
                     , Css.paddingBottom (Css.px 4)
                     , Css.paddingTop (Css.px 4)
+                    , defaultBoxShadow
+                    , Css.after
+                        ---1px 1px 7px 2px rgb(52 55 74 / 20%)
+                        [ Css.top (Css.px -13)
+                        , Css.right (Css.px 9)
+                        , Css.left Css.auto
+                        , Css.position Css.absolute
+                        , Css.display Css.inlineBlock
+                        , Css.property "content" "' '"
+                        , Css.border3 (Css.px 8) Css.solid Css.transparent
+                        , Css.borderBottom3 (Css.px 8) Css.solid (Css.hex "#ffffff")
+                        ]
+                    , Css.before
+                        [ Css.top (Css.px -13)
+                        , Css.right (Css.px 9)
+                        , Css.left Css.auto
+                        , Css.position Css.absolute
+                        , Css.display Css.inlineBlock
+                        , Css.property "content" "' '"
+                        , Css.border3 (Css.px 8) Css.solid Css.transparent
+                        , Css.borderTop3 (Css.px 8) Css.solid defaultShadowRGBA
+                        , Css.marginTop (Css.px -2)
+                        , Css.property "filter" "blur(1px)"
+
+                        --, Css.zIndex (Css.int 2)
+                        , Css.transform (Css.rotate (Css.deg 180))
+                        ]
                     ]
                 ]
                 (renderSections config)
