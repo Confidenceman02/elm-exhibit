@@ -72,8 +72,10 @@ type Msg
     | MenuTriggerFocused
     | MenuTriggerBlurred
     | ToggleMenu
-    | ToggleMenuAndFocusFirst
-    | ToggleMenuAndFocusLast
+    | ShowMenuAndFocusFirst
+    | ShowMenuAndFocusLast
+    | MenuFocusFirst
+    | MenuFocusLast
     | HideMenu
     | MenuListMsg (MenuList.Msg MenuListAction)
 
@@ -211,6 +213,18 @@ sessionActionView (State state_) sesh =
             ]
             [ case sesh of
                 Session.LoggedIn viewer ->
+                    let
+                        arrowKeyMessages =
+                            if MenuList.isShowing state_.menuListState then
+                                [ EventsExtra.isDownArrow MenuFocusFirst
+                                , EventsExtra.isUpArrow MenuFocusLast
+                                ]
+
+                            else
+                                [ EventsExtra.isDownArrow ShowMenuAndFocusFirst
+                                , EventsExtra.isUpArrow ShowMenuAndFocusLast
+                                ]
+                    in
                     menuListContainer state_
                         sesh
                         [ Styled.fromUnstyled <|
@@ -219,12 +233,12 @@ sessionActionView (State state_) sesh =
                                     |> DummyInput.onFocus MenuTriggerFocused
                                     |> DummyInput.onBlur MenuTriggerBlurred
                                     |> DummyInput.preventKeydownOn
-                                        [ EventsExtra.isEnter ToggleMenu
-                                        , EventsExtra.isSpace ToggleMenu
-                                        , EventsExtra.isEscape HideMenu
-                                        , EventsExtra.isDownArrow ToggleMenuAndFocusFirst
-                                        , EventsExtra.isUpArrow ToggleMenuAndFocusLast
-                                        ]
+                                        ([ EventsExtra.isEnter ToggleMenu
+                                         , EventsExtra.isSpace ToggleMenu
+                                         , EventsExtra.isEscape HideMenu
+                                         ]
+                                            ++ arrowKeyMessages
+                                        )
                                 )
                                 menuListTriggerId
                         , viewerAvatar viewer
@@ -450,28 +464,42 @@ update state_ msg =
 
         ToggleMenu ->
             let
-                menuListAction =
+                menuListState =
                     if MenuList.isShowing s.menuListState then
                         MenuList.hide s.menuListState
 
                     else
                         MenuList.show s.menuListState
             in
-            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
 
-        ToggleMenuAndFocusFirst ->
+        ShowMenuAndFocusFirst ->
             let
-                menuListAction =
+                menuListState =
                     MenuList.showAndFocusFirst s.menuListState
             in
-            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
 
-        ToggleMenuAndFocusLast ->
+        ShowMenuAndFocusLast ->
             let
-                menuListAction =
+                menuListState =
                     MenuList.showAndFocusLast s.menuListState
             in
-            ( State { s | menuListState = menuListAction }, Cmd.none, Effect.none )
+            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+
+        MenuFocusFirst ->
+            let
+                menuListState =
+                    MenuList.focusFirst s.menuListState
+            in
+            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+
+        MenuFocusLast ->
+            let
+                menuListState =
+                    MenuList.focusLast s.menuListState
+            in
+            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
 
         HideMenu ->
             ( State { s | menuListState = MenuList.hide s.menuListState }, Cmd.none, Effect.none )

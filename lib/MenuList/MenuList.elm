@@ -4,6 +4,8 @@ module MenuList.MenuList exposing
     , State
     , action
     , default
+    , focusFirst
+    , focusLast
     , hide
     , initialState
     , isShowing
@@ -266,6 +268,7 @@ type Msg item
     | DownArrowKeyDowned
     | UpArrowKeyDowned
     | FocusFirstItem Time.Posix
+    | FocusLastItem Time.Posix
     | ProcessBatchedSteps Time.Posix
 
 
@@ -320,6 +323,9 @@ stepSubscriptions (State_ s) =
 
         Visible (Just FocussingFirstItem) ->
             BrowserEvents.onAnimationFrame FocusFirstItem
+
+        Visible (Just FocussingLastItem) ->
+            BrowserEvents.onAnimationFrame FocusLastItem
 
         Batched _ ->
             BrowserEvents.onAnimationFrame ProcessBatchedSteps
@@ -397,6 +403,22 @@ update msg ((State_ state_) as s) =
                         Just firstFocusableIndices ->
                             -- TODO: Check if the focus succeeded
                             Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId firstFocusableIndices state_.sections)
+
+                        _ ->
+                            Cmd.none
+            in
+            ( State_ { state_ | step = Visible Nothing }, focusCmd, Nothing )
+
+        FocusLastItem _ ->
+            let
+                maybeLastFocusableItemPosition =
+                    getLastItemIndices state_.sections
+
+                focusCmd =
+                    case maybeLastFocusableItemPosition of
+                        Just lastFocusableIndices ->
+                            -- TODO: Check if the focus succeeded
+                            Task.attempt (\_ -> None) <| BrowserDom.focus (resolveFocusableItemId lastFocusableIndices state_.sections)
 
                         _ ->
                             Cmd.none
@@ -653,8 +675,43 @@ show (State_ s) =
 
 {-|
 
+        focus the first focusable item in the menu.
+
+        If the menu is not showing nothing will happen. Instead see showAndFocusFirst.
+
+-}
+focusFirst : State item -> State item
+focusFirst ((State_ state_) as s) =
+    case state_.step of
+        Visible Nothing ->
+            State_ { state_ | step = Visible (Just FocussingFirstItem) }
+
+        _ ->
+            s
+
+
+{-|
+
+        focus the last focusable item in the menu.
+
+        If the menu is not showing nothing will happen. Instead see showAndFocusLast.
+
+-}
+focusLast : State item -> State item
+focusLast ((State_ state_) as s) =
+    case state_.step of
+        Visible Nothing ->
+            State_ { state_ | step = Visible (Just FocussingLastItem) }
+
+        _ ->
+            s
+
+
+{-|
+
     Visibly render the menu list and focus the first focusable item.
-    If the menu is already visible the first focusable item will be focused.
+
+    If the menu is already open then no items will be focused. Instead see focusFirst.
 
 -}
 showAndFocusFirst : State item -> State item
@@ -675,8 +732,9 @@ showAndFocusFirst ((State_ state_) as s) =
 
 {-|
 
-    Visibly render the menu list and focus the first focusable item.
-    If the menu is already visible the first focusable item will be focused.
+    Visibly render the menu list and focus the last focusable item.
+
+    If the menu is already open then no items will be focused. Instead see focusLast.
 
 -}
 showAndFocusLast : State item -> State item
