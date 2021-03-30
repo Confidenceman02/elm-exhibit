@@ -2,6 +2,9 @@ module Components.Button exposing
     ( Icon(..)
     , Orientation(..)
     , icon
+    , iconDefault
+    , iconLabel
+    , iconOrientation
     , onClick
     , secondary
     , view
@@ -9,10 +12,10 @@ module Components.Button exposing
     )
 
 import Css exposing (Style)
-import Html.Styled as Styled exposing (button, span, text)
+import Html.Styled as Styled exposing (button, div, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
-import Styles.Color exposing (exColorBurn500, exColorBurn600, exColorMulch600)
+import Styles.Color exposing (exColorMulch600)
 import Styles.Grid as Grid
 import Styles.Transition as Transition
 import Styles.Typography exposing (exTypographyButtonSecondaryFontSize)
@@ -27,11 +30,21 @@ type Variant msg
 
 
 type Icon
-    = Triangle Orientation
+    = Triangle IconConfig
 
 
 type Config msg
     = Config (Configuration msg)
+
+
+type IconConfig
+    = IconConfig IconConfiguration
+
+
+type alias IconConfiguration =
+    { orientation : Orientation
+    , label : Maybe String
+    }
 
 
 type alias Configuration msg =
@@ -52,9 +65,31 @@ defaults =
     }
 
 
+iconConfigDefaults : IconConfiguration
+iconConfigDefaults =
+    { orientation = RightFacing
+    , label = Nothing
+    }
+
+
 secondary : Config msg
 secondary =
     Config { defaults | variant = Secondary }
+
+
+iconDefault : IconConfig
+iconDefault =
+    IconConfig iconConfigDefaults
+
+
+iconOrientation : Orientation -> IconConfig -> IconConfig
+iconOrientation orientation (IconConfig config) =
+    IconConfig { config | orientation = orientation }
+
+
+iconLabel : String -> IconConfig -> IconConfig
+iconLabel label (IconConfig config) =
+    IconConfig { config | label = Just label }
 
 
 icon : Icon -> Config msg
@@ -104,8 +139,8 @@ view (Config config) label =
                         [ text label ]
                     ]
 
-                IconButton (Triangle orientation) ->
-                    [ triangle orientation config ]
+                IconButton (Triangle (IconConfig iconConfig)) ->
+                    [ triangle iconConfig ]
 
                 Wrapper content ->
                     content
@@ -115,27 +150,46 @@ view (Config config) label =
         resolveButtonBody
 
 
-triangle : Orientation -> Configuration msg -> Styled.Html msg
-triangle orientation config =
+triangle : IconConfiguration -> Styled.Html msg
+triangle iconConfig =
     let
         resolveDeg =
-            case orientation of
+            case iconConfig.orientation of
                 RightFacing ->
                     180
 
                 _ ->
                     0
+
+        resolvedSvg =
+            svg
+                [ height "32"
+                , viewBox "0 0 150 300"
+                , SvgAttribs.css <|
+                    ([ Css.fill Css.currentColor
+                     ]
+                        ++ Transition.transform (Css.rotate <| Css.deg resolveDeg)
+                    )
+                ]
+                [ polygon [ points "0, 150 150, 0 150,300" ] [] ]
     in
-    svg
-        [ height "32"
-        , viewBox "0 0 150 300"
-        , SvgAttribs.css <|
-            ([ Css.fill Css.currentColor
-             ]
-                ++ Transition.transform (Css.rotate <| Css.deg resolveDeg)
-            )
-        ]
-        [ polygon [ points "0, 150 150, 0 150,300" ] [] ]
+    case iconConfig.label of
+        Just label ->
+            div [ StyledAttribs.css [ Css.displayFlex ] ]
+                [ span
+                    [ StyledAttribs.css
+                        [ Css.position Css.absolute
+                        , Css.left (Css.px -75)
+                        , Css.transform (Css.translate2 (Css.pct 0) (Css.pct 50))
+                        , Css.marginTop (Css.px -2)
+                        ]
+                    ]
+                    [ text "Description" ]
+                , resolvedSvg
+                ]
+
+        _ ->
+            resolvedSvg
 
 
 
@@ -160,16 +214,10 @@ secondaryStyles =
 
 iconStyles : List Style
 iconStyles =
-    [ Css.position Css.absolute
-    , Css.displayFlex
-    , Css.backgroundColor Css.transparent
+    [ Css.backgroundColor Css.transparent
     , Css.padding (Css.px 0)
     , Css.borderColor (Css.rgba 0 0 0 0)
     , Css.border (Css.px 0)
-    , Css.top (Css.pct 50)
-    , Css.left (Css.px 0)
-    , Css.marginLeft (Grid.calc Grid.grid Grid.divide -1)
-    , Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
     , Css.color Css.inherit
     ]
 

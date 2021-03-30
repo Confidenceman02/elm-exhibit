@@ -14,11 +14,12 @@ import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Markdown as Markdown
 import Package exposing (Package)
 import Pages.Interstitial.Interstitial as InterstitialPage
-import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
+import Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
@@ -458,16 +459,31 @@ sliderToggle open =
     let
         orientation =
             if open then
-                Button.Open
+                Button.RightFacing
 
             else
-                Button.Closed
+                Button.LeftFacing
     in
-    Button.view
-        (Button.icon (Button.Triangle orientation)
-            |> Button.onClick ToggleDescriptionPanel
-        )
-        "open slider"
+    div
+        [ StyledAttribs.css
+            [ Css.position Css.absolute
+            , Css.top (Css.pct 50)
+            , Css.marginLeft (Grid.calc Grid.grid Grid.divide -1)
+            , Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
+            , Css.left (Css.px 0)
+            , Css.color exColorBurn500
+            , Css.hover [ Css.color exColorBurn600 ]
+            ]
+        ]
+        [ Button.view
+            (Button.icon
+                (Button.Triangle
+                    (Button.iconDefault |> Button.iconOrientation orientation |> Button.iconLabel "Description")
+                )
+                |> Button.onClick ToggleDescriptionPanel
+            )
+            "open description panel"
+        ]
 
 
 selectedTriangle : Styled.Html msg
