@@ -470,9 +470,9 @@ sliderToggle open =
              , Css.top (Css.pct 50)
              , Css.marginLeft (Grid.calc Grid.grid Grid.divide -1)
              , Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
-             , Css.left (Css.px 0)
+             , Css.left (Css.px -80)
              , Css.color exColorBurn500
-             , Css.hover [ Css.color exColorBurn600, Css.transform (Css.scale 1.2) ]
+             , Css.hover [ Css.color exColorBurn600, Css.transform (Css.scale 1.1) ]
              ]
                 ++ Transition.scale 1
             )

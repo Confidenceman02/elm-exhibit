@@ -175,13 +175,10 @@ triangle iconConfig =
     in
     case iconConfig.label of
         Just label ->
-            div [ StyledAttribs.css [ Css.displayFlex ] ]
+            div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
                 [ span
                     [ StyledAttribs.css
-                        [ Css.position Css.absolute
-                        , Css.left (Css.px -75)
-                        , Css.transform (Css.translate2 (Css.pct 0) (Css.pct 50))
-                        , Css.marginTop (Css.px -2)
+                        [ Css.marginRight (Css.px 12)
                         ]
                     ]
                     [ text label ]
