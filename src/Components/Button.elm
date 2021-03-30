@@ -184,7 +184,7 @@ triangle iconConfig =
                         , Css.marginTop (Css.px -2)
                         ]
                     ]
-                    [ text "Description" ]
+                    [ text label ]
                 , resolvedSvg
                 ]
 
@@ -214,7 +214,8 @@ secondaryStyles =
 
 iconStyles : List Style
 iconStyles =
-    [ Css.backgroundColor Css.transparent
+    [ Css.displayFlex
+    , Css.backgroundColor Css.transparent
     , Css.padding (Css.px 0)
     , Css.borderColor (Css.rgba 0 0 0 0)
     , Css.border (Css.px 0)
