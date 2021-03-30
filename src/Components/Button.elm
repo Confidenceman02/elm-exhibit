@@ -1,4 +1,12 @@
-module Components.Button exposing (Icon(..), Orientation(..), icon, onClick, secondary, view, wrapper)
+module Components.Button exposing
+    ( Icon(..)
+    , Orientation(..)
+    , icon
+    , onClick
+    , secondary
+    , view
+    , wrapper
+    )
 
 import Css exposing (Style)
 import Html.Styled as Styled exposing (button, span, text)
@@ -33,8 +41,8 @@ type alias Configuration msg =
 
 
 type Orientation
-    = Closed
-    | Open
+    = RightFacing
+    | LeftFacing
 
 
 defaults : Configuration msg
@@ -97,7 +105,7 @@ view (Config config) label =
                     ]
 
                 IconButton (Triangle orientation) ->
-                    [ triangle orientation ]
+                    [ triangle orientation config ]
 
                 Wrapper content ->
                     content
@@ -107,12 +115,12 @@ view (Config config) label =
         resolveButtonBody
 
 
-triangle : Orientation -> Styled.Html msg
-triangle orientation =
+triangle : Orientation -> Configuration msg -> Styled.Html msg
+triangle orientation config =
     let
         resolveDeg =
             case orientation of
-                Open ->
+                RightFacing ->
                     180
 
                 _ ->
@@ -122,8 +130,7 @@ triangle orientation =
         [ height "32"
         , viewBox "0 0 150 300"
         , SvgAttribs.css <|
-            ([ Css.fill exColorBurn500
-             , Css.hover [ Css.fill exColorBurn600 ]
+            ([ Css.fill Css.currentColor
              ]
                 ++ Transition.transform (Css.rotate <| Css.deg resolveDeg)
             )
@@ -163,6 +170,7 @@ iconStyles =
     , Css.left (Css.px 0)
     , Css.marginLeft (Grid.calc Grid.grid Grid.divide -1)
     , Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
+    , Css.color Css.inherit
     ]
 
 
