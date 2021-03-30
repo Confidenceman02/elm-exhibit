@@ -157,8 +157,6 @@ initialState =
 type ListItem item
     = Navigation NavigationConfiguration
     | Action (ActionConfiguration item)
-    | CustomNavigation String (List BaseConfiguration)
-    | CustomAction (List (CustomActionConfiguration item BaseConfiguration))
 
 
 type alias BaseConfiguration =
@@ -654,12 +652,6 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
                         , text config.label
                         ]
 
-                CustomNavigation href configs ->
-                    a [ StyledAttribs.href href, StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderBaseConfiguration configs
-
-                CustomAction configs ->
-                    div [ StyledAttribs.css (listItemContainerStyles ++ listItemFocusHoverStyles styling ++ pointerStyles) ] <| List.map renderCustomAction configs
-
         buildViews items builtViews itemIndex =
             case items of
                 [] ->
@@ -993,13 +985,7 @@ resolveFocusableItemId ( sectionIndex, itemIndex ) allSections =
                         Action _ ->
                             DummyInput.inputIdPrefix ++ buildDummyInputId ( sectionIndex, itemIndex )
 
-                        CustomAction _ ->
-                            DummyInput.inputIdPrefix ++ buildDummyInputId ( sectionIndex, itemIndex )
-
                         Navigation _ ->
-                            buildItemId ( sectionIndex, itemIndex )
-
-                        CustomNavigation _ _ ->
                             buildItemId ( sectionIndex, itemIndex )
 
                 _ ->
