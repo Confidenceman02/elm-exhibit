@@ -11,7 +11,7 @@ import {
   userExists,
 } from "./redis/actions";
 import { githubLoginEndpoint, githubUserEndpoint } from "./endpoint";
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import { acceptJson, withAuth } from "./headers";
 import { UserSession } from "./redis/schema";
 import redisClient from "./redis/client";
@@ -39,25 +39,24 @@ export async function handler(
   try {
     const stateParamAsObject: TempSession = JSON.parse(decodedState);
     const sessionId = stateParamAsObject.sessionId;
-    const tmpSessionExists = await tempSessionExists(
+    const tmpSessionExists: boolean = await tempSessionExists(
       stateParamAsObject,
       client
     );
     const loginEndPoint: ResultType<URL> = githubLoginEndpoint(params.code);
     if (tmpSessionExists && loginEndPoint.Status === Status.Ok) {
-      const loginResponse = await fetch(loginEndPoint.data.href, {
+      const loginResponse: Response = await fetch(loginEndPoint.data.href, {
         method: "POST",
         headers: { ...acceptJson },
       });
-      //TODO: validate response was "ok"
+      if (!loginResponse.ok) return errorResponse(noIdea);
       const loginResponseData: GithubLoginData = await loginResponse.json();
       // get user github info
       const githubUserResponse = await fetch(githubUserEndpoint().href, {
         headers: { ...acceptJson, ...withAuth(loginResponseData.access_token) },
       });
-      if (!githubUserResponse.ok) {
-        return errorResponse(noIdea);
-      }
+      if (!githubUserResponse.ok) return errorResponse(noIdea);
+      // TODO: Validate data
       const parsedGithubUserResponse: GithubUserData = await githubUserResponse.json();
       // initiate a session
       const initiatedSession: boolean = await initSession(
@@ -65,17 +64,20 @@ export async function handler(
         parsedGithubUserResponse,
         client
       );
-      const session: ResultType<UserSession> = await getSession(
+      const fetchedSession: ResultType<UserSession> = await getSession(
         sessionId,
         client
       );
-      if (initiatedSession && session.Status === Status.Ok) {
+      if (initiatedSession && fetchedSession.Status === Status.Ok) {
         // check for a existing user as maybe the cookie expired or they revoked the app.
-        const usrExists = await userExists(parsedGithubUserResponse.id, client);
-        if (usrExists) {
+        const existingUser: boolean = await userExists(
+          parsedGithubUserResponse.id,
+          client
+        );
+        if (existingUser) {
           return successResponse({
             tag: "SessionGranted",
-            session: session.data,
+            session: fetchedSession.data,
           });
         }
         // create user if this is first time logging in
@@ -87,7 +89,7 @@ export async function handler(
         if (createdUser) {
           return successResponse({
             tag: "SessionGranted",
-            session: session.data,
+            session: fetchedSession.data,
           });
         }
         return errorResponse({ tag: "LoginFailed" });
@@ -96,7 +98,6 @@ export async function handler(
     }
     return errorResponse({ tag: "LoginFailed" });
   } catch (e) {
-    console.log(e);
     return errorResponse(noIdea);
   }
 }
