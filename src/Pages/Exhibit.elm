@@ -450,7 +450,7 @@ exampleSelector (SelectedExample selectedExample) example =
                     |> Button.onClick (SelectExample example)
                 )
                 example.name
-            , viewIf (selectedExample.id == example.id) Indicator.view
+            , viewIf (selectedExample.id == example.id) selectedTriangle
             ]
         ]
 
@@ -486,6 +486,20 @@ sliderToggle open =
                 |> Button.onClick ToggleDescriptionPanel
             )
             "open description panel"
+        ]
+
+
+selectedTriangle : Styled.Html msg
+selectedTriangle =
+    div
+        [ SvgStyledAttribs.css
+            [ Css.transform <| Css.translate2 (Css.pct 0) (Css.pct -50)
+            , Css.top (Css.pct 50)
+            , Css.position Css.absolute
+            , Css.right (Grid.calc Grid.halfGrid Grid.multiply -1)
+            ]
+        ]
+        [ Indicator.view
         ]
 
 
