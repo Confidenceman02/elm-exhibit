@@ -32,7 +32,7 @@ import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import MenuList.MenuList as MenuList exposing (Actions(..))
 import Package exposing (Package)
 import Session exposing (Session)
-import Styles.Color exposing (exColorBurn500, exColorSky600, exColorSky700, exColorWhite)
+import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Styles.Common exposing (absoluteCenterHorizontal)
 import Styles.Grid as Grid
 import Viewer exposing (Viewer)
@@ -437,7 +437,6 @@ appTitle =
 
 
 
--- HELPERS
 -- STATE
 
 
