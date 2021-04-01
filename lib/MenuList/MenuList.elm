@@ -783,8 +783,14 @@ showAndFocusLast ((State_ state_) as s) =
 
 
 hide : State item -> State item
-hide (State_ s) =
-    State_ { s | step = Visible (Just BecomingInvisible) }
+hide ((State_ state_) as s) =
+    case state_.step of
+        Visible _ ->
+            State_ { state_ | step = Visible (Just BecomingInvisible) }
+
+        _ ->
+            --TODO: Handle more gracefully as it will immediately go invisible.
+            State_ { state_ | step = Invisible Nothing }
 
 
 {-|
