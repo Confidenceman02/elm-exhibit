@@ -497,9 +497,10 @@ selectedTriangle =
             , Css.top (Css.pct 50)
             , Css.position Css.absolute
             , Css.right (Grid.calc Grid.halfGrid Grid.multiply -1)
+            , Css.color exColorOfficialDarkBlue
             ]
         ]
-        [ Indicator.view
+        [ Indicator.view Indicator.LeftFacing
         ]
 
 

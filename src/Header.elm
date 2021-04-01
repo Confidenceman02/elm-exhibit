@@ -19,6 +19,7 @@ import Components.Button as Button
 import Components.ElmLogo as ElmLogo
 import Components.GithubLogo as GithubLogo
 import Components.Heading as Heading
+import Components.Indicator as Indicator
 import Components.Link as Link
 import Css as Css
 import DummyInput
@@ -31,7 +32,7 @@ import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import MenuList.MenuList as MenuList exposing (Actions(..))
 import Package exposing (Package)
 import Session exposing (Session)
-import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
+import Styles.Color exposing (exColorBurn500, exColorSky600, exColorSky700, exColorWhite)
 import Styles.Common exposing (absoluteCenterHorizontal)
 import Styles.Grid as Grid
 import Viewer exposing (Viewer)
@@ -195,6 +196,9 @@ sessionActionView (State state_) sesh =
 
             else
                 config
+
+        menuListShowing =
+            MenuList.isShowing state_.menuListState
     in
     viewIf
         ((not <| Session.isRefreshing sesh)
@@ -215,7 +219,7 @@ sessionActionView (State state_) sesh =
                 Session.LoggedIn viewer ->
                     let
                         arrowKeyMessages =
-                            if MenuList.isShowing state_.menuListState then
+                            if menuListShowing then
                                 [ EventsExtra.isDownArrow MenuFocusFirst
                                 , EventsExtra.isUpArrow MenuFocusLast
                                 ]
@@ -241,7 +245,7 @@ sessionActionView (State state_) sesh =
                                         )
                                 )
                                 menuListTriggerId
-                        , viewerAvatar viewer
+                        , viewerAvatar menuListShowing viewer
                         , span
                             [ StyledAttribs.css
                                 [ Css.position Css.absolute
@@ -261,7 +265,7 @@ sessionActionView (State state_) sesh =
                         ]
 
                 Session.LoggingOut viewer ->
-                    menuListContainer state_ sesh [ viewerAvatar viewer ]
+                    menuListContainer state_ sesh [ viewerAvatar menuListShowing viewer ]
 
                 _ ->
                     Button.view
@@ -292,7 +296,6 @@ menuListContainer state_ sesh content =
     div
         [ StyledAttribs.css
             ([ Css.displayFlex
-             , Css.marginRight Grid.halfGrid
              , Css.position Css.relative
              , Css.cursor Css.pointer
              ]
@@ -334,19 +337,41 @@ withBeforeElement state_ =
         []
 
 
-viewerAvatar : Viewer -> Styled.Html msg
-viewerAvatar viewer =
-    img
-        [ StyledAttribs.alt (Viewer.getUsername viewer)
-        , StyledAttribs.css
-            [ Css.borderRadius (Css.px 17)
-            , Css.height (Css.px avatarHeight)
-            , Css.width (Css.px 33)
-            , Css.border3 (Css.px 1) Css.solid exColorSky700
+viewerAvatar : Bool -> Viewer -> Styled.Html msg
+viewerAvatar menuShowing viewer =
+    let
+        resolveIndicatorOrientation =
+            if menuShowing then
+                Indicator.UpFacing
+
+            else
+                Indicator.DownFacing
+    in
+    div
+        [ StyledAttribs.css
+            [ Css.displayFlex
+            , Css.alignItems Css.center
             ]
-        , StyledAttribs.src (Viewer.getAvatarUrl viewer)
         ]
-        []
+        [ img
+            [ StyledAttribs.alt (Viewer.getUsername viewer)
+            , StyledAttribs.css
+                [ Css.borderRadius (Css.px 17)
+                , Css.height (Css.px avatarHeight)
+                , Css.width (Css.px 33)
+                , Css.border3 (Css.px 1) Css.solid exColorSky700
+                ]
+            , StyledAttribs.src (Viewer.getAvatarUrl viewer)
+            ]
+            []
+        , span
+            [ StyledAttribs.css
+                [ Css.marginLeft (Grid.calc Grid.halfGrid Grid.divide 2)
+                , Css.color exColorWhite
+                ]
+            ]
+            [ Indicator.view resolveIndicatorOrientation ]
+        ]
 
 
 nav : Configuration -> Styled.Html msg
