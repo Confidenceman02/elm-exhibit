@@ -5,6 +5,7 @@ import Components.Button as Button
 import Components.ElmLogo as ElmLogo
 import Components.ExhibitPane as ExhibitPane
 import Components.Heading as Heading
+import Components.Indicator as Indicator
 import Components.Link as Link
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
@@ -449,7 +450,7 @@ exampleSelector (SelectedExample selectedExample) example =
                     |> Button.onClick (SelectExample example)
                 )
                 example.name
-            , viewIf (selectedExample.id == example.id) selectedTriangle
+            , viewIf (selectedExample.id == example.id) Indicator.view
             ]
         ]
 
@@ -486,21 +487,6 @@ sliderToggle open =
             )
             "open description panel"
         ]
-
-
-selectedTriangle : Styled.Html msg
-selectedTriangle =
-    svg
-        [ height "8"
-        , viewBox "0 0 8 8"
-        , SvgStyledAttribs.css
-            [ Css.transform <| Css.translate2 (Css.pct 0) (Css.pct -50)
-            , Css.top (Css.pct 50)
-            , Css.position Css.absolute
-            , Css.marginLeft Grid.halfGrid
-            ]
-        ]
-        [ path [ d "M0.402038 4.01184L7.15204 0.114727L7.15204 7.90895L0.402038 4.01184Z", fill exColorOfficialDarkBlue.value ] [] ]
 
 
 
