@@ -174,7 +174,7 @@ sessionActionView (State state_) sesh =
                 span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ]
                     [ Heading.view (Heading.h5 |> Heading.inline True)
                         (if Session.isGuest sesh then
-                            "Log in with Github"
+                            "Continue with Github"
 
                          else if Session.isLoggingIn sesh then
                             "Logging in"
