@@ -1,4 +1,4 @@
-module Pages.Exhibit exposing (Effect(..), Model, Msg, init, subscriptions, toContext, toHeaderMsg, update, view)
+module Pages.Exhibit exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Components.Button as Button
@@ -13,9 +13,8 @@ import Css as Css
 import Effect as Effect
 import Example as Example exposing (Example)
 import Header as Header
-import Html.Styled as Styled exposing (Attribute, div, h2, li, p, span, text, ul)
+import Html.Styled as Styled exposing (Attribute, div, h2, li, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
-import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import Markdown as Markdown
 import Package exposing (Package)
@@ -25,13 +24,7 @@ import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
 import Styles.Transition as Transition
-import Svg.Styled exposing (path, svg)
-import Svg.Styled.Attributes as SvgStyledAttribs exposing (d, fill, height, viewBox)
-
-
-toContext : Model -> Context
-toContext model =
-    model.context
+import Svg.Styled.Attributes as SvgStyledAttribs
 
 
 type alias Model =

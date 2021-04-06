@@ -20,8 +20,7 @@ import Viewer
 
 
 type Msg
-    = Noop
-    | ClickedLink Browser.UrlRequest
+    = ClickedLink Browser.UrlRequest
     | ChangedUrl Url
     | GotExhibitMsg ExhibitPage.Msg
     | GotAuthorMsg AuthorPage.Msg
@@ -163,9 +162,13 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model ) of
-        ( GotExhibitMsg examplesMsg, Exhibit examples ) ->
-            ExhibitPage.update examplesMsg examples
-                |> updateWithEffect Exhibit GotExhibitMsg exampleEffectHandler
+        ( GotExhibitMsg examplesMsg, Exhibit exhibitModel ) ->
+            ExhibitPage.update examplesMsg exhibitModel
+                |> updateWithEffect Exhibit GotExhibitMsg exhibitEffectHandler
+
+        ( GotAuthorMsg authorMsg, Author authorModel ) ->
+            AuthorPage.update authorMsg authorModel
+                |> updateWithEffect Author GotAuthorMsg authorEffectHandler
 
         ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
             let
@@ -195,6 +198,16 @@ update msg model =
             in
             ( Exhibit updatedModel, sessionCmd )
 
+        ( RefreshedSession result, Author m ) ->
+            let
+                updatedModel =
+                    { m | context = Context.updateSession updatedSession m.context }
+
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
+            in
+            ( Author updatedModel, sessionCmd )
+
         ( SessionAuthorizing result, Exhibit m ) ->
             let
                 updatedModel =
@@ -205,6 +218,16 @@ update msg model =
             in
             ( Exhibit updatedModel, sessionCmd )
 
+        ( SessionAuthorizing result, Author m ) ->
+            let
+                updatedModel =
+                    { m | context = Context.updateSession updatedSession m.context }
+
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
+            in
+            ( Author updatedModel, sessionCmd )
+
         ( SessionDestroying result, Exhibit m ) ->
             let
                 updatedModel =
@@ -214,6 +237,16 @@ update msg model =
                     Session.fromResult result
             in
             ( Exhibit updatedModel, sessionCmd )
+
+        ( SessionDestroying result, Author m ) ->
+            let
+                updatedModel =
+                    { m | context = Context.updateSession updatedSession m.context }
+
+                ( sessionCmd, updatedSession ) =
+                    Session.fromResult result
+            in
+            ( Author updatedModel, sessionCmd )
 
         _ ->
             ( model, Cmd.none )
@@ -246,15 +279,30 @@ subscriptions model =
             Sub.none
 
 
-exampleEffectHandler : Effect.Handler ExhibitPage.Model ExhibitPage.Effect Msg
-exampleEffectHandler model effect =
+exhibitEffectHandler : Effect.Handler ExhibitPage.Model ExhibitPage.Effect Msg
+exhibitEffectHandler model effect =
     case effect of
         ExhibitPage.HeaderEffect headerEffect ->
-            headerEffectHandler model headerEffect
+            let
+                ( updatedContext, cmds ) =
+                    headerEffectHandler model.context headerEffect
+            in
+            ( { model | context = updatedContext }, cmds )
 
 
-headerEffectHandler : Effect.Handler ExhibitPage.Model Header.HeaderEffect Msg
-headerEffectHandler model effect =
+authorEffectHandler : Effect.Handler AuthorPage.Model AuthorPage.Effect Msg
+authorEffectHandler model effect =
+    case effect of
+        AuthorPage.HeaderEffect headerEffect ->
+            let
+                ( updatedContext, cmds ) =
+                    headerEffectHandler model.context headerEffect
+            in
+            ( { model | context = updatedContext }, cmds )
+
+
+headerEffectHandler : Effect.Handler Context Header.HeaderEffect Msg
+headerEffectHandler context effect =
     case effect of
         Header.SignInEffect ->
             let
@@ -262,14 +310,14 @@ headerEffectHandler model effect =
                     Session.login SessionAuthorizing
 
                 updatedContext =
-                    Context.updateSession session model.context
+                    Context.updateSession session context
             in
-            ( { model | context = updatedContext }, sessionCmd )
+            ( updatedContext, sessionCmd )
 
         Header.SignOutEffect ->
             let
                 viewer =
-                    Session.getViewer model.context.session
+                    Session.getViewer context.session
 
                 ( sessionCmd, session ) =
                     case viewer of
@@ -277,12 +325,12 @@ headerEffectHandler model effect =
                             Session.logOut SessionDestroying (Viewer.credentials v)
 
                         _ ->
-                            ( Cmd.none, model.context.session )
+                            ( Cmd.none, context.session )
 
                 updatedContext =
-                    Context.updateSession session model.context
+                    Context.updateSession session context
             in
-            ( { model | context = updatedContext }, sessionCmd )
+            ( updatedContext, sessionCmd )
 
 
 main : Program Encode.Value Model Msg

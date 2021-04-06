@@ -393,13 +393,15 @@ nav config =
             , Css.alignItems Css.center
             ]
         ]
-        -- shadowLink is just taking up the space so we can absolutely position the actual home logo link
         [ case config.variant of
             Exhibit authr package ->
-                exampleTitle authr package
+                exhibitTitle authr package
+
+            Author authr ->
+                authorTitle authr
 
             _ ->
-                text "Something"
+                text ""
         ]
 
 
@@ -424,12 +426,19 @@ homeLink =
         ]
 
 
-exampleTitle : Author -> Package -> Styled.Html msg
-exampleTitle authr package =
+exhibitTitle : Author -> Package -> Styled.Html msg
+exhibitTitle authr package =
     h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
         [ text (Author.toString authr)
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
         , text (Package.toString package)
+        ]
+
+
+authorTitle : Author -> Styled.Html msg
+authorTitle authr =
+    h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
+        [ text (Author.toString authr)
         ]
 
 
