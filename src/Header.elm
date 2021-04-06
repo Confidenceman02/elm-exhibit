@@ -159,7 +159,8 @@ view (Config config) =
             , Css.height (Css.px navHeight)
             ]
         ]
-        [ div [ StyledAttribs.css absoluteCenterHorizontal ]
+        [ homeLink
+        , div [ StyledAttribs.css absoluteCenterHorizontal ]
             [ nav config
             ]
         , viewMaybe (sessionActionView config.state) config.session
@@ -384,20 +385,18 @@ nav config =
             ]
         ]
         -- shadowLink is just taking up the space so we can absolutely position the actual home logo link
-        [ shadowHomeLink
-        , case config.variant of
+        [ case config.variant of
             Example author package ->
                 exampleTitle author package
 
             _ ->
                 text ""
-        , homeLink
         ]
 
 
 homeLink : Styled.Html msg
 homeLink =
-    div [ StyledAttribs.css [ Css.position Css.absolute ] ]
+    div [ StyledAttribs.css [ Css.position Css.absolute, Css.top (Css.pct 1), Css.color exColorWhite ] ]
         [ Link.view (Link.default |> Link.href "/")
             (Link.htmlBody
                 [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
