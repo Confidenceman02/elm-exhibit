@@ -3,7 +3,8 @@ module Header exposing
     , HeaderEffect(..)
     , Msg
     , State
-    , example
+    , author
+    , exhibit
     , initState
     , navBottomBorder
     , navHeight
@@ -63,7 +64,8 @@ type Config
 
 
 type Variant
-    = Example Author Package
+    = Exhibit Author Package
+    | Author Author
     | Home
 
 
@@ -131,9 +133,14 @@ type HeaderEffect
 -- CONFIG BUILDERS
 
 
-example : Author -> Package -> Config
-example author package =
-    Config { defaultConfig | variant = Example author package }
+exhibit : Author -> Package -> Config
+exhibit authr package =
+    Config { defaultConfig | variant = Exhibit authr package }
+
+
+author : Author -> Config
+author authr =
+    Config { defaultConfig | variant = Author authr }
 
 
 session : Session -> Config -> Config
@@ -388,11 +395,11 @@ nav config =
         ]
         -- shadowLink is just taking up the space so we can absolutely position the actual home logo link
         [ case config.variant of
-            Example author package ->
-                exampleTitle author package
+            Exhibit authr package ->
+                exampleTitle authr package
 
             _ ->
-                text ""
+                text "Something"
         ]
 
 
@@ -418,9 +425,9 @@ homeLink =
 
 
 exampleTitle : Author -> Package -> Styled.Html msg
-exampleTitle author package =
+exampleTitle authr package =
     h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
-        [ text (Author.toString author)
+        [ text (Author.toString authr)
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
         , text (Package.toString package)
         ]

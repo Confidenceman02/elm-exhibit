@@ -9,7 +9,8 @@ import Session exposing (Session)
 
 type Page msg
     = Home
-    | Examples Author Package Session (Header.Msg -> msg) Header.State
+    | Exhibit Author Package Session (Header.Msg -> msg) Header.State
+    | Author Author Session (Header.Msg -> msg) Header.State
     | AuthGithubRedirect
 
 
@@ -23,10 +24,15 @@ view page { title, content } =
 viewHeader : Page msg -> Styled.Html msg
 viewHeader page =
     case page of
-        Examples author package session toHeaderMsg headerState ->
+        Exhibit author package session toHeaderMsg headerState ->
             -- This looks weird but the Header has its own msgs it can dispatch so we need to
-            -- catch those in the relevant Page. The Examples page in this case.
-            Styled.map toHeaderMsg (Header.view (Header.example author package |> Header.session session |> Header.state headerState))
+            -- catch those in the relevant Page. The Exhibit page in this case.
+            Styled.map toHeaderMsg (Header.view (Header.exhibit author package |> Header.session session |> Header.state headerState))
+
+        Author author session toHeaderMsg headerState ->
+            -- This looks weird but the Header has its own msgs it can dispatch so we need to
+            -- catch those in the relevant Page. The Author page in this case.
+            Styled.map toHeaderMsg (Header.view (Header.author author |> Header.session session |> Header.state headerState))
 
         Home ->
             text ""

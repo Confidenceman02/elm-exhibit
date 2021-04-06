@@ -9,6 +9,7 @@ import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
 import Pages.AuthRedirect as AuthRedirectPage
+import Pages.Author as AuthorPage
 import Pages.Exhibit as ExhibitPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
@@ -23,6 +24,7 @@ type Msg
     | ClickedLink Browser.UrlRequest
     | ChangedUrl Url
     | GotExhibitMsg ExhibitPage.Msg
+    | GotAuthorMsg AuthorPage.Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
     | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
@@ -31,7 +33,8 @@ type Msg
 
 
 type Model
-    = Example ExhibitPage.Model
+    = Exhibit ExhibitPage.Model
+    | Author AuthorPage.Model
     | Home HomePage.Model
     | NotFound Context
     | AuthRedirect AuthRedirectPage.Model
@@ -73,9 +76,15 @@ changeRouteTo maybeRoute context =
                 ( model, cmds ) =
                     ExhibitPage.init author package context
             in
-            ( Example model, Cmd.batch [ Cmd.map GotExhibitMsg cmds ] )
+            ( Exhibit model, Cmd.batch [ Cmd.map GotExhibitMsg cmds ] )
 
-        -- TODO: Create home page
+        Just (Route.Author author) ->
+            let
+                model =
+                    AuthorPage.init author context
+            in
+            ( Author model, Cmd.none )
+
         Just Route.Home ->
             let
                 model =
@@ -94,7 +103,10 @@ changeRouteTo maybeRoute context =
 toContext : Model -> Context
 toContext model =
     case model of
-        Example m ->
+        Exhibit m ->
+            m.context
+
+        Author m ->
             m.context
 
         Home m ->
@@ -120,17 +132,23 @@ view model =
             }
     in
     case model of
-        Example examplesModel ->
+        Exhibit exhibitModel ->
             viewPage
-                (Page.Examples
-                    examplesModel.author
-                    examplesModel.package
-                    examplesModel.context.session
+                (Page.Exhibit
+                    exhibitModel.author
+                    exhibitModel.package
+                    exhibitModel.context.session
                     ExhibitPage.toHeaderMsg
-                    examplesModel.headerState
+                    exhibitModel.headerState
                 )
                 GotExhibitMsg
-                (ExhibitPage.view examplesModel)
+                (ExhibitPage.view exhibitModel)
+
+        Author authorModel ->
+            viewPage
+                (Page.Author authorModel.author authorModel.context.session AuthorPage.toHeaderMsg authorModel.headerState)
+                GotAuthorMsg
+                (AuthorPage.view authorModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
@@ -145,9 +163,9 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model ) of
-        ( GotExhibitMsg examplesMsg, Example examples ) ->
+        ( GotExhibitMsg examplesMsg, Exhibit examples ) ->
             ExhibitPage.update examplesMsg examples
-                |> updateWithEffect Example GotExhibitMsg exampleEffectHandler
+                |> updateWithEffect Exhibit GotExhibitMsg exampleEffectHandler
 
         ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
             let
@@ -167,7 +185,7 @@ update msg model =
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) (toContext model)
 
-        ( RefreshedSession result, Example m ) ->
+        ( RefreshedSession result, Exhibit m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -175,9 +193,9 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Example updatedModel, sessionCmd )
+            ( Exhibit updatedModel, sessionCmd )
 
-        ( SessionAuthorizing result, Example m ) ->
+        ( SessionAuthorizing result, Exhibit m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -185,9 +203,9 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Example updatedModel, sessionCmd )
+            ( Exhibit updatedModel, sessionCmd )
 
-        ( SessionDestroying result, Example m ) ->
+        ( SessionDestroying result, Exhibit m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -195,7 +213,7 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Example updatedModel, sessionCmd )
+            ( Exhibit updatedModel, sessionCmd )
 
         _ ->
             ( model, Cmd.none )
@@ -221,7 +239,7 @@ subscriptions model =
         AuthRedirect _ ->
             Sub.map GotAuthGithubRedirectMsg AuthRedirectPage.subscriptions
 
-        Example m ->
+        Exhibit m ->
             Sub.map GotExhibitMsg (ExhibitPage.subscriptions m)
 
         _ ->
