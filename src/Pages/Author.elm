@@ -1,4 +1,4 @@
-module Pages.Author exposing (Effect(..), Model, Msg, init, toHeaderMsg, update, view)
+module Pages.Author exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Context exposing (Context)
@@ -55,3 +55,8 @@ update msg model =
                     Header.update model.headerState headerMsg
             in
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions m =
+    Sub.map HeaderMsg (Header.subscriptions m.headerState)

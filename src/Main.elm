@@ -275,6 +275,9 @@ subscriptions model =
         Exhibit m ->
             Sub.map GotExhibitMsg (ExhibitPage.subscriptions m)
 
+        Author m ->
+            Sub.map GotAuthorMsg (AuthorPage.subscriptions m)
+
         _ ->
             Sub.none
 
