@@ -157,6 +157,8 @@ view (Config config) =
             , Css.overflowX Css.hidden
             , Css.borderBottom3 (Css.px navBottomBorder) Css.solid exColorSky700
             , Css.height (Css.px navHeight)
+            , Css.position Css.relative
+            , Css.overflow Css.visible
             ]
         ]
         [ homeLink
@@ -396,7 +398,14 @@ nav config =
 
 homeLink : Styled.Html msg
 homeLink =
-    div [ StyledAttribs.css [ Css.position Css.absolute, Css.top (Css.pct 1), Css.color exColorWhite ] ]
+    div
+        [ StyledAttribs.css
+            [ Css.transform (Css.translate2 (Css.pct 0) (Css.pct -50))
+            , Css.position Css.absolute
+            , Css.top (Css.pct 50)
+            , Css.color exColorWhite
+            ]
+        ]
         [ Link.view (Link.default |> Link.href "/")
             (Link.htmlBody
                 [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
@@ -405,16 +414,6 @@ homeLink =
                     ]
                 ]
             )
-        ]
-
-
-shadowHomeLink : Styled.Html msg
-shadowHomeLink =
-    div [ StyledAttribs.css [ Css.displayFlex, Css.marginRight (Css.px 32), Css.visibility Css.hidden ] ]
-        [ div [ StyledAttribs.css [ Css.displayFlex, Css.alignItems Css.center ] ]
-            [ ElmLogo.view <| ElmLogo.static
-            , appTitle
-            ]
         ]
 
 
