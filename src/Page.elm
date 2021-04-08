@@ -27,12 +27,12 @@ viewHeader page =
         Exhibit author package session toHeaderMsg headerState ->
             -- This looks weird but the Header has its own msgs it can dispatch so we need to
             -- catch those in the relevant Page. The Exhibit page in this case.
-            Styled.map toHeaderMsg (Header.view (Header.exhibit author package |> Header.session session |> Header.state headerState))
+            Styled.map toHeaderMsg (Header.view (Header.exhibit author package |> Header.state headerState) session)
 
         Author author session toHeaderMsg headerState ->
             -- This looks weird but the Header has its own msgs it can dispatch so we need to
             -- catch those in the relevant Page. The Author page in this case.
-            Styled.map toHeaderMsg (Header.view (Header.author author |> Header.session session |> Header.state headerState))
+            Styled.map toHeaderMsg (Header.view (Header.author author |> Header.state headerState) session)
 
         Home ->
             text ""

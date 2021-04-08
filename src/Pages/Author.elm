@@ -52,11 +52,11 @@ update msg model =
         HeaderMsg headerMsg ->
             let
                 ( headerState, headerCmds, headerEffect ) =
-                    Header.update model.headerState headerMsg
+                    Header.update model.context.session model.headerState headerMsg
             in
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions m =
-    Sub.map HeaderMsg (Header.subscriptions m.headerState)
+    Sub.map HeaderMsg (Header.subscriptions m.headerState m.context.session)

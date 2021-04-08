@@ -8,7 +8,6 @@ module Header exposing
     , initState
     , navBottomBorder
     , navHeight
-    , session
     , state
     , subscriptions
     , update
@@ -93,7 +92,7 @@ type State
 
 type alias State_ =
     { menu : Menu
-    , menuListState : MenuList.State MenuListAction
+    , menuListState : Session -> MenuList.State MenuListAction
     }
 
 
@@ -104,7 +103,6 @@ type Menu
 
 type alias Configuration =
     { variant : Variant
-    , session : Maybe Session
     , state : State
     }
 
@@ -119,7 +117,6 @@ type alias PackageConfiguration =
 defaultConfig : Configuration
 defaultConfig =
     { variant = Home
-    , session = Nothing
     , state = initState
     }
 
@@ -143,18 +140,17 @@ author authr =
     Config { defaultConfig | variant = Author authr }
 
 
-session : Session -> Config -> Config
-session sesh (Config config) =
-    Config { config | session = Just sesh }
-
-
 state : State -> Config -> Config
 state s (Config config) =
     Config { config | state = s }
 
 
-view : Config -> Styled.Html Msg
-view (Config config) =
+view : Config -> Session -> Styled.Html Msg
+view (Config config) session =
+    let
+        (State s) =
+            config.state
+    in
     div
         [ StyledAttribs.css
             [ Css.width <| Css.calc (Css.pct 100) Css.minus (Css.px 40)
@@ -172,7 +168,7 @@ view (Config config) =
         , div [ StyledAttribs.css absoluteCenterHorizontal ]
             [ nav config
             ]
-        , viewMaybe (sessionActionView config.state) config.session
+        , sessionActionView config.state session
         ]
 
 
@@ -208,7 +204,7 @@ sessionActionView (State state_) sesh =
                 config
 
         menuListShowing =
-            MenuList.isShowing state_.menuListState
+            MenuList.isShowing (state_.menuListState sesh)
     in
     viewIf
         ((not <| Session.isRefreshing sesh)
@@ -268,7 +264,7 @@ sessionActionView (State state_) sesh =
                             [ Styled.map MenuListMsg
                                 (MenuList.view
                                     (MenuList.default
-                                        |> MenuList.state state_.menuListState
+                                        |> MenuList.state (state_.menuListState sesh)
                                     )
                                 )
                             ]
@@ -298,7 +294,7 @@ menuListContainer state_ sesh content =
         withAddedStyles =
             case sesh of
                 Session.LoggedIn _ ->
-                    withBeforeElement state_ ++ focusTriggerStyles state_
+                    withBeforeElement state_ sesh ++ focusTriggerStyles state_
 
                 _ ->
                     []
@@ -326,9 +322,9 @@ focusTriggerStyles state_ =
             []
 
 
-withBeforeElement : State_ -> List Css.Style
-withBeforeElement state_ =
-    if MenuList.isShowing state_.menuListState then
+withBeforeElement : State_ -> Session -> List Css.Style
+withBeforeElement state_ sesh =
+    if MenuList.isShowing (state_.menuListState sesh) then
         [ Css.before
             [ Css.position Css.fixed
             , Css.top (Css.px 0)
@@ -459,30 +455,50 @@ initState =
     State
         { menu = Idle
         , menuListState =
-            MenuList.initialState
-                |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
-                |> MenuList.sections
-                    [ MenuList.section
-                        [ MenuList.navigation { label = "Home", href = "/" }
-                        ]
-                    , MenuList.section
-                        [ MenuList.action { label = "Sign out", item = SignOutAction }
-                        ]
-                    ]
+            \latestSession ->
+                MenuList.initialState
+                    |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
+                    |> MenuList.sections
+                        (resolveSections
+                            latestSession
+                        )
         }
+
+
+newMenuListState : MenuList.State MenuListAction -> Session -> MenuList.State MenuListAction
+newMenuListState latestState =
+    \latestSession ->
+        latestState
+            |> MenuList.sections (resolveSections latestSession)
+
+
+resolveSections : Session -> List (MenuList.Section MenuListAction)
+resolveSections sesh =
+    case sesh of
+        Session.LoggedIn _ ->
+            [ MenuList.section
+                [ MenuList.navigation { label = "Home", href = "/" }
+                ]
+            , MenuList.section
+                [ MenuList.action { label = "Sign out", item = SignOutAction }
+                ]
+            ]
+
+        _ ->
+            []
 
 
 
 -- UPDATE
 
 
-subscriptions : State -> Sub Msg
-subscriptions (State state_) =
-    Sub.map MenuListMsg (MenuList.subscriptions state_.menuListState)
+subscriptions : State -> Session -> Sub Msg
+subscriptions (State state_) sesh =
+    Sub.map MenuListMsg (MenuList.subscriptions (state_.menuListState sesh))
 
 
-update : State -> Msg -> ( State, Cmd Msg, Effect HeaderEffect )
-update state_ msg =
+update : Session -> State -> Msg -> ( State, Cmd Msg, Effect HeaderEffect )
+update sesh state_ msg =
     let
         (State s) =
             state_
@@ -503,49 +519,53 @@ update state_ msg =
         ToggleMenu ->
             let
                 menuListState =
-                    if MenuList.isShowing s.menuListState then
-                        MenuList.hide s.menuListState
+                    if MenuList.isShowing (s.menuListState sesh) then
+                        MenuList.hide (s.menuListState sesh)
 
                     else
-                        MenuList.show s.menuListState
+                        MenuList.show (s.menuListState sesh)
             in
-            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         ShowMenuAndFocusFirst ->
             let
                 menuListState =
-                    MenuList.showAndFocusFirst s.menuListState
+                    MenuList.showAndFocusFirst (s.menuListState sesh)
             in
-            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         ShowMenuAndFocusLast ->
             let
                 menuListState =
-                    MenuList.showAndFocusLast s.menuListState
+                    MenuList.showAndFocusLast (s.menuListState sesh)
             in
-            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         MenuFocusFirst ->
             let
                 menuListState =
-                    MenuList.focusFirst s.menuListState
+                    MenuList.focusFirst (s.menuListState sesh)
             in
-            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         MenuFocusLast ->
             let
                 menuListState =
-                    MenuList.focusLast s.menuListState
+                    MenuList.focusLast (s.menuListState sesh)
             in
-            ( State { s | menuListState = menuListState }, Cmd.none, Effect.none )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         HideMenu ->
-            ( State { s | menuListState = MenuList.hide s.menuListState }, Cmd.none, Effect.none )
+            let
+                menuListState =
+                    MenuList.hide (s.menuListState sesh)
+            in
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
         MenuListMsg menuListMsg ->
             let
                 ( menuListState, menuListCmd, menuListAction ) =
-                    MenuList.update menuListMsg s.menuListState
+                    MenuList.update menuListMsg (s.menuListState sesh)
 
                 effect =
                     case menuListAction of
@@ -555,4 +575,4 @@ update state_ msg =
                         Nothing ->
                             Effect.none
             in
-            ( State { s | menuListState = menuListState }, Cmd.map MenuListMsg menuListCmd, effect )
+            ( State { s | menuListState = newMenuListState menuListState }, Cmd.map MenuListMsg menuListCmd, effect )
