@@ -475,9 +475,10 @@ newMenuListState latestState =
 resolveSections : Session -> List (MenuList.Section MenuListAction)
 resolveSections sesh =
     case sesh of
-        Session.LoggedIn _ ->
+        Session.LoggedIn viewer ->
             [ MenuList.section
                 [ MenuList.navigation { label = "Home", href = "/" }
+                , MenuList.navigation { label = "Your exhibits", href = "/" ++ Viewer.getUsername viewer }
                 ]
             , MenuList.section
                 [ MenuList.action { label = "Sign out", item = SignOutAction }
