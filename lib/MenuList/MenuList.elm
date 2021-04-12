@@ -276,6 +276,7 @@ type Msg item
 
 type Actions item
     = ActionItemClicked item
+    | MenuHidden
 
 
 subscriptions : State item -> Sub (Msg item)
@@ -343,7 +344,7 @@ update msg ((State_ state_) as s) =
             ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
 
         MakeHidden _ ->
-            ( State_ { state_ | step = Hidden Nothing, focusedListItem = Nothing }, Cmd.none, Nothing )
+            ( State_ { state_ | step = Hidden Nothing, focusedListItem = Nothing }, Cmd.none, Just MenuHidden )
 
         ListItemFocused sectionIndex itemIndex ->
             ( State_ { state_ | focusedListItem = Just (FocusedListItem ( sectionIndex, itemIndex )) }, Cmd.none, Nothing )
