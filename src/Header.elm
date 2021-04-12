@@ -461,7 +461,6 @@ initState =
         , menuListState =
             \latestSession ->
                 MenuList.initialState
-                    |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
                     |> MenuList.sections
                         (resolveSections
                             latestSession
@@ -536,6 +535,7 @@ update sesh state_ msg =
             let
                 menuListState =
                     MenuList.showAndFocusFirst (s.menuListState sesh)
+                        |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
             in
             ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 
@@ -543,6 +543,7 @@ update sesh state_ msg =
             let
                 menuListState =
                     MenuList.showAndFocusLast (s.menuListState sesh)
+                        |> MenuList.setReturnFocusTarget (MenuList.returnFocusId (DummyInput.inputIdPrefix ++ menuListTriggerId))
             in
             ( State { s | menuListState = newMenuListState menuListState }, Cmd.none, Effect.none )
 

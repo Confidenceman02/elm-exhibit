@@ -103,23 +103,23 @@ type alias StateData item =
 type VisibleActions
     = FocussingFirstItem
     | FocussingLastItem
-    | BecomingInvisible
+    | BecomingHidden
 
 
-type InvisibleActions
+type HiddenActions
     = BecomingVisible
 
 
 type Step
     = Visible (Maybe VisibleActions)
-    | Invisible (Maybe InvisibleActions)
+    | Hidden (Maybe HiddenActions)
     | Batched (List Step)
 
 
 initialState : State item
 initialState =
     State_
-        { step = Invisible Nothing
+        { step = Hidden Nothing
         , returnFocusTarget = Nothing
         , focusedListItem = Nothing
         , sections = []
@@ -270,7 +270,7 @@ state s (Config config) =
 type Msg item
     = None
     | MakeVisible Time.Posix
-    | MakeInvisible Time.Posix
+    | MakeHidden Time.Posix
     | ListItemFocused Int Int
     | ActionItemClicked_ item
     | EscapeKeyDowned
@@ -323,12 +323,12 @@ browserEventSubscriptions ((State_ state_) as s) =
 stepSubscriptions : State item -> Sub (Msg item)
 stepSubscriptions (State_ s) =
     case s.step of
-        Invisible (Just BecomingVisible) ->
+        Hidden (Just BecomingVisible) ->
             -- We are not worrying about animation at the moment, just make visible
             BrowserEvents.onAnimationFrame MakeVisible
 
-        Visible (Just BecomingInvisible) ->
-            BrowserEvents.onAnimationFrame MakeInvisible
+        Visible (Just BecomingHidden) ->
+            BrowserEvents.onAnimationFrame MakeHidden
 
         Visible (Just FocussingFirstItem) ->
             BrowserEvents.onAnimationFrame FocusFirstItem
@@ -349,8 +349,8 @@ update msg ((State_ state_) as s) =
         MakeVisible _ ->
             ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
 
-        MakeInvisible _ ->
-            ( State_ { state_ | step = Invisible Nothing, focusedListItem = Nothing }, Cmd.none, Nothing )
+        MakeHidden _ ->
+            ( State_ { state_ | step = Hidden Nothing, focusedListItem = Nothing }, Cmd.none, Nothing )
 
         ListItemFocused sectionIndex itemIndex ->
             ( State_ { state_ | focusedListItem = Just (FocusedListItem ( sectionIndex, itemIndex )) }, Cmd.none, Nothing )
@@ -365,7 +365,7 @@ update msg ((State_ state_) as s) =
                         _ ->
                             Cmd.none
             in
-            ( State_ { state_ | step = Visible (Just BecomingInvisible) }, withReturnFocusTarget, Nothing )
+            ( State_ { state_ | step = Visible (Just BecomingHidden) }, withReturnFocusTarget, Nothing )
 
         DownArrowKeyDowned ->
             case state_.focusedListItem of
@@ -442,16 +442,16 @@ update msg ((State_ state_) as s) =
                     case steps of
                         [] ->
                             -- TODO: Handle more gracefully.
-                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+                            ( State_ { state_ | step = Hidden Nothing }, Cmd.none, Nothing )
 
-                        (Invisible (Just BecomingVisible)) :: [] ->
+                        (Hidden (Just BecomingVisible)) :: [] ->
                             ( State_ { state_ | step = Visible Nothing }, Cmd.none, Nothing )
 
-                        (Invisible Nothing) :: [] ->
-                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+                        (Hidden Nothing) :: [] ->
+                            ( State_ { state_ | step = Hidden Nothing }, Cmd.none, Nothing )
 
-                        (Visible (Just BecomingInvisible)) :: [] ->
-                            ( State_ { state_ | step = Invisible Nothing }, Cmd.none, Nothing )
+                        (Visible (Just BecomingHidden)) :: [] ->
+                            ( State_ { state_ | step = Hidden Nothing }, Cmd.none, Nothing )
 
                         (Visible (Just FocussingFirstItem)) :: [] ->
                             let
@@ -491,13 +491,13 @@ update msg ((State_ state_) as s) =
                         (Batched st) :: [] ->
                             ( State_ { state_ | step = Batched st }, Cmd.none, Nothing )
 
-                        (Invisible (Just BecomingVisible)) :: rest ->
+                        (Hidden (Just BecomingVisible)) :: rest ->
                             ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
 
-                        (Invisible Nothing) :: rest ->
+                        (Hidden Nothing) :: rest ->
                             ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
 
-                        (Visible (Just BecomingInvisible)) :: rest ->
+                        (Visible (Just BecomingHidden)) :: rest ->
                             ( State_ { state_ | step = Batched rest }, Cmd.none, Nothing )
 
                         --TODO: Focus first item.
@@ -580,7 +580,7 @@ view (Config config) =
         Visible _ ->
             menu
 
-        Invisible (Just BecomingVisible) ->
+        Hidden (Just BecomingVisible) ->
             menu
 
         Batched batchedSteps ->
@@ -593,10 +593,10 @@ view (Config config) =
                         (Visible _) :: _ ->
                             menu
 
-                        (Invisible (Just BecomingVisible)) :: _ ->
+                        (Hidden (Just BecomingVisible)) :: _ ->
                             menu
 
-                        (Invisible Nothing) :: _ ->
+                        (Hidden Nothing) :: _ ->
                             text ""
 
                         (Batched st) :: _ ->
@@ -604,7 +604,7 @@ view (Config config) =
             in
             resolveView batchedSteps
 
-        Invisible Nothing ->
+        Hidden Nothing ->
             text ""
 
 
@@ -700,7 +700,7 @@ renderCustomAction customActionConfig =
 -}
 show : State item -> State item
 show (State_ s) =
-    State_ { s | step = Invisible (Just BecomingVisible) }
+    State_ { s | step = Hidden (Just BecomingVisible) }
 
 
 {-|
@@ -750,11 +750,11 @@ showAndFocusFirst ((State_ state_) as s) =
         Visible Nothing ->
             State_ { state_ | step = Visible (Just FocussingFirstItem) }
 
-        (Invisible (Just BecomingVisible)) as currentStep ->
+        (Hidden (Just BecomingVisible)) as currentStep ->
             State_ { state_ | step = Batched [ currentStep, Visible (Just FocussingFirstItem) ] }
 
-        Invisible Nothing ->
-            State_ { state_ | step = Batched [ Invisible (Just BecomingVisible), Visible (Just FocussingFirstItem) ] }
+        Hidden Nothing ->
+            State_ { state_ | step = Batched [ Hidden (Just BecomingVisible), Visible (Just FocussingFirstItem) ] }
 
         _ ->
             s
@@ -773,11 +773,11 @@ showAndFocusLast ((State_ state_) as s) =
         Visible Nothing ->
             State_ { state_ | step = Visible (Just FocussingLastItem) }
 
-        (Invisible (Just BecomingVisible)) as currentStep ->
+        (Hidden (Just BecomingVisible)) as currentStep ->
             State_ { state_ | step = Batched [ currentStep, Visible (Just FocussingLastItem) ] }
 
-        Invisible Nothing ->
-            State_ { state_ | step = Batched [ Invisible (Just BecomingVisible), Visible (Just FocussingLastItem) ] }
+        Hidden Nothing ->
+            State_ { state_ | step = Batched [ Hidden (Just BecomingVisible), Visible (Just FocussingLastItem) ] }
 
         _ ->
             s
@@ -787,11 +787,11 @@ hide : State item -> State item
 hide ((State_ state_) as s) =
     case state_.step of
         Visible _ ->
-            State_ { state_ | step = Visible (Just BecomingInvisible) }
+            State_ { state_ | step = Visible (Just BecomingHidden) }
 
         _ ->
             --TODO: Handle more gracefully as it will immediately go invisible.
-            State_ { state_ | step = Invisible Nothing }
+            State_ { state_ | step = Hidden Nothing }
 
 
 {-|
@@ -805,7 +805,7 @@ isShowing (State_ s) =
         Visible Nothing ->
             True
 
-        Invisible (Just BecomingVisible) ->
+        Hidden (Just BecomingVisible) ->
             True
 
         _ ->
