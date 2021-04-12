@@ -160,13 +160,6 @@ type ListItem item
     | Action (ActionConfiguration item)
 
 
-type alias BaseConfiguration =
-    { tag : String
-    , styles : List Css.Style
-    , content : String
-    }
-
-
 type alias CustomActionConfiguration item base =
     { base
         | item : item
@@ -674,16 +667,6 @@ renderSection styling sectionCounts sectionIndex (Section menuItems) accumViews 
     buildViews menuItems [] 0
         ++ withDivider
         ++ accumViews
-
-
-renderBaseConfiguration : BaseConfiguration -> Styled.Html (Msg item)
-renderBaseConfiguration customNavConfig =
-    Styled.node customNavConfig.tag [ StyledAttribs.css customNavConfig.styles ] [ text customNavConfig.content ]
-
-
-renderCustomAction : CustomActionConfiguration item BaseConfiguration -> Styled.Html (Msg item)
-renderCustomAction customActionConfig =
-    Styled.node customActionConfig.tag [ StyledAttribs.css customActionConfig.styles ] [ text customActionConfig.content ]
 
 
 
