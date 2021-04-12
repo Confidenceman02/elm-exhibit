@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes";
 import { UserSession } from "./redis/schema";
-import { Response } from "node-fetch";
 
 export type NoIdea = { tag: "KeineAhnung" };
 
@@ -23,13 +22,15 @@ export type SessionErrorBody =
   | { tag: "MissingCookie" }
   | NoIdea;
 
+export type ExhibitsErrorBody = NoIdea;
+
 export type SessionSuccessBody =
   | { tag: "SessionRefreshed"; session: UserSession }
   | { tag: "Redirecting"; location: string }
   | { tag: "SessionGranted"; session: UserSession }
   | { tag: "SessionDestroyed" };
 
-export type ErrorBody = ExampleErrorBody | SessionErrorBody;
+export type ErrorBody = ExampleErrorBody | SessionErrorBody | ExhibitsErrorBody;
 
 export type SuccessBody = SessionSuccessBody | ExampleSuccessBody;
 

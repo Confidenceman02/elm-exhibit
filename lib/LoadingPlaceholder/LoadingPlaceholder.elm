@@ -1,9 +1,10 @@
-module LoadingPlaceholder.LoadingPlaceholder exposing (animated, colorVariant, default, size, view, width)
+module LoadingPlaceholder.LoadingPlaceholder exposing (Margin(..), Size(..), animated, colorVariant, default, marginBottom, size, view, width)
 
 import Css
 import Css.Animations as CssAnimation
 import Html.Styled as Styled exposing (div)
 import Html.Styled.Attributes as StyledAttribs
+import Styles.Spacing exposing (exSpacingMd)
 
 
 type Config
@@ -12,6 +13,13 @@ type Config
 
 type Size
     = Normal
+    | Tall
+    | TallXl
+
+
+type Margin
+    = DefaultMargin
+    | Custom Float
 
 
 type ColorVariant
@@ -23,7 +31,7 @@ type alias Configuration =
     , colorVariant : ColorVariant
     , size : Size
     , width : Float
-    , marginBottom : Bool
+    , marginBottom : Margin
     }
 
 
@@ -38,7 +46,7 @@ defaults =
     , colorVariant = Default
     , size = Normal
     , width = 100
-    , marginBottom = True
+    , marginBottom = DefaultMargin
     }
 
 
@@ -49,6 +57,11 @@ defaults =
 animated : Bool -> Config -> Config
 animated value (Config config) =
     Config { config | animated = value }
+
+
+marginBottom : Margin -> Config -> Config
+marginBottom m (Config config) =
+    Config { config | marginBottom = m }
 
 
 colorVariant : ColorVariant -> Config -> Config
@@ -99,6 +112,12 @@ withSizeStyles config =
         Normal ->
             [ Css.height (Css.px 15) ]
 
+        Tall ->
+            [ Css.height (Css.px 20) ]
+
+        TallXl ->
+            [ Css.height (Css.px 43) ]
+
 
 withWidthStyles : Configuration -> List Css.Style
 withWidthStyles config =
@@ -107,11 +126,12 @@ withWidthStyles config =
 
 withMarginBottomStyles : Configuration -> List Css.Style
 withMarginBottomStyles config =
-    if config.marginBottom then
-        [ Css.marginBottom (Css.px 24) ]
+    case config.marginBottom of
+        DefaultMargin ->
+            [ Css.marginBottom exSpacingMd ]
 
-    else
-        []
+        Custom f ->
+            [ Css.marginBottom (Css.px f) ]
 
 
 withAnimationStyles : Configuration -> List Css.Style

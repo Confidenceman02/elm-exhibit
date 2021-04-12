@@ -108,6 +108,7 @@ export async function createUser(
     PermanentDBTag.User,
     gitUser.id.toString()
   );
+  // user reference stores a git user id and a pointer to the user table. Handy for complex queries.
   const setUserReference = await client.ZADDAsync(
     Table.users,
     gitUser.id,

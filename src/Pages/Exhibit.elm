@@ -13,7 +13,7 @@ import Css as Css
 import Effect as Effect
 import Example as Example exposing (Example)
 import Header as Header
-import Html.Styled as Styled exposing (Attribute, div, h2, li, span, text, ul)
+import Html.Styled as Styled exposing (Attribute, div, h2, li, main_, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
@@ -378,7 +378,7 @@ sliderRight model =
 
 stageWrapper : List (Styled.Html msg) -> Styled.Html msg
 stageWrapper content =
-    div
+    main_
         [ StyledAttribs.css
             [ Css.top (Css.px 0)
             , Css.bottom (Css.px 0)
