@@ -458,14 +458,18 @@ initState : State
 initState =
     State
         { menu = Idle
-        , menuListState =
-            \latestSession ->
-                MenuList.initialState
-                    |> MenuList.sections
-                        (resolveSections
-                            latestSession
-                        )
+        , menuListState = initialMenuListState
         }
+
+
+initialMenuListState : Session -> MenuList.State MenuListAction
+initialMenuListState =
+    \latestSession ->
+        MenuList.initialState
+            |> MenuList.sections
+                (resolveSections
+                    latestSession
+                )
 
 
 newMenuListState : MenuList.State MenuListAction -> Session -> MenuList.State MenuListAction
@@ -573,12 +577,15 @@ update sesh state_ msg =
                 ( menuListState, menuListCmd, menuListAction ) =
                     MenuList.update menuListMsg (s.menuListState sesh)
 
-                effect =
+                ( updatedMenuListState, effect ) =
                     case menuListAction of
                         Just (ActionItemClicked SignOutAction) ->
-                            Effect.single SignOutEffect
+                            ( newMenuListState menuListState, Effect.single SignOutEffect )
+
+                        Just MenuHidden ->
+                            ( initialMenuListState, Effect.none )
 
                         Nothing ->
-                            Effect.none
+                            ( newMenuListState menuListState, Effect.none )
             in
-            ( State { s | menuListState = newMenuListState menuListState }, Cmd.map MenuListMsg menuListCmd, effect )
+            ( State { s | menuListState = updatedMenuListState }, Cmd.map MenuListMsg menuListCmd, effect )
