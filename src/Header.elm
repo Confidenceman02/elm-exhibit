@@ -28,7 +28,7 @@ import EventsExtra
 import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
-import Html.Styled.Extra exposing (viewIf, viewMaybe)
+import Html.Styled.Extra exposing (viewIf)
 import MenuList.MenuList as MenuList exposing (Actions(..))
 import Package exposing (Package)
 import Session exposing (Session)
@@ -147,10 +147,6 @@ state s (Config config) =
 
 view : Config -> Session -> Styled.Html Msg
 view (Config config) session =
-    let
-        (State s) =
-            config.state
-    in
     div
         [ StyledAttribs.css
             [ Css.width <| Css.calc (Css.pct 100) Css.minus (Css.px 40)
@@ -179,14 +175,18 @@ sessionActionView (State state_) sesh =
             if Session.isGuest sesh || Session.isLoggingIn sesh then
                 span [ StyledAttribs.css [ Css.color exColorWhite, Css.marginRight Grid.halfGrid ] ]
                     [ Heading.view (Heading.h5 |> Heading.inline True)
-                        (if Session.isGuest sesh then
-                            "Continue with Github"
+                        (case sesh of
+                            Session.Guest ->
+                                "Continue with Github"
 
-                         else if Session.isLoggingIn sesh then
-                            "Logging in"
+                            Session.LoggingIn ->
+                                "Logging in"
 
-                         else
-                            ""
+                            Session.Failed ->
+                                "Continue with Github"
+
+                            _ ->
+                                ""
                         )
                     ]
 
@@ -194,14 +194,18 @@ sessionActionView (State state_) sesh =
                 text ""
 
         withSessionAction config =
-            if Session.isLoggedIn sesh then
-                Button.onClick SignOut config
+            case sesh of
+                Session.LoggedIn _ ->
+                    Button.onClick SignOut config
 
-            else if Session.isGuest sesh then
-                Button.onClick SignIn config
+                Session.Guest ->
+                    Button.onClick SignIn config
 
-            else
-                config
+                Session.Failed ->
+                    Button.onClick SignIn config
+
+                _ ->
+                    config
 
         menuListShowing =
             MenuList.isShowing (state_.menuListState sesh)
