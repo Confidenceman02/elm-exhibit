@@ -16,6 +16,7 @@ import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf, viewMaybe)
+import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Markdown as Markdown
 import Package exposing (Package)
 import Pages.Interstitial.Interstitial as InterstitialPage
@@ -23,6 +24,7 @@ import Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exC
 import Styles.Common as CommonStyles
 import Styles.Font as Font
 import Styles.Grid as Grid
+import Styles.Spacing exposing (exSpacingSm)
 import Styles.Transition as Transition
 import Svg.Styled.Attributes as SvgStyledAttribs
 
@@ -310,15 +312,6 @@ animatedBuildingView example =
 
 sliderLeft : Model -> Styled.Html Msg
 sliderLeft model =
-    let
-        maybeExamples =
-            case model.examples of
-                Loaded examples ->
-                    Just examples
-
-                _ ->
-                    Nothing
-    in
     div
         [ StyledAttribs.css
             ([ Css.width (Css.pct sliderLeftWidth)
@@ -327,7 +320,7 @@ sliderLeft model =
                 ++ commonSliderStyles
             )
         ]
-        [ viewMaybe exampleList maybeExamples ]
+        [ examplesList model.examples ]
 
 
 sliderRight : Model -> Styled.Html Msg
@@ -397,11 +390,30 @@ stageWrapper content =
         content
 
 
-exampleList : ( SelectedExample, List Example ) -> Styled.Html Msg
-exampleList ( selectedExample, examples ) =
+examplesList : Status ( SelectedExample, List Example ) -> Styled.Html Msg
+examplesList examples =
     let
         paddingCalc =
             (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
+
+        renderExampleSelector =
+            case examples of
+                Loaded ( se, e ) ->
+                    ul []
+                        (List.map
+                            (exampleSelector se)
+                            e
+                        )
+
+                _ ->
+                    div [ StyledAttribs.css [ Css.paddingRight (Css.px 10), Css.width (Css.px 120), Css.display Css.inlineBlock, Css.marginTop exSpacingSm ] ]
+                        [ LoadingPlaceholder.view LoadingPlaceholder.default
+                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        ]
     in
     div [ StyledAttribs.css [ Css.textAlign Css.right, Css.margin4 (Grid.calc Grid.grid Grid.divide 1.25) (Css.px 0) (Css.px 0) (Css.px 0) ] ]
         [ h2
@@ -412,11 +424,7 @@ exampleList ( selectedExample, examples ) =
                 ]
             ]
             [ text "Examples" ]
-        , ul []
-            (List.map
-                (exampleSelector selectedExample)
-                examples
-            )
+        , renderExampleSelector
         ]
 
 
