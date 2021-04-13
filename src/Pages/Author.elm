@@ -79,7 +79,34 @@ loadingView =
         , LoadingPlaceholder.view
             (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
                 |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
+                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 40)
             )
+        , div [ StyledAttribs.css [ Css.property "display" "grid", Css.property "grid-template-columns" "repeat(auto-fill, 300px)", Css.property "grid-gap" "10px", Css.justifyContent Css.spaceBetween ] ]
+            [ div []
+                [ LoadingPlaceholder.view
+                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+                , LoadingPlaceholder.view
+                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                ]
+            , div []
+                [ LoadingPlaceholder.view
+                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+                , LoadingPlaceholder.view
+                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                ]
+            , div []
+                [ LoadingPlaceholder.view
+                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+                , LoadingPlaceholder.view
+                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                ]
+            , div []
+                [ LoadingPlaceholder.view
+                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+                , LoadingPlaceholder.view
+                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                ]
+            ]
         ]
 
 
