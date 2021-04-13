@@ -2,7 +2,6 @@ module Components.Indicator exposing (Orientation(..), view)
 
 import Css
 import Html.Styled as Styled
-import Styles.Color exposing (exColorOfficialDarkBlue)
 import Styles.Transition as Transition
 import Svg.Styled exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttribs exposing (d, fill, height, viewBox)

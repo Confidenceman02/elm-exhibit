@@ -5,7 +5,7 @@ import Context exposing (Context)
 import Css
 import Effect
 import Header
-import Html.Styled as Styled exposing (div, main_, text)
+import Html.Styled as Styled exposing (div, main_)
 import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Styles.Spacing exposing (exSpacingXxl)
@@ -70,8 +70,16 @@ mainContentWrapper =
 loadingView : Styled.Html msg
 loadingView =
     div [ StyledAttribs.css [ Css.width (Css.pct 100) ] ]
-        [ LoadingPlaceholder.view (LoadingPlaceholder.default |> LoadingPlaceholder.size LoadingPlaceholder.Tall |> LoadingPlaceholder.width 20 |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 40))
-        , LoadingPlaceholder.view (LoadingPlaceholder.default |> LoadingPlaceholder.size LoadingPlaceholder.TallXl |> LoadingPlaceholder.width 100)
+        [ LoadingPlaceholder.view
+            (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                |> LoadingPlaceholder.height LoadingPlaceholder.Tall
+                |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 20)
+                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 40)
+            )
+        , LoadingPlaceholder.view
+            (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
+                |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
+            )
         ]
 
 

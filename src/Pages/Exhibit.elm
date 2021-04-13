@@ -15,7 +15,7 @@ import Example as Example exposing (Example)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, main_, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
-import Html.Styled.Extra exposing (viewIf, viewMaybe)
+import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Markdown as Markdown
 import Package exposing (Package)
@@ -407,12 +407,12 @@ examplesList examples =
 
                 _ ->
                     div [ StyledAttribs.css [ Css.paddingRight (Css.px 10), Css.width (Css.px 120), Css.display Css.inlineBlock, Css.marginTop exSpacingSm ] ]
-                        [ LoadingPlaceholder.view LoadingPlaceholder.default
-                        , LoadingPlaceholder.view LoadingPlaceholder.default
-                        , LoadingPlaceholder.view LoadingPlaceholder.default
-                        , LoadingPlaceholder.view LoadingPlaceholder.default
-                        , LoadingPlaceholder.view LoadingPlaceholder.default
-                        , LoadingPlaceholder.view LoadingPlaceholder.default
+                        [ LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                        , LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                        , LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                        , LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                        , LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+                        , LoadingPlaceholder.view <| LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
                         ]
     in
     div [ StyledAttribs.css [ Css.textAlign Css.right, Css.margin4 (Grid.calc Grid.grid Grid.divide 1.25) (Css.px 0) (Css.px 0) (Css.px 0) ] ]

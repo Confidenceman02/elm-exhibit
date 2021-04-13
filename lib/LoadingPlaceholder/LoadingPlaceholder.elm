@@ -1,4 +1,17 @@
-module LoadingPlaceholder.LoadingPlaceholder exposing (Margin(..), Size(..), animated, colorVariant, default, marginBottom, size, view, width)
+module LoadingPlaceholder.LoadingPlaceholder exposing
+    ( Height(..)
+    , MarginBottom(..)
+    , Width(..)
+    , animated
+    , block
+    , borderRadius
+    , colorVariant
+    , defaultBlock
+    , height
+    , marginBottom
+    , view
+    , width
+    )
 
 import Css
 import Css.Animations as CssAnimation
@@ -8,16 +21,21 @@ import Styles.Spacing exposing (exSpacingMd)
 
 
 type Config
-    = Config Configuration
+    = Config ( BaseConfiguration, Variant )
 
 
-type Size
+type Variant
+    = Block BlockConfig
+
+
+type Height
     = Normal
     | Tall
     | TallXl
+    | CustomHeight Float
 
 
-type Margin
+type MarginBottom
     = DefaultMargin
     | Custom Float
 
@@ -26,28 +44,50 @@ type ColorVariant
     = Default
 
 
-type alias Configuration =
+type Width
+    = Pct Float
+    | Rem Float
+    | Px Float
+
+
+type alias BaseConfiguration =
     { animated : Bool
     , colorVariant : ColorVariant
-    , size : Size
-    , width : Float
-    , marginBottom : Margin
+    , height : Height
+    , width : Width
+    , marginBottom : MarginBottom
     }
 
 
-default : Config
-default =
-    Config defaults
+type alias BlockConfiguration =
+    { borderRadius : Float
+    }
 
 
-defaults : Configuration
-defaults =
+defaultBaseConfiguration : BaseConfiguration
+defaultBaseConfiguration =
     { animated = True
     , colorVariant = Default
-    , size = Normal
-    , width = 100
+    , height = Normal
+    , width = Pct 100
     , marginBottom = DefaultMargin
     }
+
+
+defaultBlock : BlockConfig
+defaultBlock =
+    BlockConfig
+        { borderRadius = 21
+        }
+
+
+type BlockConfig
+    = BlockConfig BlockConfiguration
+
+
+block : BlockConfig -> Config
+block blockConfig =
+    Config ( defaultBaseConfiguration, Block blockConfig )
 
 
 
@@ -55,28 +95,33 @@ defaults =
 
 
 animated : Bool -> Config -> Config
-animated value (Config config) =
-    Config { config | animated = value }
+animated value (Config ( base, variant )) =
+    Config ( { base | animated = value }, variant )
 
 
-marginBottom : Margin -> Config -> Config
-marginBottom m (Config config) =
-    Config { config | marginBottom = m }
+marginBottom : MarginBottom -> Config -> Config
+marginBottom m (Config ( base, variant )) =
+    Config ( { base | marginBottom = m }, variant )
 
 
 colorVariant : ColorVariant -> Config -> Config
-colorVariant value (Config config) =
-    Config { config | colorVariant = value }
+colorVariant value (Config ( base, variant )) =
+    Config ( { base | colorVariant = value }, variant )
 
 
-size : Size -> Config -> Config
-size value (Config config) =
-    Config { config | size = value }
+height : Height -> Config -> Config
+height value (Config ( base, variant )) =
+    Config ( { base | height = value }, variant )
 
 
-width : Float -> Config -> Config
-width value (Config config) =
-    Config { config | width = value }
+width : Width -> Config -> Config
+width value (Config ( base, variant )) =
+    Config ( { base | width = value }, variant )
+
+
+borderRadius : Float -> BlockConfig -> BlockConfig
+borderRadius br (BlockConfig config) =
+    BlockConfig { config | borderRadius = br }
 
 
 
@@ -84,31 +129,37 @@ width value (Config config) =
 
 
 view : Config -> Styled.Html msg
-view (Config config) =
-    div
-        [ StyledAttribs.css
-            (baseStyles
-                ++ withSizeStyles config
-                ++ withWidthStyles config
-                ++ withMarginBottomStyles config
-                ++ withAnimationStyles config
-            )
-        ]
-        []
+view (Config ( base, variant )) =
+    case variant of
+        Block (BlockConfig config) ->
+            div
+                [ StyledAttribs.css
+                    (baseStyles base
+                        ++ withHeightStyles base
+                        ++ withMarginBottomStyles base
+                        ++ withAnimationStyles base
+                        ++ withWidthStyles base
+                        ++ withBlockStyles config
+                    )
+                ]
+                []
 
 
 
 -- STYLES
 
 
-baseStyles : List Css.Style
-baseStyles =
-    [ Css.borderRadius (Css.px 21), Css.backgroundColor (Css.hex "#d6d6d6") ]
+baseStyles : BaseConfiguration -> List Css.Style
+baseStyles baseConfig =
+    [ Css.backgroundColor (Css.hex "#d6d6d6")
+
+    --, Css.borderRadius (Css.px config.borderRadius)
+    ]
 
 
-withSizeStyles : Configuration -> List Css.Style
-withSizeStyles config =
-    case config.size of
+withHeightStyles : BaseConfiguration -> List Css.Style
+withHeightStyles config =
+    case config.height of
         Normal ->
             [ Css.height (Css.px 15) ]
 
@@ -118,13 +169,11 @@ withSizeStyles config =
         TallXl ->
             [ Css.height (Css.px 43) ]
 
-
-withWidthStyles : Configuration -> List Css.Style
-withWidthStyles config =
-    [ Css.width (Css.pct config.width) ]
+        CustomHeight h ->
+            [ Css.height (Css.px h) ]
 
 
-withMarginBottomStyles : Configuration -> List Css.Style
+withMarginBottomStyles : BaseConfiguration -> List Css.Style
 withMarginBottomStyles config =
     case config.marginBottom of
         DefaultMargin ->
@@ -134,7 +183,7 @@ withMarginBottomStyles config =
             [ Css.marginBottom (Css.px f) ]
 
 
-withAnimationStyles : Configuration -> List Css.Style
+withAnimationStyles : BaseConfiguration -> List Css.Style
 withAnimationStyles config =
     if config.animated then
         [ Css.animationName <| CssAnimation.keyframes [ ( 0, [ CssAnimation.opacity (Css.num 0.6) ] ), ( 50, [ CssAnimation.opacity (Css.num 1) ] ), ( 100, [ CssAnimation.opacity (Css.num 0.6) ] ) ]
@@ -144,3 +193,21 @@ withAnimationStyles config =
 
     else
         []
+
+
+withWidthStyles : BaseConfiguration -> List Css.Style
+withWidthStyles config =
+    case config.width of
+        Pct f ->
+            [ Css.width (Css.pct f) ]
+
+        Rem f ->
+            [ Css.width (Css.rem f) ]
+
+        Px f ->
+            [ Css.width (Css.px f) ]
+
+
+withBlockStyles : BlockConfiguration -> List Css.Style
+withBlockStyles config =
+    [ Css.borderRadius (Css.px config.borderRadius) ]
