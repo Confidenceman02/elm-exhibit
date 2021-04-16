@@ -84,33 +84,33 @@ loadingView =
             (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
                 |> LoadingPlaceholder.height LoadingPlaceholder.Tall
                 |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 20)
-                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 40)
+                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
             )
         , LoadingPlaceholder.view
             (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
                 |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
-                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 40)
+                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
             )
         , div [ StyledAttribs.css [ Css.property "display" "grid", Css.property "grid-template-columns" "repeat(auto-fill, 300px)", Css.property "grid-gap" "10px", Css.justifyContent Css.spaceBetween ] ]
-            [ div []
+            [ exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
                     (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
                 ]
-            , div []
+            , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
                     (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
                 ]
-            , div []
+            , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
                     (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
                 ]
-            , div []
+            , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
@@ -118,6 +118,11 @@ loadingView =
                 ]
             ]
         ]
+
+
+exhibitContainer : List (Styled.Html msg) -> Styled.Html msg
+exhibitContainer content =
+    div [ StyledAttribs.css [ Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center ] ] content
 
 
 
