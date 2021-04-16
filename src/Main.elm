@@ -79,10 +79,10 @@ changeRouteTo maybeRoute context =
 
         Just (Route.Author author) ->
             let
-                model =
+                ( model, cmds ) =
                     AuthorPage.init author context
             in
-            ( Author model, Cmd.none )
+            ( Author model, Cmd.map GotAuthorMsg cmds )
 
         Just Route.Home ->
             let

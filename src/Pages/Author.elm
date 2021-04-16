@@ -31,12 +31,22 @@ type alias Model =
     }
 
 
-init : Author -> Context -> Model
+init : Author -> Context -> ( Model, Cmd Msg )
 init author context =
-    { context = context
-    , author = author
-    , headerState = Header.initState
-    }
+    ( { context = context
+      , author = author
+      , headerState = Header.initState
+      }
+    , Cmd.none
+    )
+
+
+type Status a
+    = StatusIdle
+    | Loading
+    | LoadingSlowly
+    | Loaded a
+    | Failed
 
 
 view : Model -> { title : String, content : Styled.Html msg }
