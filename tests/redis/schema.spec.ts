@@ -4,6 +4,7 @@ import {
   RedisHValue,
   User,
   UserSession,
+  redisUserIdToUserId,
 } from "../../functions/redis/schema";
 import { expect } from "chai";
 import { Status } from "../../lib/result";
@@ -47,6 +48,28 @@ describe("schema", () => {
         userId: 1234,
         avatarUrl: "www.bs.com",
         sessionId: "sessionId123",
+      });
+    });
+  });
+  describe("redisUserIdToUserId", () => {
+    it("should return a user id", () => {
+      const username = "1234";
+      expect(redisUserIdToUserId(username)).to.deep.eq({
+        Status: Status.Ok,
+        data: 1234,
+      });
+    });
+    it("should return error result when null", () => {
+      const username = null;
+      expect(redisUserIdToUserId(username)).to.deep.eq({
+        Status: Status.Err,
+      });
+    });
+    it("should return error result when string is NaN", () => {
+      // javascript considers "NaN" a number.. FFS!
+      const username = "NaN";
+      expect(redisUserIdToUserId(username)).to.deep.eq({
+        Status: Status.Err,
       });
     });
   });

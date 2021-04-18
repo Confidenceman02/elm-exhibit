@@ -28,7 +28,7 @@ export type RedisHValue<T> = {
   [P in keyof T]: string;
 };
 
-export const Table = { users: "users" };
+export const Table = { users: "users", exhibits: "exhibits" };
 
 export function redisReturnValueToUser(
   redisReturnValue: RedisReturnType<RedisHValue<User>>
@@ -41,7 +41,7 @@ export function redisReturnValueToUser(
       accessToken: redisReturnValue.accessToken,
     });
   }
-  return Result<User>().Err;
+  return Result().Err;
 }
 
 export function redisValueToUserSession(
@@ -53,4 +53,26 @@ export function redisValueToUserSession(
     avatarUrl: redisValue.avatarUrl,
     sessionId: redisValue.sessionId,
   };
+}
+
+export function redisUserIdToUserId(
+  redisValue: RedisReturnType<string>
+): ResultType<number> {
+  if (redisValue !== null) {
+    const parsedId = parseInt(redisValue);
+    if (typeof parsedId !== "number" || parsedId !== Number(parsedId)) {
+      return Result<null>().Err;
+    }
+    return Result<number>().Ok(parsedId);
+  }
+  return Result().Err;
+}
+
+export function redisValueToValueResult<T>(
+  redisValue: RedisReturnType<T>
+): ResultType<T> {
+  if (redisValue !== null) {
+    return Result<T>().Ok(redisValue);
+  }
+  return Result().Err;
 }

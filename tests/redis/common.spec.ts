@@ -1,35 +1,36 @@
 import {
-  generateExpirableDBKey,
-  generatePermanentDBKey,
+  generateExhibitKey,
+  generateSessionKey,
+  generateTempSessionKey,
+  generateUserKey,
   resolveExpiration,
 } from "../../functions/redis/common";
 import { expect } from "chai";
 import { ExpirableDBTag, PermanentDBTag } from "../../functions/redis/types";
 
-describe("generateExpirableDBKey", () => {
-  context("TempSession", () => {
-    it("should generate a temporary session key", () => {
-      expect(generateExpirableDBKey(ExpirableDBTag.TempSession, "1234")).to.eq(
-        "1234.tempsession"
-      );
-    });
-  });
-  context("Session", () => {
-    it("should generate a session key", () => {
-      expect(generateExpirableDBKey(ExpirableDBTag.Session, "1234")).to.eq(
-        "1234.session"
-      );
-    });
+describe("generateUserKey", () => {
+  it("should generate a user key", () => {
+    expect(generateUserKey(12345)).to.eq("12345.user");
   });
 });
 
-describe("generatePermanentDBKey", () => {
-  context("User", () => {
-    it("should generate a user key", () => {
-      expect(generatePermanentDBKey(PermanentDBTag.User, "12345")).to.eq(
-        "12345.user"
-      );
-    });
+describe("generateExhibitKey", () => {
+  it("generate exhibit keyp", () => {
+    expect(generateExhibitKey("Confidenceman02", "elm-animate-height")).to.eq(
+      "Confidenceman02.elm-animate-height.exhibit"
+    );
+  });
+});
+
+describe("generateSessionKey", () => {
+  it("generate session key", () => {
+    expect(generateSessionKey("12-34")).to.eq("12-34.session");
+  });
+});
+
+describe("generateTempSessionKey", () => {
+  it("generate temporary session key", () => {
+    expect(generateTempSessionKey("12-34")).to.eq("12-34.tempSession");
   });
 });
 

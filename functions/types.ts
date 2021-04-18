@@ -53,6 +53,10 @@ export interface Example {
   description: string;
 }
 
+export interface Exhibit {
+  name: string;
+}
+
 export type GithubUserData = {
   login: string;
   id: number;

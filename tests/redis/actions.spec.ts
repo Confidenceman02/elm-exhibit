@@ -11,6 +11,10 @@ import {
   initTempSession,
   tempSessionExists,
   userExists,
+  getUserIdByUsername,
+  getExhibitReferencesByUserId,
+  getUsernameByUserId,
+  createExhibitReference,
 } from "../../functions/redis/actions";
 import { TempSession } from "../../functions/redis/types";
 import { GithubLoginData, GithubUserData } from "../../functions/types";
@@ -203,6 +207,120 @@ describe("actions", () => {
       const sessionDestroyed = await destroySession("session123", client);
 
       expect(sessionDestroyed).to.be.true;
+    });
+  });
+  describe("getUserIdByUsername", () => {
+    it("should return Ok userId result", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const loginData: GithubLoginData = {
+        access_token: "token 1234",
+      };
+      await createUser(gitUserData, loginData, client);
+      const userIdResult = await getUserIdByUsername("Confidenceman02", client);
+
+      expect(userIdResult).to.deep.eq({
+        Status: Status.Ok,
+        data: 2345,
+      });
+    });
+    it("should return Err userId result", async () => {
+      const userIdResult = await getUserIdByUsername("Confidenceman02", client);
+      expect(userIdResult).to.deep.eq({
+        Status: Status.Err,
+      });
+    });
+  });
+  describe("getExhibitReferencesByUserId", () => {
+    it("should return exhibit references", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const loginData: GithubLoginData = {
+        access_token: "token 1234",
+      };
+
+      await createUser(gitUserData, loginData, client);
+      await createExhibitReference(
+        gitUserData.id,
+        "elm-animate-height",
+        client
+      );
+      await createExhibitReference(gitUserData.id, "elm-select", client);
+
+      const exhibitReferences = await getExhibitReferencesByUserId(
+        gitUserData.id,
+        client
+      );
+      expect(exhibitReferences).to.deep.eq({
+        Status: Status.Ok,
+        data: [
+          "Confidenceman02.elm-animate-height.exhibit",
+          "Confidenceman02.elm-select.exhibit",
+        ],
+      });
+    });
+    it("should return no exhibit references", async () => {
+      const userReferences = await getExhibitReferencesByUserId(1, client);
+      expect(userReferences).to.deep.eq({
+        Status: Status.Ok,
+        data: [],
+      });
+    });
+  });
+  describe("createExhibitReference", () => {
+    it("should create a exhibit reference", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const loginData: GithubLoginData = {
+        access_token: "token 1234",
+      };
+
+      await createUser(gitUserData, loginData, client);
+      const exhibitReferenceCreated = await createExhibitReference(
+        2345,
+        "someExhibit",
+        client
+      );
+
+      expect(exhibitReferenceCreated).to.be.true;
+    });
+    it("should not create an exhibit reference without a created user", async () => {
+      const userReferenceCreated = await createExhibitReference(
+        1,
+        "elm-animate-height",
+        client
+      );
+
+      expect(userReferenceCreated).to.be.false;
+    });
+  });
+  describe("getUsernameByUserId", () => {
+    it("should get a user name", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const loginData: GithubLoginData = {
+        access_token: "token 1234",
+      };
+
+      await createUser(gitUserData, loginData, client);
+      const username = await getUsernameByUserId(2345, client);
+
+      expect(username).to.deep.eq({
+        Status: Status.Ok,
+        data: "Confidenceman02",
+      });
     });
   });
 });

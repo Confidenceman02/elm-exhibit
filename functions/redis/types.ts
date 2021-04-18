@@ -4,6 +4,7 @@ export type DBTag = PermanentDBTag | ExpirableDBTag;
 
 export enum PermanentDBTag {
   User,
+  Exhibit,
 }
 
 export enum ExpirableDBTag {
