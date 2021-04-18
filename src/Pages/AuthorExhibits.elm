@@ -4,8 +4,9 @@ import Author exposing (Author)
 import Context exposing (Context)
 import Css
 import Effect
+import Exhibit exposing (Exhibit, ExhibitError, fetchAuthorExhibits)
 import Header
-import Html.Styled as Styled exposing (div, main_)
+import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Styles.Spacing exposing (exSpacingXxl)
@@ -13,6 +14,7 @@ import Styles.Spacing exposing (exSpacingXxl)
 
 type Msg
     = HeaderMsg Header.Msg
+    | CompletedLoadExhibits (Result ExhibitError (List Exhibit))
 
 
 toHeaderMsg : Header.Msg -> Msg
@@ -27,6 +29,7 @@ type Effect
 type alias Model =
     { context : Context
     , author : Author
+    , exhibits : Status ExhibitError (List Exhibit)
     , headerState : Header.State
     }
 
@@ -35,18 +38,19 @@ init : Author -> Context -> ( Model, Cmd Msg )
 init author context =
     ( { context = context
       , author = author
+      , exhibits = Loading
       , headerState = Header.initState
       }
-    , Cmd.none
+    , fetchAuthorExhibits CompletedLoadExhibits author
     )
 
 
-type Status a
+type Status error success
     = StatusIdle
     | Loading
     | LoadingSlowly
-    | Loaded a
-    | Failed
+    | Loaded success
+    | Failed error
 
 
 view : Model -> { title : String, content : Styled.Html msg }
@@ -55,12 +59,12 @@ view model =
     , content =
         main_
             []
-            [ mainContentWrapper ]
+            [ mainContentWrapper model ]
     }
 
 
-mainContentWrapper : Styled.Html msg
-mainContentWrapper =
+mainContentWrapper : Model -> Styled.Html msg
+mainContentWrapper model =
     div
         [ StyledAttribs.css
             [ Css.displayFlex
@@ -73,51 +77,65 @@ mainContentWrapper =
             , Css.flexGrow (Css.int 0)
             ]
         ]
-        [ loadingView
+        [ exhibitsContainer
+            (case model.exhibits of
+                Loading ->
+                    loadingView
+
+                Failed e ->
+                    [ text "FAILED" ]
+
+                _ ->
+                    [ text "NOIDEA" ]
+            )
         ]
 
 
-loadingView : Styled.Html msg
+exhibitsContainer : List (Styled.Html msg) -> Styled.Html msg
+exhibitsContainer content =
+    div [ StyledAttribs.css [ Css.width (Css.pct 100) ] ] content
+
+
+loadingView : List (Styled.Html msg)
 loadingView =
-    div [ StyledAttribs.css [ Css.width (Css.pct 100) ] ]
-        [ LoadingPlaceholder.view
-            (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
-                |> LoadingPlaceholder.height LoadingPlaceholder.Tall
-                |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 20)
-                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
-            )
-        , LoadingPlaceholder.view
-            (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
-                |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
-                |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
-            )
-        , div [ StyledAttribs.css [ Css.property "display" "grid", Css.property "grid-template-columns" "repeat(auto-fill, 300px)", Css.property "grid-gap" "10px", Css.justifyContent Css.spaceBetween ] ]
-            [ exhibitContainer
-                [ LoadingPlaceholder.view
-                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
-                , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
-                ]
-            , exhibitContainer
-                [ LoadingPlaceholder.view
-                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
-                , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
-                ]
-            , exhibitContainer
-                [ LoadingPlaceholder.view
-                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
-                , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
-                ]
-            , exhibitContainer
-                [ LoadingPlaceholder.view
-                    (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
-                , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
-                ]
+    [ LoadingPlaceholder.view
+        (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock
+            |> LoadingPlaceholder.height LoadingPlaceholder.Tall
+            |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 20)
+            |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
+        )
+    , LoadingPlaceholder.view
+        (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
+            |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
+            |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
+        )
+    , div [ StyledAttribs.css [ Css.property "display" "grid", Css.property "grid-template-columns" "repeat(auto-fill, 300px)", Css.property "grid-gap" "10px", Css.justifyContent Css.spaceBetween ] ]
+        [ exhibitContainer
+            [ LoadingPlaceholder.view
+                (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+            , LoadingPlaceholder.view
+                (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+            ]
+        , exhibitContainer
+            [ LoadingPlaceholder.view
+                (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+            , LoadingPlaceholder.view
+                (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+            ]
+        , exhibitContainer
+            [ LoadingPlaceholder.view
+                (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+            , LoadingPlaceholder.view
+                (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+            ]
+        , exhibitContainer
+            [ LoadingPlaceholder.view
+                (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
+            , LoadingPlaceholder.view
+                (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
             ]
         ]
+    ]
 
 
 exhibitContainer : List (Styled.Html msg) -> Styled.Html msg
@@ -138,6 +156,12 @@ update msg model =
                     Header.update model.context.session model.headerState headerMsg
             in
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
+
+        CompletedLoadExhibits (Ok exhibits) ->
+            ( model, Cmd.none, Effect.none )
+
+        CompletedLoadExhibits (Err err) ->
+            ( { model | exhibits = Failed err }, Cmd.none, Effect.none )
 
 
 subscriptions : Model -> Sub Msg

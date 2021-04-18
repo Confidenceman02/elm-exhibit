@@ -168,7 +168,7 @@ update msg model =
 
         ( GotAuthorMsg authorMsg, AuthorExhibits authorModel ) ->
             AuthorExhibitsPage.update authorMsg authorModel
-                |> updateWithEffect AuthorExhibits GotAuthorMsg authorEffectHandler
+                |> updateWithEffect AuthorExhibits GotAuthorMsg authorExhibitsEffectHandler
 
         ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
             let
@@ -293,8 +293,8 @@ exhibitEffectHandler model effect =
             ( { model | context = updatedContext }, cmds )
 
 
-authorEffectHandler : Effect.Handler AuthorExhibitsPage.Model AuthorExhibitsPage.Effect Msg
-authorEffectHandler model effect =
+authorExhibitsEffectHandler : Effect.Handler AuthorExhibitsPage.Model AuthorExhibitsPage.Effect Msg
+authorExhibitsEffectHandler model effect =
     case effect of
         AuthorExhibitsPage.HeaderEffect headerEffect ->
             let

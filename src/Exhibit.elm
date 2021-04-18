@@ -1,4 +1,4 @@
-module Exhibit exposing (Exhibit, exhibitsDecoder, fetchAuthorExhibits, toQueryParam, toString, urlParser)
+module Exhibit exposing (Exhibit, ExhibitError(..), exhibitsDecoder, fetchAuthorExhibits, toQueryParam, toString, urlParser)
 
 import Api.Api as Api
 import Api.Endpoint as Endpoint
