@@ -1,4 +1,4 @@
-module Pages.Author exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
+module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
 
 import Author exposing (Author)
 import Context exposing (Context)

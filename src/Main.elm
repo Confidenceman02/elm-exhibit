@@ -9,7 +9,7 @@ import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
 import Pages.AuthRedirect as AuthRedirectPage
-import Pages.Author as AuthorPage
+import Pages.AuthorExhibits as AuthorExhibitsPage
 import Pages.Exhibit as ExhibitPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
@@ -23,7 +23,7 @@ type Msg
     = ClickedLink Browser.UrlRequest
     | ChangedUrl Url
     | GotExhibitMsg ExhibitPage.Msg
-    | GotAuthorMsg AuthorPage.Msg
+    | GotAuthorMsg AuthorExhibitsPage.Msg
     | GotHomeMsg HomePage.Msg
     | RefreshedSession (Result Session.SessionError Session.SessionSuccess)
     | SessionAuthorizing (Result Session.SessionError Session.SessionSuccess)
@@ -33,7 +33,7 @@ type Msg
 
 type Model
     = Exhibit ExhibitPage.Model
-    | Author AuthorPage.Model
+    | AuthorExhibits AuthorExhibitsPage.Model
     | Home HomePage.Model
     | NotFound Context
     | AuthRedirect AuthRedirectPage.Model
@@ -77,12 +77,12 @@ changeRouteTo maybeRoute context =
             in
             ( Exhibit model, Cmd.batch [ Cmd.map GotExhibitMsg cmds ] )
 
-        Just (Route.Author author) ->
+        Just (Route.AuthorExhibits author) ->
             let
                 ( model, cmds ) =
-                    AuthorPage.init author context
+                    AuthorExhibitsPage.init author context
             in
-            ( Author model, Cmd.map GotAuthorMsg cmds )
+            ( AuthorExhibits model, Cmd.map GotAuthorMsg cmds )
 
         Just Route.Home ->
             let
@@ -105,7 +105,7 @@ toContext model =
         Exhibit m ->
             m.context
 
-        Author m ->
+        AuthorExhibits m ->
             m.context
 
         Home m ->
@@ -143,11 +143,11 @@ view model =
                 GotExhibitMsg
                 (ExhibitPage.view exhibitModel)
 
-        Author authorModel ->
+        AuthorExhibits authorModel ->
             viewPage
-                (Page.Author authorModel.author authorModel.context.session AuthorPage.toHeaderMsg authorModel.headerState)
+                (Page.AuthorExhibits authorModel.author authorModel.context.session AuthorExhibitsPage.toHeaderMsg authorModel.headerState)
                 GotAuthorMsg
-                (AuthorPage.view authorModel)
+                (AuthorExhibitsPage.view authorModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view
@@ -166,9 +166,9 @@ update msg model =
             ExhibitPage.update examplesMsg exhibitModel
                 |> updateWithEffect Exhibit GotExhibitMsg exhibitEffectHandler
 
-        ( GotAuthorMsg authorMsg, Author authorModel ) ->
-            AuthorPage.update authorMsg authorModel
-                |> updateWithEffect Author GotAuthorMsg authorEffectHandler
+        ( GotAuthorMsg authorMsg, AuthorExhibits authorModel ) ->
+            AuthorExhibitsPage.update authorMsg authorModel
+                |> updateWithEffect AuthorExhibits GotAuthorMsg authorEffectHandler
 
         ( GotAuthGithubRedirectMsg authRedirectMsg, AuthRedirect m ) ->
             let
@@ -198,7 +198,7 @@ update msg model =
             in
             ( Exhibit updatedModel, sessionCmd )
 
-        ( RefreshedSession result, Author m ) ->
+        ( RefreshedSession result, AuthorExhibits m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -206,7 +206,7 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Author updatedModel, sessionCmd )
+            ( AuthorExhibits updatedModel, sessionCmd )
 
         ( SessionAuthorizing result, Exhibit m ) ->
             let
@@ -218,7 +218,7 @@ update msg model =
             in
             ( Exhibit updatedModel, sessionCmd )
 
-        ( SessionAuthorizing result, Author m ) ->
+        ( SessionAuthorizing result, AuthorExhibits m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -226,7 +226,7 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Author updatedModel, sessionCmd )
+            ( AuthorExhibits updatedModel, sessionCmd )
 
         ( SessionDestroying result, Exhibit m ) ->
             let
@@ -238,7 +238,7 @@ update msg model =
             in
             ( Exhibit updatedModel, sessionCmd )
 
-        ( SessionDestroying result, Author m ) ->
+        ( SessionDestroying result, AuthorExhibits m ) ->
             let
                 updatedModel =
                     { m | context = Context.updateSession updatedSession m.context }
@@ -246,7 +246,7 @@ update msg model =
                 ( sessionCmd, updatedSession ) =
                     Session.fromResult result
             in
-            ( Author updatedModel, sessionCmd )
+            ( AuthorExhibits updatedModel, sessionCmd )
 
         _ ->
             ( model, Cmd.none )
@@ -275,8 +275,8 @@ subscriptions model =
         Exhibit m ->
             Sub.map GotExhibitMsg (ExhibitPage.subscriptions m)
 
-        Author m ->
-            Sub.map GotAuthorMsg (AuthorPage.subscriptions m)
+        AuthorExhibits m ->
+            Sub.map GotAuthorMsg (AuthorExhibitsPage.subscriptions m)
 
         _ ->
             Sub.none
@@ -293,10 +293,10 @@ exhibitEffectHandler model effect =
             ( { model | context = updatedContext }, cmds )
 
 
-authorEffectHandler : Effect.Handler AuthorPage.Model AuthorPage.Effect Msg
+authorEffectHandler : Effect.Handler AuthorExhibitsPage.Model AuthorExhibitsPage.Effect Msg
 authorEffectHandler model effect =
     case effect of
-        AuthorPage.HeaderEffect headerEffect ->
+        AuthorExhibitsPage.HeaderEffect headerEffect ->
             let
                 ( updatedContext, cmds ) =
                     headerEffectHandler model.context headerEffect
