@@ -16,5 +16,5 @@ export async function handler(
   if (redisClient.Status === Status.Err) {
     return errorResponse(noIdea);
   }
-  return errorResponse(noIdea);
+  return errorResponse({ tag: "AuthorNotFound" });
 }

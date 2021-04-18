@@ -3,6 +3,8 @@ import { UserSession } from "./redis/schema";
 
 export type NoIdea = { tag: "KeineAhnung" };
 
+export type AuthorExhibitsErrorBody = { tag: "AuthorNotFound" };
+
 export type ExampleErrorBody =
   | { tag: "ExampleBuildFailed" }
   | { tag: "AuthorNotFound"; foundAuthor: string }
@@ -22,15 +24,16 @@ export type SessionErrorBody =
   | { tag: "MissingCookie" }
   | NoIdea;
 
-export type ExhibitsErrorBody = NoIdea;
-
 export type SessionSuccessBody =
   | { tag: "SessionRefreshed"; session: UserSession }
   | { tag: "Redirecting"; location: string }
   | { tag: "SessionGranted"; session: UserSession }
   | { tag: "SessionDestroyed" };
 
-export type ErrorBody = ExampleErrorBody | SessionErrorBody | ExhibitsErrorBody;
+export type ErrorBody =
+  | ExampleErrorBody
+  | SessionErrorBody
+  | AuthorExhibitsErrorBody;
 
 export type SuccessBody = SessionSuccessBody | ExampleSuccessBody;
 

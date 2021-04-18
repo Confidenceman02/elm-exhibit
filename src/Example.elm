@@ -90,7 +90,7 @@ errorBodyDecoder author exhibit =
 
 
 decodeResponseString : Author -> Exhibit -> Decoder a -> Response String -> Result ExampleError a
-decodeResponseString author exhibit decoder response =
+decodeResponseString author exhibit goodStatusDecoder response =
     case response of
         Http.BadStatus_ _ body ->
             case Decode.decodeString (errorBodyDecoder author exhibit) body of
@@ -101,7 +101,7 @@ decodeResponseString author exhibit decoder response =
                     Err KeineAhnung
 
         Http.GoodStatus_ _ body ->
-            case Decode.decodeString decoder body of
+            case Decode.decodeString goodStatusDecoder body of
                 Ok decodedBody ->
                     Ok decodedBody
 
