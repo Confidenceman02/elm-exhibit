@@ -13,11 +13,12 @@ import { GithubLoginData, GithubUserData } from "../types";
 import {
   RedisHValue,
   UserSession,
-  redisValueToUser,
+  redisReturnValueToUser,
   redisValueToUserSession,
   Table,
   User,
   UserSchemaKey,
+  RedisReturnType,
 } from "./schema";
 import { Result, ResultType } from "../../lib/result";
 
@@ -148,9 +149,8 @@ export async function getUser(
     PermanentDBTag.User,
     gitUserId.toString()
   );
-  const redisUser: RedisHValue<User> = await client.HGETALLAsync(
-    userReferenceKey
-  );
-  const user = redisValueToUser(redisUser);
-  return Result<User>().Ok(user);
+  const redisUser: RedisReturnType<
+    RedisHValue<User>
+  > = await client.HGETALLAsync(userReferenceKey);
+  return redisReturnValueToUser(redisUser);
 }

@@ -101,7 +101,7 @@ describe("actions", () => {
     });
   });
   describe("getUser", () => {
-    it("should get a user", async () => {
+    it("should get a user result", async () => {
       const gitUserData: GithubUserData = {
         login: "Confidenceman02",
         id: 2345,
@@ -121,6 +121,17 @@ describe("actions", () => {
           avatarUrl: "www.bs.com",
           accessToken: "token 1234",
         },
+      });
+    });
+    it("return result error", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const user = await getUser(gitUserData.id, client);
+      expect(user).to.deep.eq({
+        Status: Status.Err,
       });
     });
   });

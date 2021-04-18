@@ -1,3 +1,5 @@
+import { Result, ResultType } from "../../lib/result";
+
 export const UserSchemaKey = {
   username: "username",
   userId: "userId",
@@ -19,19 +21,27 @@ export type UserSession = {
   sessionId: string;
 };
 
+export type RedisReturnType<T> = null | T;
+
+// all H values in redis return as a string
 export type RedisHValue<T> = {
   [P in keyof T]: string;
 };
 
 export const Table = { users: "users" };
 
-export function redisValueToUser(redisValue: RedisHValue<User>): User {
-  return {
-    username: redisValue.username,
-    userId: parseInt(redisValue.userId),
-    avatarUrl: redisValue.avatarUrl,
-    accessToken: redisValue.accessToken,
-  };
+export function redisReturnValueToUser(
+  redisReturnValue: RedisReturnType<RedisHValue<User>>
+): ResultType<User> {
+  if (redisReturnValue != null) {
+    return Result<User>().Ok({
+      username: redisReturnValue.username,
+      userId: parseInt(redisReturnValue.userId),
+      avatarUrl: redisReturnValue.avatarUrl,
+      accessToken: redisReturnValue.accessToken,
+    });
+  }
+  return Result<User>().Err;
 }
 
 export function redisValueToUserSession(
