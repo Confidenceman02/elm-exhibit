@@ -3,7 +3,9 @@ import { UserSession } from "./redis/schema";
 
 export type NoIdea = { tag: "KeineAhnung" };
 
-export type AuthorExhibitsErrorBody = { tag: "AuthorNotFound" };
+export type AuthorExhibitsErrorBody =
+  | { tag: "AuthorNotFound" }
+  | { tag: "MissingAuthor" };
 
 export type ExampleErrorBody =
   | { tag: "ExampleBuildFailed" }

@@ -15,6 +15,7 @@ type Exhibit
 
 type ExhibitError
     = AuthorNotFound Author
+    | MissingAuthor
     | KeineAhnung
 
 

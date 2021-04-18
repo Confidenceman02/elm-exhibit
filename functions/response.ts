@@ -52,6 +52,8 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
       return StatusCodes.NOT_FOUND;
     case "MissingCookie":
       return StatusCodes.BAD_REQUEST;
+    case "MissingAuthor":
+      return StatusCodes.BAD_REQUEST;
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR;
   }
