@@ -1,15 +1,15 @@
 module Page exposing (Page(..), view)
 
 import Author exposing (Author)
+import Exhibit exposing (Exhibit)
 import Header as Header
 import Html.Styled as Styled exposing (text)
-import Package exposing (Package)
 import Session exposing (Session)
 
 
 type Page msg
     = Home
-    | Exhibit Author Package Session (Header.Msg -> msg) Header.State
+    | Exhibit Author Exhibit Session (Header.Msg -> msg) Header.State
     | AuthorExhibits Author Session (Header.Msg -> msg) Header.State
     | AuthGithubRedirect
 

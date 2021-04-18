@@ -40,9 +40,9 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
       return StatusCodes.BAD_REQUEST;
     case "AuthorNotFound":
       return StatusCodes.NOT_FOUND;
-    case "PackageNotFound":
+    case "ExhibitNotFound":
       return StatusCodes.NOT_FOUND;
-    case "AuthorAndPackageNotFound":
+    case "AuthorAndExhibitNotFound":
       return StatusCodes.NOT_FOUND;
     case "RefreshFailed":
       return StatusCodes.NOT_FOUND;

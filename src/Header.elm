@@ -25,12 +25,12 @@ import Css as Css
 import DummyInput
 import Effect exposing (Effect)
 import EventsExtra
+import Exhibit exposing (Exhibit)
 import Html.Styled as Styled exposing (div, h1, img, span, text)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Events as Events
 import Html.Styled.Extra exposing (viewIf)
 import MenuList.MenuList as MenuList exposing (Actions(..))
-import Package exposing (Package)
 import Session exposing (Session)
 import Styles.Color exposing (exColorSky600, exColorSky700, exColorWhite)
 import Styles.Common exposing (absoluteCenterHorizontal)
@@ -63,7 +63,7 @@ type Config
 
 
 type Variant
-    = Exhibit Author Package
+    = Exhibit Author Exhibit
     | Author Author
     | Home
 
@@ -130,7 +130,7 @@ type HeaderEffect
 -- CONFIG BUILDERS
 
 
-exhibit : Author -> Package -> Config
+exhibit : Author -> Exhibit -> Config
 exhibit authr package =
     Config { defaultConfig | variant = Exhibit authr package }
 
@@ -426,12 +426,12 @@ homeLink =
         ]
 
 
-exhibitTitle : Author -> Package -> Styled.Html msg
+exhibitTitle : Author -> Exhibit -> Styled.Html msg
 exhibitTitle authr package =
     h1 [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
         [ text (Author.toString authr)
         , span [ StyledAttribs.css [ Css.margin2 (Css.px 0) (Css.px 10) ] ] [ text "/" ]
-        , text (Package.toString package)
+        , text (Exhibit.toString package)
         ]
 
 

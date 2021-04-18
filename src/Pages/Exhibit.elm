@@ -12,13 +12,13 @@ import Context exposing (Context)
 import Css as Css
 import Effect as Effect
 import Example as Example exposing (Example)
+import Exhibit exposing (Exhibit)
 import Header as Header
 import Html.Styled as Styled exposing (Attribute, div, h2, li, main_, span, text, ul)
 import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Markdown as Markdown
-import Package exposing (Package)
 import Pages.Interstitial.Interstitial as InterstitialPage
 import Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
@@ -31,7 +31,7 @@ import Svg.Styled.Attributes as SvgStyledAttribs
 
 type alias Model =
     { author : Author
-    , package : Package
+    , package : Exhibit
     , examples : Status ( SelectedExample, List Example.Example )
     , descriptionPanel : DescriptionPanel
     , viewPanel : ViewPanel
@@ -86,7 +86,7 @@ toHeaderMsg =
     HeaderMsg
 
 
-init : Author -> Package -> Context -> ( Model, Cmd Msg )
+init : Author -> Exhibit -> Context -> ( Model, Cmd Msg )
 init author package context =
     ( { author = author
       , package = package
@@ -178,7 +178,7 @@ centerContent center model =
 exampleErrorToView : Status ( SelectedExample, List Example.Example ) -> Example.ExampleError -> Styled.Html msg
 exampleErrorToView examples exampleError =
     case exampleError of
-        Example.AuthorAndPackageNotFound author package ->
+        Example.AuthorAndExhibitNotFound author package ->
             InterstitialPage.view
                 (InterstitialPage.bummer
                     |> InterstitialPage.content (authorAndPackageNotFoundErrorView author package)
@@ -188,7 +188,7 @@ exampleErrorToView examples exampleError =
             InterstitialPage.view
                 (InterstitialPage.weird |> InterstitialPage.content (authorNotFoundView author package foundAuthor))
 
-        Example.PackageNotFound author package ->
+        Example.ExhibitNotFound author package ->
             InterstitialPage.view (InterstitialPage.weird |> InterstitialPage.content (packageNotFoundView author package))
 
         Example.KeineAhnung ->
@@ -208,11 +208,11 @@ keineAhnungView =
     ]
 
 
-packageNotFoundView : Author -> Package -> List (Styled.Html msg)
+packageNotFoundView : Author -> Exhibit -> List (Styled.Html msg)
 packageNotFoundView author package =
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can't seem to find the exhibit "
-        , text <| Package.toString package
+        , text <| Exhibit.toString package
         , text "."
         , Paragraph.view Paragraph.default [ text <| Author.toString author, text " has some other exhibits you might like to checkout though. " ]
         , Paragraph.view Paragraph.default
@@ -228,11 +228,11 @@ packageNotFoundView author package =
     ]
 
 
-authorNotFoundView : Author -> Package -> Example.FoundAuthor -> List (Styled.Html msg)
+authorNotFoundView : Author -> Exhibit -> Example.FoundAuthor -> List (Styled.Html msg)
 authorNotFoundView author package foundAuthor =
     let
         resolvedExhibitHref =
-            "/" ++ String.join "/" [ "example", Author.toString foundAuthor, Package.toString package ]
+            "/" ++ String.join "/" [ "example", Author.toString foundAuthor, Exhibit.toString package ]
     in
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can't seem to find the exhibitionist "
@@ -240,7 +240,7 @@ authorNotFoundView author package foundAuthor =
         , text "."
         , Paragraph.view Paragraph.default
             [ text "Looks like the "
-            , text <| Package.toString package
+            , text <| Exhibit.toString package
             , text " exhibit belongs to "
             , text (Author.toString foundAuthor)
             , text " though."
@@ -258,7 +258,7 @@ authorNotFoundView author package foundAuthor =
     ]
 
 
-authorAndPackageNotFoundErrorView : Author -> Package -> List (Styled.Html msg)
+authorAndPackageNotFoundErrorView : Author -> Exhibit -> List (Styled.Html msg)
 authorAndPackageNotFoundErrorView author package =
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can’t seem to find the exhibitionist "
@@ -274,7 +274,7 @@ authorAndPackageNotFoundErrorView author package =
                 |> Paragraph.style Paragraph.Intro
                 |> Paragraph.inline True
             )
-            [ text <| Package.toString package ]
+            [ text <| Exhibit.toString package ]
         , text " exhibit."
         ]
     , Paragraph.view Paragraph.default

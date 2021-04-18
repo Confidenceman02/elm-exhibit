@@ -36,7 +36,7 @@ describe("errorResponse", () => {
       });
     });
     describe("PackageNotFound", () => {
-      const tag: ExampleErrorBody = { tag: "PackageNotFound" };
+      const tag: ExampleErrorBody = { tag: "ExhibitNotFound" };
       it("should return error response body", () => {
         const expected = {
           statusCode: StatusCodes.NOT_FOUND,
@@ -47,7 +47,7 @@ describe("errorResponse", () => {
       });
     });
     describe("AuthorAndPackageNotFound", () => {
-      const tag: ExampleErrorBody = { tag: "AuthorAndPackageNotFound" };
+      const tag: ExampleErrorBody = { tag: "AuthorAndExhibitNotFound" };
       it("should return error response body", () => {
         const expected = {
           statusCode: StatusCodes.NOT_FOUND,

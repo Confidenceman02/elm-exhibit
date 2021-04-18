@@ -3,10 +3,10 @@ module Example exposing (CompiledExample, Example, ExampleError(..), FoundAuthor
 import Api.Api as Api
 import Api.Endpoint as Endpoint
 import Author as Author exposing (Author)
+import Exhibit as Exhibit exposing (Exhibit)
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
-import Package as Package exposing (Package)
 import Url.Builder as UrlBuilder exposing (QueryParameter)
 
 
@@ -27,14 +27,14 @@ type CompiledExample
 
 type ExampleError
     = ExampleBuildFailed
-    | AuthorNotFound Author Package FoundAuthor
-    | PackageNotFound Author Package
-    | AuthorAndPackageNotFound Author Package
+    | AuthorNotFound Author Exhibit FoundAuthor
+    | ExhibitNotFound Author Exhibit
+    | AuthorAndExhibitNotFound Author Exhibit
     | KeineAhnung
 
 
 
--- So we found the package but it has a different author
+-- So we found the exhibit but it has a different author
 
 
 type alias FoundAuthor =
@@ -64,36 +64,36 @@ authorNotFoundDecoder =
     Decode.at [ "foundAuthor" ] Author.decoder
 
 
-mapTagToExampleError : Author -> Package -> String -> Decoder ExampleError
-mapTagToExampleError author package tag =
+mapTagToExampleError : Author -> Exhibit -> String -> Decoder ExampleError
+mapTagToExampleError author exhibit tag =
     case tag of
         "ExampleBuildFailed" ->
             Decode.succeed ExampleBuildFailed
 
         "AuthorNotFound" ->
-            Decode.map (AuthorNotFound author package) authorNotFoundDecoder
+            Decode.map (AuthorNotFound author exhibit) authorNotFoundDecoder
 
-        "PackageNotFound" ->
-            Decode.succeed (PackageNotFound author package)
+        "ExhibitNotFound" ->
+            Decode.succeed (ExhibitNotFound author exhibit)
 
-        "AuthorAndPackageNotFound" ->
-            Decode.succeed (AuthorAndPackageNotFound author package)
+        "AuthorAndExhibitNotFound" ->
+            Decode.succeed (AuthorAndExhibitNotFound author exhibit)
 
         _ ->
             Decode.succeed KeineAhnung
 
 
-errorBodyDecoder : Author -> Package -> Decoder ExampleError
-errorBodyDecoder author package =
+errorBodyDecoder : Author -> Exhibit -> Decoder ExampleError
+errorBodyDecoder author exhibit =
     Decode.field "tag" Decode.string
-        |> Decode.andThen (mapTagToExampleError author package)
+        |> Decode.andThen (mapTagToExampleError author exhibit)
 
 
-decodeResponseString : Author -> Package -> Decoder a -> Response String -> Result ExampleError a
-decodeResponseString author package decoder response =
+decodeResponseString : Author -> Exhibit -> Decoder a -> Response String -> Result ExampleError a
+decodeResponseString author exhibit decoder response =
     case response of
         Http.BadStatus_ _ body ->
-            case Decode.decodeString (errorBodyDecoder author package) body of
+            case Decode.decodeString (errorBodyDecoder author exhibit) body of
                 Ok errorBody ->
                     Err errorBody
 
@@ -117,21 +117,21 @@ nameQueryToParam example =
     UrlBuilder.string "example" example.name
 
 
-fetch : (Result ExampleError (List Example) -> msg) -> Author -> Package -> Cmd msg
-fetch toMsg author package =
+fetch : (Result ExampleError (List Example) -> msg) -> Author -> Exhibit -> Cmd msg
+fetch toMsg author exhibit =
     Api.get
         (Endpoint.lambdaUrl [ "examples" ]
-            [ Author.toQueryParam author, Package.toQueryParam package ]
+            [ Author.toQueryParam author, Exhibit.toQueryParam exhibit ]
         )
         toMsg
-        (decodeResponseString author package examplesDecoder)
+        (decodeResponseString author exhibit examplesDecoder)
 
 
-build : (Result ExampleError CompiledExample -> msg) -> Author -> Package -> Example -> Cmd msg
-build toMsg author package example =
+build : (Result ExampleError CompiledExample -> msg) -> Author -> Exhibit -> Example -> Cmd msg
+build toMsg author exhibit example =
     Api.get
         (Endpoint.lambdaUrl [ "build-example" ]
-            [ Author.toQueryParam author, Package.toQueryParam package, nameQueryToParam example ]
+            [ Author.toQueryParam author, Exhibit.toQueryParam exhibit, nameQueryToParam example ]
         )
         toMsg
-        (decodeResponseString author package compiledExample)
+        (decodeResponseString author exhibit compiledExample)

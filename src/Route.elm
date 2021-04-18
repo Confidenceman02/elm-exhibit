@@ -1,14 +1,14 @@
 module Route exposing (Route(..), fromUrl, isAuthGithubRedirect)
 
 import Author as Author exposing (Author)
+import Exhibit as Package exposing (Exhibit)
 import GithubAuth
-import Package as Package exposing (Package)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), (<?>), oneOf, s)
 
 
 type Route
-    = Exhibit Author Package
+    = Exhibit Author Exhibit
     | AuthorExhibits Author
     | AuthGithubRedirect (Maybe GithubAuth.CallBackParams)
     | Home

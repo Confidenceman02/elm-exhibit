@@ -6,8 +6,8 @@ export type NoIdea = { tag: "KeineAhnung" };
 export type ExampleErrorBody =
   | { tag: "ExampleBuildFailed" }
   | { tag: "AuthorNotFound"; foundAuthor: string }
-  | { tag: "PackageNotFound" }
-  | { tag: "AuthorAndPackageNotFound" }
+  | { tag: "ExhibitNotFound" }
+  | { tag: "AuthorAndExhibitNotFound" }
   | NoIdea;
 
 export type ExampleSuccessBody = {
