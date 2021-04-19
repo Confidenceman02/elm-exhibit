@@ -15,6 +15,7 @@ import {
   getExhibitReferencesByUserId,
   getUsernameByUserId,
   createExhibitReference,
+  updateUserAccessToken,
 } from "../../functions/redis/actions";
 import { TempSession } from "../../functions/redis/types";
 import { GithubLoginData, GithubUserData } from "../../functions/types";
@@ -321,6 +322,28 @@ describe("actions", () => {
         Status: Status.Ok,
         data: "Confidenceman02",
       });
+    });
+  });
+  describe("updateUserAccessToken", () => {
+    it("should update access token", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
+      const loginData: GithubLoginData = {
+        access_token: "token 1234",
+      };
+
+      await createUser(gitUserData, loginData, client);
+      const updated = await updateUserAccessToken(2345, "token 1111", client);
+
+      expect(updated).to.be.true;
+    });
+    it("should not update the access token", async () => {
+      const updated = await updateUserAccessToken(2345, "token 1111", client);
+
+      expect(updated).to.be.false;
     });
   });
 });

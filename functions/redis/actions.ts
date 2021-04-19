@@ -25,6 +25,7 @@ import {
   UserSession,
 } from "./schema";
 import { Result, ResultType, Status } from "../../lib/result";
+import { Multi } from "redis";
 
 // This will store the referer so that when the user approves the github app we can
 // redirect them back to where they tried to login from. i.e. example page
@@ -33,9 +34,9 @@ export async function initTempSession(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateTempSessionKey(meta.sessionId);
-  const setSession = await client.HSETAsync(dbKey, "referer", meta.referer);
+  const setSession: boolean = client.HSET(dbKey, "referer", meta.referer);
   client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.TempSession));
-  return !!setSession;
+  return setSession;
 }
 
 export async function initSession(
@@ -44,19 +45,20 @@ export async function initSession(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateSessionKey(sessionId);
-  const setSession = await client.HSETAsync(
+  const redisMulti: Multi = client.multi();
+  redisMulti.HSET(
     dbKey,
     UserSchemaKey.username,
     gitUser.login,
     UserSchemaKey.userId,
-    gitUser.id,
+    gitUser.id.toString(),
     UserSchemaKey.avatarUrl,
     gitUser.avatar_url,
     "sessionId",
     sessionId
   );
-  client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
-  return !!setSession;
+  redisMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
+  return redisMulti.EXEC();
 }
 
 export async function getSession(
@@ -194,6 +196,22 @@ export async function createExhibitReference(
     exhibitReference
   );
   return !!setReference;
+}
+
+export async function updateUserAccessToken(
+  userId: number,
+  access_token: string,
+  client: IPromisifiedRedis
+): Promise<boolean> {
+  const userDbKey = generateUserKey(userId);
+  const validUser = await userExists(userId, client);
+  if (!validUser) return false;
+  const userAccessTokenUpdated: boolean = client.HSET(
+    userDbKey,
+    UserSchemaKey.accessToken,
+    access_token
+  );
+  return userAccessTokenUpdated;
 }
 
 // export async function getExhibitsByUsername(
