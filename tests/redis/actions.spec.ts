@@ -33,6 +33,7 @@ describe("actions", () => {
   afterEach(() => {
     client.FLUSHALL();
   });
+
   describe("initTempSession", () => {
     it("should init a temporary session", async () => {
       const tempSession: TempSession = {
@@ -45,6 +46,7 @@ describe("actions", () => {
       expect(tempSessionInitiated).to.be.true;
     });
   });
+
   describe("initSession", () => {
     it("should init a session", async () => {
       const sessionId = "1234";
@@ -63,6 +65,7 @@ describe("actions", () => {
       expect(sessionInitiated).to.be.true;
     });
   });
+
   describe("tempSessionExists", () => {
     it("should find a temp session", async () => {
       const tempSession: TempSession = {
@@ -74,7 +77,19 @@ describe("actions", () => {
 
       expect(foundTempSession).to.be.true;
     });
+
+    it("should not find a temp session", async () => {
+      const tempSession: TempSession = {
+        sessionId: "1234",
+        referer: "www.elm-exhibit.com",
+      };
+
+      const foundTempSession = await tempSessionExists(tempSession, client);
+
+      expect(foundTempSession).to.be.false;
+    });
   });
+
   describe("sessionExists", () => {
     it("should find a session", async () => {
       const sessionId = "1234";
@@ -89,7 +104,16 @@ describe("actions", () => {
 
       expect(foundSession).to.be.true;
     });
+
+    it("should not find a session", async () => {
+      const sessionId = "1234";
+
+      const foundSession = await sessionExists(sessionId, client);
+
+      expect(foundSession).to.be.false;
+    });
   });
+
   describe("createUser", () => {
     it("should create a user", async () => {
       const gitUserData: GithubUserData = {
@@ -105,6 +129,7 @@ describe("actions", () => {
       expect(userCreated).to.be.true;
     });
   });
+
   describe("getUser", () => {
     it("should get a user result", async () => {
       const gitUserData: GithubUserData = {
@@ -128,7 +153,8 @@ describe("actions", () => {
         },
       });
     });
-    it("return result error", async () => {
+
+    it("should not find a user", async () => {
       const gitUserData: GithubUserData = {
         login: "Confidenceman02",
         id: 2345,
@@ -140,8 +166,9 @@ describe("actions", () => {
       });
     });
   });
+
   describe("userExists", () => {
-    it("should find a user", async () => {
+    it("user should exist", async () => {
       const gitUserData: GithubUserData = {
         login: "Confidenceman02",
         id: 2345,
@@ -156,20 +183,20 @@ describe("actions", () => {
       const user = await userExists(gitUserData.id, client);
       expect(user).to.be.true;
     });
-    describe("when there is no user", () => {
-      it("should not find a user", async () => {
-        const gitUserData: GithubUserData = {
-          login: "Confidenceman02",
-          id: 2345,
-          avatar_url: "www.bs.com",
-        };
 
-        const user = await userExists(gitUserData.id, client);
+    it("should not find a user", async () => {
+      const gitUserData: GithubUserData = {
+        login: "Confidenceman02",
+        id: 2345,
+        avatar_url: "www.bs.com",
+      };
 
-        expect(user).to.be.false;
-      });
+      const user = await userExists(gitUserData.id, client);
+
+      expect(user).to.be.false;
     });
   });
+
   describe("getSession", () => {
     it("should get a session", async () => {
       const gitUserData: GithubUserData = {
@@ -191,7 +218,16 @@ describe("actions", () => {
         },
       });
     });
+
+    it("should not find a session", async () => {
+      const session = await getSession("session123", client);
+
+      expect(session).to.deep.eq({
+        Status: Status.Err,
+      });
+    });
   });
+
   describe("destroySession", () => {
     it("should destroy a session", async () => {
       const gitUserData: GithubUserData = {

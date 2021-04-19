@@ -1,5 +1,5 @@
 import {
-  redisValueToUserSession,
+  redisUserSessionUserSession,
   redisReturnValueToUser,
   RedisHValue,
   User,
@@ -28,6 +28,7 @@ describe("schema", () => {
         },
       });
     });
+
     it("should return error result", () => {
       const redisHValue = null;
       expect(redisReturnValueToUser(redisHValue)).to.deep.eq({
@@ -35,7 +36,8 @@ describe("schema", () => {
       });
     });
   });
-  describe("redisValueToUserSession", () => {
+
+  describe("redisUserSessionToUserSession", () => {
     it("should return user session", () => {
       const redisHValue: RedisHValue<UserSession> = {
         username: "confidenceman02",
@@ -43,14 +45,24 @@ describe("schema", () => {
         avatarUrl: "www.bs.com",
         sessionId: "sessionId123",
       };
-      expect(redisValueToUserSession(redisHValue)).to.deep.eq({
-        username: "confidenceman02",
-        userId: 1234,
-        avatarUrl: "www.bs.com",
-        sessionId: "sessionId123",
+      expect(redisUserSessionUserSession(redisHValue)).to.deep.eq({
+        Status: Status.Ok,
+        data: {
+          username: "confidenceman02",
+          userId: 1234,
+          avatarUrl: "www.bs.com",
+          sessionId: "sessionId123",
+        },
+      });
+    });
+
+    it("should return error result when null redisHValue", () => {
+      expect(redisUserSessionUserSession(null)).to.deep.eq({
+        Status: Status.Err,
       });
     });
   });
+
   describe("redisUserIdToUserId", () => {
     it("should return a user id", () => {
       const username = "1234";
@@ -59,12 +71,14 @@ describe("schema", () => {
         data: 1234,
       });
     });
+
     it("should return error result when null", () => {
       const username = null;
       expect(redisUserIdToUserId(username)).to.deep.eq({
         Status: Status.Err,
       });
     });
+
     it("should return error result when string is NaN", () => {
       // javascript considers "NaN" a number.. FFS!
       const username = "NaN";

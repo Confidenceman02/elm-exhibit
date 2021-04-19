@@ -26,12 +26,12 @@ export async function handler(
 
   // when no cookie
   if (cookieResult.Status === Status.Err) {
+    // TODO: Handle when cookie session ends but there is a cached session. This avoids doing the auth callback.
     // save temporary session meta
     const tempSession = await initTempSession(
       { sessionId, referer: resolvedReferer },
       client
     );
-
     if (tempSession && authEndpoint.Status === Status.Ok) {
       return successResponse({
         tag: "Redirecting",

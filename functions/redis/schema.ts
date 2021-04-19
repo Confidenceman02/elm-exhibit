@@ -33,7 +33,7 @@ export const Table = { users: "users", exhibits: "exhibits" };
 export function redisReturnValueToUser(
   redisReturnValue: RedisReturnType<RedisHValue<User>>
 ): ResultType<User> {
-  if (redisReturnValue != null) {
+  if (redisReturnValue !== null) {
     return Result<User>().Ok({
       username: redisReturnValue.username,
       userId: parseInt(redisReturnValue.userId),
@@ -44,15 +44,18 @@ export function redisReturnValueToUser(
   return Result().Err;
 }
 
-export function redisValueToUserSession(
-  redisValue: RedisHValue<UserSession>
-): UserSession {
-  return {
-    username: redisValue.username,
-    userId: parseInt(redisValue.userId),
-    avatarUrl: redisValue.avatarUrl,
-    sessionId: redisValue.sessionId,
-  };
+export function redisUserSessionUserSession(
+  redisReturnValue: RedisReturnType<RedisHValue<UserSession>>
+): ResultType<UserSession> {
+  if (redisReturnValue !== null) {
+    return Result<UserSession>().Ok({
+      username: redisReturnValue.username,
+      userId: parseInt(redisReturnValue.userId),
+      avatarUrl: redisReturnValue.avatarUrl,
+      sessionId: redisReturnValue.sessionId,
+    });
+  }
+  return Result().Err;
 }
 
 export function redisUserIdToUserId(

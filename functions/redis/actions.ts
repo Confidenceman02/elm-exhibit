@@ -5,19 +5,14 @@ import {
   generateUserKey,
   resolveExpiration,
 } from "./common";
-import {
-  ExpirableDBTag,
-  IPromisifiedRedis,
-  PermanentDBTag,
-  TempSession,
-} from "./types";
+import { ExpirableDBTag, IPromisifiedRedis, TempSession } from "./types";
 import { GithubLoginData, GithubUserData } from "../types";
 import {
   RedisHValue,
   RedisReturnType,
   redisReturnValueToUser,
   redisUserIdToUserId,
-  redisValueToUserSession,
+  redisUserSessionUserSession,
   redisValueToValueResult,
   Table,
   User,
@@ -25,7 +20,6 @@ import {
   UserSession,
 } from "./schema";
 import { Result, ResultType, Status } from "../../lib/result";
-import { Multi } from "redis";
 
 // This will store the referer so that when the user approves the github app we can
 // redirect them back to where they tried to login from. i.e. example page
@@ -34,9 +28,14 @@ export async function initTempSession(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateTempSessionKey(meta.sessionId);
-  const setSession: boolean = client.HSET(dbKey, "referer", meta.referer);
+  // returns the number of fields changed, should always be > 0
+  const tempSessionSet: number = client.HSETAsync(
+    dbKey,
+    "referer",
+    meta.referer
+  );
   client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.TempSession));
-  return setSession;
+  return !!tempSessionSet;
 }
 
 export async function initSession(
@@ -45,8 +44,7 @@ export async function initSession(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateSessionKey(sessionId);
-  const redisMulti: Multi = client.multi();
-  redisMulti.HSET(
+  const sessionInitiated: number = client.HSETAsync(
     dbKey,
     UserSchemaKey.username,
     gitUser.login,
@@ -57,8 +55,8 @@ export async function initSession(
     "sessionId",
     sessionId
   );
-  redisMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
-  return redisMulti.EXEC();
+  client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
+  return !!sessionInitiated;
 }
 
 export async function getSession(
@@ -69,8 +67,10 @@ export async function getSession(
   const redisUserSession: RedisHValue<UserSession> = await client.HGETALLAsync(
     key
   );
-  const userSession: UserSession = redisValueToUserSession(redisUserSession);
-  return Result<UserSession>().Ok(userSession);
+  const userSession: ResultType<UserSession> = redisUserSessionUserSession(
+    redisUserSession
+  );
+  return userSession;
 }
 
 export async function destroySession(
@@ -87,8 +87,8 @@ export async function tempSessionExists(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateTempSessionKey(tempSesh.sessionId);
-  const keyExists = await client.EXISTSAsync(dbKey);
-  return !!keyExists;
+  const exists: number = await client.EXISTSAsync(dbKey);
+  return !!exists;
 }
 
 export async function sessionExists(
@@ -96,8 +96,8 @@ export async function sessionExists(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateSessionKey(sessionId);
-  const keyExists = await client.EXISTSAsync(dbKey);
-  return !!keyExists;
+  const exists: number = await client.EXISTSAsync(dbKey);
+  return !!exists;
 }
 
 export async function createUser(
@@ -131,7 +131,7 @@ export async function userExists(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const userReferenceKey = generateUserKey(gitUserId);
-  const user = await client.EXISTSAsync(userReferenceKey);
+  const user: number = await client.EXISTSAsync(userReferenceKey);
   return !!user;
 }
 

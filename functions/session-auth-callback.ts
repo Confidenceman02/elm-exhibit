@@ -8,6 +8,7 @@ import {
   getSession,
   initSession,
   tempSessionExists,
+  updateUserAccessToken,
   userExists,
 } from "./redis/actions";
 import { githubLoginEndpoint, githubUserEndpoint } from "./endpoint";
@@ -75,10 +76,17 @@ export async function handler(
           client
         );
         if (existingUser) {
-          return successResponse({
-            tag: "SessionGranted",
-            session: fetchedSession.data,
-          });
+          const updatedAccessToken = await updateUserAccessToken(
+            parsedGithubUserResponse.id,
+            loginResponseData.access_token,
+            client
+          );
+          if (updatedAccessToken)
+            return successResponse({
+              tag: "SessionGranted",
+              session: fetchedSession.data,
+            });
+          return errorResponse(noIdea);
         }
         // create user if this is first time logging in
         const createdUser: boolean = await createUser(
