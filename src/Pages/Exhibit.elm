@@ -236,7 +236,7 @@ authorNotFoundView author exhibit foundAuthor =
             exhibitLink author exhibit
     in
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
-        [ text "We can't seem to find the exhibitionist "
+        [ text "We can't seem to find the author "
         , text <| Author.toString author
         , text "."
         , Paragraph.view Paragraph.default

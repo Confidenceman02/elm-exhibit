@@ -2,6 +2,7 @@ module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscription
 
 import Author exposing (Author)
 import Components.ExhibitPane as ExhibitPane
+import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
 import Effect
@@ -45,7 +46,6 @@ init author context =
       , headerState = Header.initState
       }
     , fetchAuthorExhibits CompletedLoadExhibits author
-      --, Cmd.none
     )
 
 
@@ -95,7 +95,7 @@ mainContentWrapper model =
             Failed e ->
                 case e of
                     Exhibit.AuthorNotFound a ->
-                        ExhibitPane.view ExhibitPane.default [ Interstitial.view Interstitial.oops ]
+                        ExhibitPane.view ExhibitPane.default [ Interstitial.view (Interstitial.oops |> Interstitial.content (authorNotFoundView model.author)) ]
 
                     _ ->
                         text "NOIDEA"
@@ -151,6 +151,16 @@ loadingView =
                 ]
             ]
         ]
+
+
+authorNotFoundView : Author -> List (Styled.Html msg)
+authorNotFoundView author =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We can't seem to find the author "
+        , text <| Author.toString author
+        , text "."
+        ]
+    ]
 
 
 exhibitContainer : List (Styled.Html msg) -> Styled.Html msg
