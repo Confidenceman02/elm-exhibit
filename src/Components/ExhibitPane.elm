@@ -1,4 +1,4 @@
-module Components.ExhibitPane exposing (ShadowPosition(..), default, shadowPosition, view)
+module Components.ExhibitPane exposing (ShadowPosition(..), default, defaultContentWidth, shadowPosition, view)
 
 import Css
 import Html.Styled as Styled exposing (Attribute, div)
@@ -49,37 +49,37 @@ shadowPosition pos (Config config) =
     Config { config | shadowPosition = pos }
 
 
-centerContentWidth : Float
-centerContentWidth =
+defaultContentWidth : Float
+defaultContentWidth =
     460
 
 
-centerContentHeight : Float
-centerContentHeight =
+defaultContentHeight : Float
+defaultContentHeight =
     590
 
 
 view : Config -> List (Styled.Html msg) -> Styled.Html msg
 view (Config config) content =
-    div []
-        [ shadow config.shadowPosition
+    div [ StyledAttribs.css [ Css.position Css.absolute ] ]
+        [ shadow config.shadowPosition config.variant
         , div
             [ StyledAttribs.css
-                [ Css.display Css.block
-                , Css.position Css.relative
-                , Css.width (Css.px centerContentWidth)
-                , Css.height (Css.px centerContentHeight)
-                , Css.overflow Css.hidden
-                , Css.backgroundColor exColorWhite
-                , Css.borderRadius (Css.px 12)
-                ]
+                ([ Css.display Css.block
+                 , Css.position Css.relative
+                 , Css.overflow Css.hidden
+                 , Css.backgroundColor exColorWhite
+                 , Css.borderRadius (Css.px 12)
+                 ]
+                    ++ setDimensionStyles config.variant
+                )
             ]
             content
         ]
 
 
-shadow : ShadowPosition -> Styled.Html msg
-shadow shadowPos =
+shadow : ShadowPosition -> Variant -> Styled.Html msg
+shadow shadowPos v =
     svg
         [ width "510"
         , height "691"
@@ -88,14 +88,14 @@ shadow shadowPos =
         ]
         [ filter [ id "shadowBlur" ] [ feGaussianBlur [ in_ "sourceGraphics", stdDeviation "7" ] [] ]
         , rect
-            [ x "14.855576"
-            , y "16.587036"
-            , rx "12"
-            , height (String.fromFloat centerContentHeight)
-            , width (String.fromFloat centerContentWidth)
-            , fill exColorColt200.value
-            , SvgStyledAttribs.filter "url(#shadowBlur)"
-            ]
+            ([ x "14.855576"
+             , y "16.587036"
+             , rx "12"
+             , fill exColorColt200.value
+             , SvgStyledAttribs.filter "url(#shadowBlur)"
+             ]
+                ++ setShadowDimensionStyles v
+            )
             []
         ]
 
@@ -117,3 +117,17 @@ centerShadowStyles shadowPos =
          ]
             ++ Transition.left (Css.pct resolveLeft)
         )
+
+
+setDimensionStyles : Variant -> List Css.Style
+setDimensionStyles v =
+    case v of
+        Default ->
+            [ Css.width (Css.px defaultContentWidth), Css.height (Css.px defaultContentHeight) ]
+
+
+setShadowDimensionStyles : Variant -> List (Svg.Styled.Attribute msg)
+setShadowDimensionStyles v =
+    case v of
+        Default ->
+            [ height (String.fromFloat defaultContentHeight), width (String.fromFloat defaultContentWidth) ]
