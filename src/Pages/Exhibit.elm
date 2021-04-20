@@ -195,9 +195,6 @@ exampleErrorToView examples exampleError =
         Example.KeineAhnung ->
             InterstitialPage.view (InterstitialPage.ourBad |> InterstitialPage.content keineAhnungView)
 
-        _ ->
-            text "ExampleBuildFailed"
-
 
 keineAhnungView : List (Styled.Html msg)
 keineAhnungView =

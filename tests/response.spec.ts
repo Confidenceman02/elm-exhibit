@@ -10,21 +10,9 @@ import { StatusCodes } from "http-status-codes";
 
 describe("errorResponse", () => {
   describe("ExampleErrorBody", () => {
-    describe("ExampleBuildFailed", () => {
-      const tag: ExampleErrorBody = { tag: "ExampleBuildFailed" };
-      it("should return error response body", () => {
-        const expected = {
-          statusCode: StatusCodes.BAD_REQUEST,
-          body: JSON.stringify(tag),
-          headers: { "Content-Type": "application/json" },
-        };
-        expect(errorResponse(tag)).to.deep.eq(expected);
-      });
-    });
     describe("AuthorNotFound", () => {
       const tag: ExampleErrorBody = {
         tag: "AuthorNotFound",
-        foundAuthor: "Some Author",
       };
       it("should return error response body", () => {
         const expected = {
@@ -121,7 +109,7 @@ describe("errorResponse", () => {
   });
 });
 
-describe("successBody", () => {
+describe("ExampleSuccessBody", () => {
   describe("ExamplesFetched", () => {
     const tag: ExampleSuccessBody = {
       tag: "ExamplesFetched",

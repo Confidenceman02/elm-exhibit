@@ -3,7 +3,7 @@ import { ResponseBody } from "./types";
 import redisClient from "./redis/client";
 import { Status } from "../lib/result";
 import { errorResponse, noIdea } from "./response";
-import { getUserIdByUsername } from "./redis/actions";
+import { getExhibitsByUserId, getUserIdByUsername } from "./redis/actions";
 
 export async function handler(
   event: APIGatewayEvent,
@@ -21,5 +21,13 @@ export async function handler(
   if (userIdResult.Status === Status.Err)
     return errorResponse({ tag: "AuthorNotFound" });
   // TODO: get user exhibits
+
+  const userExhibits = await getExhibitsByUserId(
+    userIdResult.data,
+    redisClient.data
+  );
+
+  if (userExhibits.Status === Status.Err) return errorResponse(noIdea);
+
   return errorResponse(noIdea);
 }

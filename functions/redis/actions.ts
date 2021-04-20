@@ -5,7 +5,6 @@ import {
   generateUserKey,
   resolveExpiration,
 } from "./common";
-import { Promise } from "bluebird";
 import {
   ExpirableDBTag,
   IPromisifiedRedis,
@@ -222,6 +221,13 @@ export async function updateUserAccessToken(
     access_token
   );
   return userAccessTokenUpdated;
+}
+
+export async function getExhibitsByUserId(
+  userId: number,
+  client: IPromisifiedRedis
+): Promise<ResultType<[]>> {
+  return Result<[]>().Ok([]);
 }
 
 // export async function getExhibitsByUsername(

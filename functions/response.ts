@@ -36,8 +36,6 @@ export const noIdea: NoIdea = { tag: "KeineAhnung" };
 
 function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
   switch (error.tag) {
-    case "ExampleBuildFailed":
-      return StatusCodes.BAD_REQUEST;
     case "AuthorNotFound":
       return StatusCodes.NOT_FOUND;
     case "ExhibitNotFound":

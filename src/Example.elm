@@ -26,8 +26,7 @@ type CompiledExample
 
 
 type ExampleError
-    = ExampleBuildFailed
-    | AuthorNotFound Author Exhibit FoundAuthor
+    = AuthorNotFound Author Exhibit FoundAuthor
     | ExhibitNotFound Author Exhibit
     | AuthorAndExhibitNotFound Author Exhibit
     | KeineAhnung
@@ -67,9 +66,6 @@ authorNotFoundDecoder =
 mapTagToExampleError : Author -> Exhibit -> String -> Decoder ExampleError
 mapTagToExampleError author exhibit tag =
     case tag of
-        "ExampleBuildFailed" ->
-            Decode.succeed ExampleBuildFailed
-
         "AuthorNotFound" ->
             Decode.map (AuthorNotFound author exhibit) authorNotFoundDecoder
 
