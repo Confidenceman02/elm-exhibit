@@ -10,6 +10,7 @@ import Header
 import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
+import Pages.Interstitial.Interstitial as Interstitial
 import Styles.Color exposing (exColorColt100)
 import Styles.Spacing exposing (exSpacingXxl)
 
@@ -94,7 +95,7 @@ mainContentWrapper model =
             Failed e ->
                 case e of
                     Exhibit.AuthorNotFound a ->
-                        ExhibitPane.view ExhibitPane.default []
+                        ExhibitPane.view ExhibitPane.default [ Interstitial.view Interstitial.oops ]
 
                     _ ->
                         text "NOIDEA"

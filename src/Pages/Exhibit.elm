@@ -20,6 +20,7 @@ import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Markdown as Markdown
 import Pages.Interstitial.Interstitial as InterstitialPage
+import Route exposing (exhibitLink)
 import Styles.Color exposing (exColorBorder, exColorBurn500, exColorBurn600, exColorColt100, exColorColt200, exColorOfficialDarkBlue, exColorWhite)
 import Styles.Common as CommonStyles
 import Styles.Font as Font
@@ -229,10 +230,10 @@ packageNotFoundView author package =
 
 
 authorNotFoundView : Author -> Exhibit -> Example.FoundAuthor -> List (Styled.Html msg)
-authorNotFoundView author package foundAuthor =
+authorNotFoundView author exhibit foundAuthor =
     let
         resolvedExhibitHref =
-            "/" ++ String.join "/" [ "example", Author.toString foundAuthor, Exhibit.toString package ]
+            exhibitLink author exhibit
     in
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
         [ text "We can't seem to find the exhibitionist "
@@ -240,7 +241,7 @@ authorNotFoundView author package foundAuthor =
         , text "."
         , Paragraph.view Paragraph.default
             [ text "Looks like the "
-            , text <| Exhibit.toString package
+            , text <| Exhibit.toString exhibit
             , text " exhibit belongs to "
             , text (Author.toString foundAuthor)
             , text " though."

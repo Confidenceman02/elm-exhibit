@@ -1,9 +1,10 @@
-module Route exposing (Route(..), fromUrl, isAuthGithubRedirect)
+module Route exposing (Route(..), authorExhibitLink, exhibitLink, fromUrl, isAuthGithubRedirect)
 
 import Author as Author exposing (Author)
-import Exhibit as Package exposing (Exhibit)
+import Exhibit exposing (Exhibit)
 import GithubAuth
 import Url exposing (Url)
+import Url.Builder
 import Url.Parser as Parser exposing ((</>), (<?>), oneOf, s)
 
 
@@ -18,7 +19,7 @@ parser : Parser.Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home Parser.top
-        , Parser.map Exhibit (s "exhibit" </> Author.urlParser </> Package.urlParser)
+        , Parser.map Exhibit (s exhibitSlug </> Author.urlParser </> Exhibit.urlParser)
         , Parser.map AuthorExhibits Author.urlParser
         , Parser.map AuthGithubRedirect (s "auth" </> s "github" </> s "callback" <?> GithubAuth.callBackParamsParser)
         ]
@@ -29,6 +30,11 @@ fromUrl url =
     Parser.parse parser url
 
 
+exhibitSlug : String
+exhibitSlug =
+    "exhibit"
+
+
 isAuthGithubRedirect : Route -> Bool
 isAuthGithubRedirect route =
     case route of
@@ -37,3 +43,13 @@ isAuthGithubRedirect route =
 
         _ ->
             False
+
+
+authorExhibitLink : Author -> String
+authorExhibitLink author =
+    Url.Builder.relative [ Author.toString author ] []
+
+
+exhibitLink : Author -> Exhibit -> String
+exhibitLink author exhibit =
+    Url.Builder.relative (exhibitSlug :: [ Author.toString author, Exhibit.toString exhibit ]) []
