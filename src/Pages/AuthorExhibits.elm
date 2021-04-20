@@ -95,14 +95,40 @@ mainContentWrapper model =
             Failed e ->
                 case e of
                     Exhibit.AuthorNotFound a ->
-                        div [ StyledAttribs.css [ Css.position Css.absolute, Css.left (Css.pct 50), Css.marginLeft (Css.px -(ExhibitPane.defaultContentWidth / 2)) ] ] [ ExhibitPane.view ExhibitPane.default [ Interstitial.view (Interstitial.oops |> Interstitial.content (authorNotFoundView model.author)) ] ]
+                        errorContainer
+                            [ ExhibitPane.view ExhibitPane.default
+                                [ Interstitial.view
+                                    (Interstitial.bummer
+                                        |> Interstitial.content (authorNotFoundView model.author)
+                                    )
+                                ]
+                            ]
 
                     _ ->
-                        text "NOIDEA"
+                        errorContainer
+                            [ ExhibitPane.view ExhibitPane.default
+                                [ Interstitial.view
+                                    (Interstitial.ourBad
+                                        |> Interstitial.content keineAhnungErrorView
+                                    )
+                                ]
+                            ]
 
             _ ->
                 text "NOIDEA"
         ]
+
+
+errorContainer : List (Styled.Html msg) -> Styled.Html msg
+errorContainer content =
+    div
+        [ StyledAttribs.css
+            [ Css.position Css.absolute
+            , Css.left (Css.pct 50)
+            , Css.marginLeft (Css.px -(ExhibitPane.defaultContentWidth / 2))
+            ]
+        ]
+        content
 
 
 exhibitsContainer : List (Styled.Html msg) -> Styled.Html msg
@@ -159,6 +185,14 @@ authorNotFoundView author =
         [ text "We can't seem to find the author "
         , text <| Author.toString author
         , text "."
+        ]
+    ]
+
+
+keineAhnungErrorView : List (Styled.Html msg)
+keineAhnungErrorView =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We aren't exactly sure what happened but we're really sorry!."
         ]
     ]
 
