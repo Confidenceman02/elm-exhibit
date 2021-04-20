@@ -1,12 +1,12 @@
 module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
 
 import Author exposing (Author)
+import AuthorExhibits as AuthorExhibits exposing (AuthorExhibit, AuthorExhibitsError)
 import Components.ExhibitPane as ExhibitPane
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
 import Effect
-import Exhibit exposing (Exhibit, ExhibitError, fetchAuthorExhibits)
 import Header
 import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
@@ -18,7 +18,7 @@ import Styles.Spacing exposing (exSpacingXxl)
 
 type Msg
     = HeaderMsg Header.Msg
-    | CompletedLoadExhibits (Result ExhibitError (List Exhibit))
+    | CompletedLoadExhibits (Result AuthorExhibitsError (List AuthorExhibit))
 
 
 toHeaderMsg : Header.Msg -> Msg
@@ -33,7 +33,7 @@ type Effect
 type alias Model =
     { context : Context
     , author : Author
-    , exhibits : Status ExhibitError (List Exhibit)
+    , exhibits : Status AuthorExhibitsError (List AuthorExhibit)
     , headerState : Header.State
     }
 
@@ -45,7 +45,7 @@ init author context =
       , exhibits = Loading
       , headerState = Header.initState
       }
-    , fetchAuthorExhibits CompletedLoadExhibits author
+    , AuthorExhibits.fetch CompletedLoadExhibits author
     )
 
 
@@ -94,7 +94,7 @@ mainContentWrapper model =
 
             Failed e ->
                 case e of
-                    Exhibit.AuthorNotFound a ->
+                    AuthorExhibits.AuthorNotFound a ->
                         errorContainer
                             [ ExhibitPane.view ExhibitPane.default
                                 [ Interstitial.view
