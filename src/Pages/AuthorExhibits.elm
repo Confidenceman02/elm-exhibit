@@ -95,7 +95,7 @@ mainContentWrapper model =
             Failed e ->
                 case e of
                     Exhibit.AuthorNotFound a ->
-                        ExhibitPane.view ExhibitPane.default [ Interstitial.view (Interstitial.oops |> Interstitial.content (authorNotFoundView model.author)) ]
+                        div [ StyledAttribs.css [ Css.position Css.absolute, Css.left (Css.pct 50), Css.marginLeft (Css.px -(ExhibitPane.defaultContentWidth / 2)) ] ] [ ExhibitPane.view ExhibitPane.default [ Interstitial.view (Interstitial.oops |> Interstitial.content (authorNotFoundView model.author)) ] ]
 
                     _ ->
                         text "NOIDEA"
