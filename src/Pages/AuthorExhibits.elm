@@ -217,6 +217,7 @@ update msg model =
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
 
         CompletedLoadExhibits (Ok exhibits) ->
+            -- TODO: Handle successful load
             ( model, Cmd.none, Effect.none )
 
         CompletedLoadExhibits (Err err) ->

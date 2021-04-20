@@ -2,7 +2,7 @@ import { APIGatewayEvent, Context } from "aws-lambda";
 import { ResponseBody } from "./types";
 import redisClient from "./redis/client";
 import { Status } from "../lib/result";
-import { errorResponse, noIdea } from "./response";
+import { errorResponse, noIdea, successResponse } from "./response";
 import { getExhibitsByUserId, getUserIdByUsername } from "./redis/actions";
 
 export async function handler(
@@ -29,5 +29,8 @@ export async function handler(
 
   if (userExhibits.Status === Status.Err) return errorResponse(noIdea);
 
-  return errorResponse(noIdea);
+  return successResponse({
+    tag: "AuthorExhibitsFetched",
+    exhibits: userExhibits.data,
+  });
 }
