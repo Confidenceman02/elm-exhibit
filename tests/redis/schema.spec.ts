@@ -1,6 +1,6 @@
 import {
   redisUserSessionUserSession,
-  redisReturnValueToUser,
+  redisUserToUser,
   RedisHValue,
   User,
   UserSession,
@@ -18,7 +18,7 @@ describe("schema", () => {
         avatarUrl: "www.bs.com",
         accessToken: "token 1234",
       };
-      expect(redisReturnValueToUser(redisHValue)).to.deep.eq({
+      expect(redisUserToUser(redisHValue)).to.deep.eq({
         Status: Status.Ok,
         data: {
           username: "confidenceman02",
@@ -31,7 +31,7 @@ describe("schema", () => {
 
     it("should return error result", () => {
       const redisHValue = null;
-      expect(redisReturnValueToUser(redisHValue)).to.deep.eq({
+      expect(redisUserToUser(redisHValue)).to.deep.eq({
         Status: Status.Err,
       });
     });

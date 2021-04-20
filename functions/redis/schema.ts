@@ -30,7 +30,7 @@ export type RedisHValue<T> = {
 
 export const Table = { users: "users", exhibits: "exhibits" };
 
-export function redisReturnValueToUser(
+export function redisUserToUser(
   redisReturnValue: RedisReturnType<RedisHValue<User>>
 ): ResultType<User> {
   if (redisReturnValue !== null) {

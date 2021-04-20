@@ -20,5 +20,6 @@ export async function handler(
   const userIdResult = await getUserIdByUsername(author, redisClient.data);
   if (userIdResult.Status === Status.Err)
     return errorResponse({ tag: "AuthorNotFound" });
+  // TODO: get user exhibits
   return errorResponse(noIdea);
 }

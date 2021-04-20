@@ -1,7 +1,13 @@
 import { Promise } from "bluebird";
 import { createClient, RedisClient } from "redis";
-import { IPromisifiedRedis } from "./types";
+import { IPromisifiedRedis, IPromisifiedRedisMulti } from "./types";
 import { Result, ResultType } from "../../lib/result";
+
+export const redisClientMulti: (
+  cl: IPromisifiedRedis
+) => IPromisifiedRedisMulti = (c: IPromisifiedRedis) => {
+  return Promise.promisifyAll(c.MULTI());
+};
 
 const redisPort: string | undefined = process.env.REDIS_SERVICE_PORT;
 const redisIP: string | undefined = process.env.REDIS_SERVICE_IP;

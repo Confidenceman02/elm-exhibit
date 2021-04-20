@@ -1,4 +1,4 @@
-import { RedisClient } from "redis";
+import { Commands, Multi, RedisClient } from "redis";
 
 export type DBTag = PermanentDBTag | ExpirableDBTag;
 
@@ -15,6 +15,10 @@ export enum ExpirableDBTag {
 export type Seconds = number;
 
 export interface IPromisifiedRedis extends RedisClient {
+  [x: string]: any;
+}
+
+export interface IPromisifiedRedisMulti extends Multi {
   [x: string]: any;
 }
 

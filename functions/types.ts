@@ -7,6 +7,11 @@ export type AuthorExhibitsErrorBody =
   | { tag: "AuthorNotFound" }
   | { tag: "MissingAuthor" };
 
+export type AuthorExhibitsSuccessBody = {
+  tag: "AuthorExhibitsFetched";
+  // TODO: Create Exhibit Type
+  exhibits: [];
+};
 export type ExampleErrorBody =
   | { tag: "ExampleBuildFailed" }
   | { tag: "AuthorNotFound"; foundAuthor: string }

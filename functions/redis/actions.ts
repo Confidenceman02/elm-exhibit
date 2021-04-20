@@ -5,14 +5,20 @@ import {
   generateUserKey,
   resolveExpiration,
 } from "./common";
-import { ExpirableDBTag, IPromisifiedRedis, TempSession } from "./types";
+import { Promise } from "bluebird";
+import {
+  ExpirableDBTag,
+  IPromisifiedRedis,
+  IPromisifiedRedisMulti,
+  TempSession,
+} from "./types";
 import { GithubLoginData, GithubUserData } from "../types";
 import {
   RedisHValue,
   RedisReturnType,
-  redisReturnValueToUser,
   redisUserIdToUserId,
   redisUserSessionUserSession,
+  redisUserToUser,
   redisValueToValueResult,
   Table,
   User,
@@ -20,6 +26,7 @@ import {
   UserSession,
 } from "./schema";
 import { Result, ResultType, Status } from "../../lib/result";
+import { redisClientMulti } from "./client";
 
 // This will store the referer so that when the user approves the github app we can
 // redirect them back to where they tried to login from. i.e. example page
@@ -27,15 +34,14 @@ export async function initTempSession(
   meta: TempSession,
   client: IPromisifiedRedis
 ): Promise<boolean> {
+  const clientMulti: IPromisifiedRedisMulti = redisClientMulti(client);
   const dbKey = generateTempSessionKey(meta.sessionId);
-  // returns the number of fields changed, should always be > 0
-  const tempSessionSet: number = client.HSETAsync(
-    dbKey,
-    "referer",
-    meta.referer
-  );
-  client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.TempSession));
-  return !!tempSessionSet;
+
+  clientMulti.HSET(dbKey, "referer", meta.referer);
+  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.TempSession));
+  const multiReturn: number[] = await clientMulti.EXECAsync();
+
+  return multiReturn.every(Boolean);
 }
 
 export async function initSession(
@@ -44,7 +50,9 @@ export async function initSession(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const dbKey = generateSessionKey(sessionId);
-  const sessionInitiated: number = client.HSETAsync(
+  const clientMulti: IPromisifiedRedisMulti = redisClientMulti(client);
+
+  clientMulti.HSET(
     dbKey,
     UserSchemaKey.username,
     gitUser.login,
@@ -55,8 +63,10 @@ export async function initSession(
     "sessionId",
     sessionId
   );
-  client.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
-  return !!sessionInitiated;
+  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
+  const multiReturn: number[] = await clientMulti.EXECAsync();
+
+  return multiReturn.every(Boolean);
 }
 
 export async function getSession(
@@ -106,24 +116,24 @@ export async function createUser(
   client: IPromisifiedRedis
 ): Promise<boolean> {
   const userReferenceKey = generateUserKey(gitUser.id);
+  const clientMulti = redisClientMulti(client);
+
   // user reference stores a git username and a pointer to the user table. Handy for complex queries.
-  const setUserNameReference = await client.ZADDAsync(
-    Table.users,
-    gitUser.id,
-    gitUser.login
-  );
-  const setUser = await client.HSETAsync(
+  clientMulti.ZADD(Table.users, gitUser.id, gitUser.login);
+  clientMulti.HSET(
     userReferenceKey,
     UserSchemaKey.username,
     gitUser.login,
     UserSchemaKey.userId,
-    gitUser.id,
+    gitUser.id.toString(),
     UserSchemaKey.avatarUrl,
     gitUser.avatar_url,
     UserSchemaKey.accessToken,
     loginData.access_token
   );
-  return !!setUserNameReference && !!setUser;
+  const multiReturn: number[] = await clientMulti.EXECAsync();
+
+  return multiReturn.every(Boolean);
 }
 
 export async function userExists(
@@ -143,7 +153,7 @@ export async function getUser(
   const redisUser: RedisReturnType<
     RedisHValue<User>
   > = await client.HGETALLAsync(userReferenceKey);
-  return redisReturnValueToUser(redisUser);
+  return redisUserToUser(redisUser);
 }
 
 export async function getUserIdByUsername(
