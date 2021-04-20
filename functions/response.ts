@@ -50,7 +50,7 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
       return StatusCodes.NOT_FOUND;
     case "MissingCookie":
       return StatusCodes.BAD_REQUEST;
-    case "MissingAuthor":
+    case "MissingAuthorParam":
       return StatusCodes.BAD_REQUEST;
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR;
@@ -70,6 +70,8 @@ function resolveStatusCodeFromSuccessBody(
     case "Redirecting":
       return StatusCodes.OK;
     case "SessionDestroyed":
+      return StatusCodes.OK;
+    case "AuthorExhibitsFetched":
       return StatusCodes.OK;
     default:
       return StatusCodes.INTERNAL_SERVER_ERROR;

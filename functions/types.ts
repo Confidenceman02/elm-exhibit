@@ -5,7 +5,12 @@ export type NoIdea = { tag: "KeineAhnung" };
 
 export type AuthorExhibitsErrorBody =
   | { tag: "AuthorNotFound" }
-  | { tag: "MissingAuthor" };
+  | { tag: "MissingAuthorParam" };
+
+export type AuthorExhibitsSuccessBody = {
+  tag: "AuthorExhibitsFetched";
+  exhibits: [];
+};
 
 export type ExampleErrorBody =
   | { tag: "AuthorNotFound" }
@@ -36,7 +41,10 @@ export type ErrorBody =
   | SessionErrorBody
   | AuthorExhibitsErrorBody;
 
-export type SuccessBody = SessionSuccessBody | ExampleSuccessBody;
+export type SuccessBody =
+  | SessionSuccessBody
+  | ExampleSuccessBody
+  | AuthorExhibitsSuccessBody;
 
 export type TaggedResponseBody = SuccessBody | ErrorBody;
 

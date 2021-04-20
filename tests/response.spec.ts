@@ -1,6 +1,8 @@
 import { expect } from "chai";
 import { errorResponse, successResponse } from "../functions/response";
 import {
+  AuthorExhibitsErrorBody,
+  AuthorExhibitsSuccessBody,
   ExampleErrorBody,
   ExampleSuccessBody,
   SessionErrorBody,
@@ -106,6 +108,46 @@ describe("errorResponse", () => {
         expect(errorResponse(tag)).to.deep.eq(expected);
       });
     });
+  });
+});
+
+describe("AuthorExhibitsErrorBody", () => {
+  it("AuthorNotFound should return NOT_FOUND", () => {
+    const tag: AuthorExhibitsErrorBody = { tag: "AuthorNotFound" };
+    const expected = {
+      statusCode: StatusCodes.NOT_FOUND,
+      body: JSON.stringify(tag),
+      headers: { "Content-Type": "application/json" },
+    };
+
+    expect(errorResponse(tag)).to.deep.eq(expected);
+  });
+  it("MissingAuthorParam should return BAD_REQUEST", () => {
+    const tag: AuthorExhibitsErrorBody = { tag: "MissingAuthorParam" };
+    const expected = {
+      statusCode: StatusCodes.BAD_REQUEST,
+      body: JSON.stringify(tag),
+      headers: { "Content-Type": "application/json" },
+    };
+
+    expect(errorResponse(tag)).to.deep.eq(expected);
+  });
+});
+
+describe("AuthorExhibitsSuccessBody", () => {
+  it("should return OK", () => {
+    const tag: AuthorExhibitsSuccessBody = {
+      tag: "AuthorExhibitsFetched",
+      exhibits: [],
+    };
+
+    const expected = {
+      statusCode: StatusCodes.OK,
+      body: JSON.stringify(tag),
+      headers: { "Content-Type": "application/json" },
+    };
+
+    expect(successResponse(tag)).to.deep.eq(expected);
   });
 });
 

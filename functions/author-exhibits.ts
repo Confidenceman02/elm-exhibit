@@ -11,7 +11,7 @@ export async function handler(
 ): Promise<ResponseBody> {
   const params = event.queryStringParameters;
   if (!params || !params.author) {
-    return errorResponse({ tag: "MissingAuthor" });
+    return errorResponse({ tag: "MissingAuthorParam" });
   }
   const author: string = params.author;
   if (redisClient.Status === Status.Err) {
