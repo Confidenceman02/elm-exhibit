@@ -271,6 +271,7 @@ wrapperStyles config =
                     [ Css.hover [ Css.backgroundColor (Css.rgba 55 55 55 0.1) ] ]
     in
     [ Css.backgroundColor Css.transparent
+    , Css.displayFlex
     , Css.border (Css.px 0)
     , Css.borderRadius (Css.px 6)
     , resolvePadding
