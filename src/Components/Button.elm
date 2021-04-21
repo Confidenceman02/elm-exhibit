@@ -274,7 +274,7 @@ wrapperStyles config =
     , Css.border (Css.px 0)
     , Css.borderRadius (Css.px 6)
     , resolvePadding
-    , Css.overflow Css.hidden
+    , Css.position Css.relative
     ]
         ++ resolveBackgroundColor
         ++ resolveHoverColor
