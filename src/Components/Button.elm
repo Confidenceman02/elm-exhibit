@@ -1,11 +1,14 @@
 module Components.Button exposing
     ( Icon(..)
     , Orientation(..)
+    , backgroundColor
+    , hoverColor
     , icon
     , iconDefault
     , iconLabel
     , iconOrientation
     , onClick
+    , padding
     , secondary
     , view
     , wrapper
@@ -50,6 +53,9 @@ type alias IconConfiguration =
 type alias Configuration msg =
     { variant : Variant msg
     , onClick : Maybe msg
+    , padding : Bool
+    , backgroundColor : Maybe Css.Color
+    , hoverColor : Maybe Css.Color
     }
 
 
@@ -62,6 +68,9 @@ defaults : Configuration msg
 defaults =
     { variant = Secondary
     , onClick = Nothing
+    , padding = True
+    , backgroundColor = Nothing
+    , hoverColor = Nothing
     }
 
 
@@ -75,6 +84,21 @@ iconConfigDefaults =
 secondary : Config msg
 secondary =
     Config { defaults | variant = Secondary }
+
+
+backgroundColor : Css.Color -> Config msg -> Config msg
+backgroundColor c (Config config) =
+    Config { config | backgroundColor = Just c }
+
+
+padding : Bool -> Config msg -> Config msg
+padding p (Config config) =
+    Config { config | padding = p }
+
+
+hoverColor : Css.Color -> Config msg -> Config msg
+hoverColor c (Config config) =
+    Config { config | hoverColor = Just c }
 
 
 iconDefault : IconConfig
@@ -124,7 +148,7 @@ view (Config config) label =
                     iconStyles
 
                 Wrapper _ ->
-                    wrapperStyles
+                    wrapperStyles config
 
         resolveButtonBody =
             case config.variant of
@@ -220,15 +244,40 @@ iconStyles =
     ]
 
 
-wrapperStyles : List Style
-wrapperStyles =
+wrapperStyles : Configuration msg -> List Style
+wrapperStyles config =
+    let
+        resolvePadding =
+            if config.padding then
+                Css.property "padding" (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
+
+            else
+                Css.padding (Css.px 0)
+
+        resolveBackgroundColor =
+            case config.backgroundColor of
+                Just c ->
+                    [ Css.backgroundColor c ]
+
+                _ ->
+                    []
+
+        resolveHoverColor =
+            case config.hoverColor of
+                Just c ->
+                    [ Css.hover [ Css.backgroundColor c ] ]
+
+                _ ->
+                    [ Css.hover [ Css.backgroundColor (Css.rgba 55 55 55 0.1) ] ]
+    in
     [ Css.backgroundColor Css.transparent
-    , Css.padding (Css.px 0)
     , Css.border (Css.px 0)
-    , Css.property "padding" (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
     , Css.borderRadius (Css.px 6)
-    , Css.hover [ Css.backgroundColor (Css.rgba 55 55 55 0.1) ] -- $kz-color-wisteria-100
+    , resolvePadding
+    , Css.overflow Css.hidden
     ]
+        ++ resolveBackgroundColor
+        ++ resolveHoverColor
 
 
 

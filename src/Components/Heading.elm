@@ -1,16 +1,8 @@
-module Components.Heading exposing (h1, h4, h5, inline, overrides, view)
+module Components.Heading exposing (h1, h3, h4, h5, inline, overrides, view)
 
 import Css
 import Html.Styled as Styled exposing (text)
-import Styles.Typography
-    exposing
-        ( exTypographyHeading1FontSize
-        , exTypographyHeading1FontWeight
-        , exTypographyHeading4FontSize
-        , exTypographyHeading4FontWeight
-        , exTypographyHeading5FontSize
-        , exTypographyHeading5FontWeight
-        )
+import Styles.Typography exposing (exTypographyHeading1FontSize, exTypographyHeading1FontWeight, exTypographyHeading3FontWeight, exTypographyHeading4FontSize, exTypographyHeading4FontWeight, exTypographyHeading5FontSize, exTypographyHeading5FontWeight)
 import Svg.Styled.Attributes as StyledAttribs
 
 
@@ -43,6 +35,7 @@ defaults =
 
 type Variant
     = Heading1
+    | Heading3
     | Heading4
     | Heading5
 
@@ -50,6 +43,11 @@ type Variant
 h1 : Config msg
 h1 =
     Config { defaults | variant = Heading1 }
+
+
+h3 : Config msg
+h3 =
+    Config { defaults | variant = Heading3 }
 
 
 h4 : Config msg
@@ -100,6 +98,9 @@ mapVariantToTag config =
         Heading1 ->
             Styled.h1
 
+        Heading3 ->
+            Styled.h3
+
         Heading4 ->
             Styled.h4
 
@@ -122,6 +123,15 @@ mapVariantToStyles config =
         Heading1 ->
             [ StyledAttribs.css
                 ([ Css.fontWeight (Css.int exTypographyHeading1FontWeight)
+                 , Css.fontSize exTypographyHeading1FontSize
+                 ]
+                    |> withInline
+                )
+            ]
+
+        Heading3 ->
+            [ StyledAttribs.css
+                ([ Css.fontWeight (Css.int exTypographyHeading3FontWeight)
                  , Css.fontSize exTypographyHeading1FontSize
                  ]
                     |> withInline

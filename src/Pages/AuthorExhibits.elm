@@ -2,7 +2,9 @@ module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscription
 
 import Author exposing (Author)
 import AuthorExhibits as AuthorExhibits exposing (AuthorExhibit, AuthorExhibitsError)
+import Components.Button as Button
 import Components.ExhibitPane as ExhibitPane
+import Components.Heading as Heading
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
@@ -12,7 +14,7 @@ import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
-import Styles.Color exposing (exColorColt100)
+import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200)
 import Styles.Spacing exposing (exSpacingXxl)
 
 
@@ -28,6 +30,20 @@ toHeaderMsg =
 
 type Effect
     = HeaderEffect Header.HeaderEffect
+
+
+
+-- CONSTANTS
+
+
+exhibitButtonWidth : Float
+exhibitButtonWidth =
+    exhibitButtonHeight / ExhibitPane.heightRatio * ExhibitPane.widthRatio
+
+
+exhibitButtonHeight : Float
+exhibitButtonHeight =
+    400
 
 
 type alias Model =
@@ -113,6 +129,28 @@ mainContentWrapper model =
                                     )
                                 ]
                             ]
+
+            Loaded e ->
+                div []
+                    [ Heading.view
+                        (Heading.h4
+                            |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
+                            |> Heading.inline True
+                            |> Heading.overrides []
+                        )
+                        "Create an exhibit to start sharing your elm package examples"
+                    , Button.view
+                        (Button.wrapper
+                            [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
+                                [ Heading.view (Heading.h5 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0) ] ]) "Creat an exhibit"
+                                ]
+                            ]
+                            |> Button.padding False
+                            |> Button.backgroundColor exColorBorder
+                            |> Button.hoverColor exColorColt200
+                        )
+                        "Create an exhibit"
+                    ]
 
             _ ->
                 text "NOIDEA"
@@ -217,8 +255,7 @@ update msg model =
             ( { model | headerState = headerState }, Cmd.map HeaderMsg headerCmds, Effect.map HeaderEffect headerEffect )
 
         CompletedLoadExhibits (Ok exhibits) ->
-            -- TODO: Handle successful load
-            ( model, Cmd.none, Effect.none )
+            ( { model | exhibits = Loaded exhibits }, Cmd.none, Effect.none )
 
         CompletedLoadExhibits (Err err) ->
             ( { model | exhibits = Failed err }, Cmd.none, Effect.none )

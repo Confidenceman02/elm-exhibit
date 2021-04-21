@@ -1,4 +1,4 @@
-module Components.ExhibitPane exposing (ShadowPosition(..), default, defaultContentWidth, shadowPosition, view)
+module Components.ExhibitPane exposing (ShadowPosition(..), default, defaultContentWidth, heightRatio, shadowPosition, view, widthRatio)
 
 import Css
 import Html.Styled as Styled exposing (Attribute, div)
@@ -49,9 +49,23 @@ shadowPosition pos (Config config) =
     Config { config | shadowPosition = pos }
 
 
+
+-- pane aspect ratio = 4:5
+
+
+heightRatio : Float
+heightRatio =
+    5
+
+
+widthRatio : Float
+widthRatio =
+    4
+
+
 defaultContentWidth : Float
 defaultContentWidth =
-    460
+    defaultContentHeight / heightRatio * widthRatio
 
 
 defaultContentHeight : Float

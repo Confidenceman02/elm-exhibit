@@ -2,6 +2,7 @@ module Styles.Typography exposing
     ( exTypographyButtonSecondaryFontSize
     , exTypographyHeading1FontSize
     , exTypographyHeading1FontWeight
+    , exTypographyHeading3FontWeight
     , exTypographyHeading4FontSize
     , exTypographyHeading4FontWeight
     , exTypographyHeading5FontSize
@@ -27,6 +28,11 @@ exTypographyHeading1FontSize =
 
 exTypographyHeading1FontWeight : Int
 exTypographyHeading1FontWeight =
+    700
+
+
+exTypographyHeading3FontWeight : Int
+exTypographyHeading3FontWeight =
     700
 
 
