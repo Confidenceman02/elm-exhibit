@@ -16,7 +16,7 @@ import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200)
-import Styles.Spacing exposing (exSpacingLg, exSpacingXxl)
+import Styles.Spacing exposing (exSpacingLg, exSpacingMd, exSpacingXxl)
 
 
 type Msg
@@ -133,12 +133,12 @@ mainContentWrapper model =
 
             Loaded e ->
                 div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
-                    [ div [ StyledAttribs.css [ Css.width (Css.pct 60), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
+                    [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
                         [ Heading.view
-                            (Heading.h4
-                                |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 400) ] ]
+                            (Heading.h2
+                                |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
                                 |> Heading.inline True
-                                |> Heading.overrides []
+                             --|> Heading.overrides []
                             )
                             "Create an exhibit to start sharing your elm package examples."
                         ]
@@ -146,8 +146,10 @@ mainContentWrapper model =
                         [ Button.view
                             (Button.wrapper
                                 [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
-                                    [ Heading.view (Heading.h3 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0) ] ]) "Create an exhibit"
-                                    , AddLogo.view
+                                    [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
+                                        [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
+                                        , AddLogo.view
+                                        ]
                                     ]
                                 ]
                                 |> Button.padding False

@@ -1,4 +1,4 @@
-module Components.Heading exposing (h1, h3, h4, h5, inline, overrides, view)
+module Components.Heading exposing (h1, h2, h3, h4, h5, inline, overrides, view)
 
 import Css
 import Html.Styled as Styled exposing (text)
@@ -35,6 +35,7 @@ defaults =
 
 type Variant
     = Heading1
+    | Heading2
     | Heading3
     | Heading4
     | Heading5
@@ -43,6 +44,11 @@ type Variant
 h1 : Config msg
 h1 =
     Config { defaults | variant = Heading1 }
+
+
+h2 : Config msg
+h2 =
+    Config { defaults | variant = Heading2 }
 
 
 h3 : Config msg
@@ -98,6 +104,9 @@ mapVariantToTag config =
         Heading1 ->
             Styled.h1
 
+        Heading2 ->
+            Styled.h2
+
         Heading3 ->
             Styled.h3
 
@@ -121,6 +130,15 @@ mapVariantToStyles config =
     in
     case config.variant of
         Heading1 ->
+            [ StyledAttribs.css
+                ([ Css.fontWeight (Css.int exTypographyHeading1FontWeight)
+                 , Css.fontSize exTypographyHeading1FontSize
+                 ]
+                    |> withInline
+                )
+            ]
+
+        Heading2 ->
             [ StyledAttribs.css
                 ([ Css.fontWeight (Css.int exTypographyHeading1FontWeight)
                  , Css.fontSize exTypographyHeading1FontSize
