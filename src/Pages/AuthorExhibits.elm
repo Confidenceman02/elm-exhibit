@@ -2,6 +2,7 @@ module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscription
 
 import Author exposing (Author)
 import AuthorExhibits as AuthorExhibits exposing (AuthorExhibit, AuthorExhibitsError)
+import Components.AddLogo as AddLogo
 import Components.Button as Button
 import Components.ExhibitPane as ExhibitPane
 import Components.Heading as Heading
@@ -145,7 +146,8 @@ mainContentWrapper model =
                         [ Button.view
                             (Button.wrapper
                                 [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
-                                    [ Heading.view (Heading.h5 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0) ] ]) "Creat an exhibit"
+                                    [ Heading.view (Heading.h3 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0) ] ]) "Create an exhibit"
+                                    , AddLogo.view
                                     ]
                                 ]
                                 |> Button.padding False
