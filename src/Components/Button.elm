@@ -1,7 +1,9 @@
 module Components.Button exposing
-    ( Icon(..)
+    ( Cursor(..)
+    , Icon(..)
     , Orientation(..)
     , backgroundColor
+    , cursor
     , hoverColor
     , icon
     , iconDefault
@@ -56,7 +58,13 @@ type alias Configuration msg =
     , padding : Bool
     , backgroundColor : Maybe Css.Color
     , hoverColor : Maybe Css.Color
+    , cursor : Cursor
     }
+
+
+type Cursor
+    = Pointer
+    | None
 
 
 type Orientation
@@ -71,6 +79,7 @@ defaults =
     , padding = True
     , backgroundColor = Nothing
     , hoverColor = Nothing
+    , cursor = None
     }
 
 
@@ -126,6 +135,11 @@ wrapper content =
     Config { defaults | variant = Wrapper content }
 
 
+cursor : Cursor -> Config msg -> Config msg
+cursor c (Config config) =
+    Config { config | cursor = c }
+
+
 view : Config msg -> String -> Styled.Html msg
 view (Config config) label =
     let
@@ -135,6 +149,17 @@ view (Config config) label =
         eventAttribs =
             List.filterMap identity
                 [ Maybe.map onClickMsg config.onClick ]
+
+        commonStyles =
+            [ Css.cursor
+                (case config.cursor of
+                    Pointer ->
+                        Css.pointer
+
+                    _ ->
+                        Css.default
+                )
+            ]
 
         calc =
             (Css.calc Grid.halfGrid Css.minus (Css.px 2)).value
@@ -170,7 +195,7 @@ view (Config config) label =
                     content
     in
     button
-        ([ StyledAttribs.type_ "button", StyledAttribs.css resolveStyles ] ++ eventAttribs)
+        ([ StyledAttribs.type_ "button", StyledAttribs.css (resolveStyles ++ commonStyles) ] ++ eventAttribs)
         resolveButtonBody
 
 

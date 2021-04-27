@@ -143,11 +143,11 @@ view model =
                 GotExhibitMsg
                 (ExhibitPage.view exhibitModel)
 
-        AuthorExhibits authorModel ->
+        AuthorExhibits authorExhibitsModel ->
             viewPage
-                (Page.AuthorExhibits authorModel.author authorModel.context.session AuthorExhibitsPage.toHeaderMsg authorModel.headerState)
+                (Page.AuthorExhibits authorExhibitsModel.author authorExhibitsModel.context.session AuthorExhibitsPage.toHeaderMsg authorExhibitsModel.headerState)
                 GotAuthorMsg
-                (AuthorExhibitsPage.view authorModel)
+                (AuthorExhibitsPage.view authorExhibitsModel)
 
         Home _ ->
             viewPage Page.Home GotHomeMsg HomePage.view

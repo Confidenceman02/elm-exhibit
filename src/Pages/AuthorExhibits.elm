@@ -13,6 +13,7 @@ import Effect
 import Header
 import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
+import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200)
@@ -74,7 +75,7 @@ type Status error success
     | Failed error
 
 
-view : Model -> { title : String, content : Styled.Html msg }
+view : Model -> { title : String, content : Styled.Html Msg }
 view model =
     { title = Author.toString model.author
     , content =
@@ -91,7 +92,7 @@ view model =
     }
 
 
-mainContentWrapper : Model -> Styled.Html msg
+mainContentWrapper : Model -> Styled.Html Msg
 mainContentWrapper model =
     div
         [ StyledAttribs.css
@@ -131,34 +132,36 @@ mainContentWrapper model =
                                 ]
                             ]
 
-            Loaded e ->
-                div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
-                    [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
-                        [ Heading.view
-                            (Heading.h2
-                                |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
-                                |> Heading.inline True
-                             --|> Heading.overrides []
-                            )
-                            "Create an exhibit to start sharing your elm package examples."
-                        ]
-                    , div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto ] ]
-                        [ Button.view
-                            (Button.wrapper
-                                [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
-                                    [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
-                                        [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
-                                        , AddLogo.view
+            Loaded exhibits ->
+                viewIf (List.isEmpty exhibits)
+                    (div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
+                        [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
+                            [ Heading.view
+                                (Heading.h2
+                                    |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
+                                    |> Heading.inline True
+                                )
+                                "Create your first exhibit to start sharing your elm package examples."
+                            ]
+                        , div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto ] ]
+                            [ Button.view
+                                (Button.wrapper
+                                    [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
+                                        [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
+                                            [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
+                                            , AddLogo.view
+                                            ]
                                         ]
                                     ]
-                                ]
-                                |> Button.padding False
-                                |> Button.backgroundColor exColorBorder
-                                |> Button.hoverColor exColorColt200
-                            )
-                            "Create an exhibit"
+                                    |> Button.padding False
+                                    |> Button.backgroundColor exColorBorder
+                                    |> Button.hoverColor (Css.hex "#CFCFCF")
+                                    |> Button.cursor Button.Pointer
+                                )
+                                "Create an exhibit"
+                            ]
                         ]
-                    ]
+                    )
 
             _ ->
                 text "NOIDEA"
