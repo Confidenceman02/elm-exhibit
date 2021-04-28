@@ -1,4 +1,5 @@
 import {
+  generateElmPackagesCacheKey,
   generateExhibitKey,
   generateSessionKey,
   generateTempSessionKey,
@@ -6,12 +7,12 @@ import {
   resolveExpiration,
 } from "./common";
 import {
-  ExpirableDBTag,
+  ExpirableDBKey,
   IPromisifiedRedis,
   IPromisifiedRedisMulti,
   TempSession,
 } from "./types";
-import { GithubLoginData, GithubUserData } from "../types";
+import { ElmLangPackage, GithubLoginData, GithubUserData } from "../types";
 import {
   RedisHValue,
   RedisReturnType,
@@ -37,7 +38,7 @@ export async function initTempSession(
   const dbKey = generateTempSessionKey(meta.sessionId);
 
   clientMulti.HSET(dbKey, "referer", meta.referer);
-  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.TempSession));
+  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBKey.TempSession));
   const multiReturn: number[] = await clientMulti.EXECAsync();
 
   return multiReturn.every(Boolean);
@@ -62,7 +63,7 @@ export async function initSession(
     "sessionId",
     sessionId
   );
-  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBTag.Session));
+  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBKey.Session));
   const multiReturn: number[] = await clientMulti.EXECAsync();
 
   return multiReturn.every(Boolean);
