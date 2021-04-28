@@ -1,6 +1,7 @@
 import { Result, ResultType } from "../lib/result";
 import { URL } from "url";
 import {
+  ELM_PACKAGE_SEARCH_ENDPOINT,
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   GITHUB_OAUTH_AUTHORIZE_ENDPOINT,
@@ -41,4 +42,8 @@ export function githubAuthorizeEndpoint(
     return Result<URL>().Ok(endPoint);
   }
   return Result().Err;
+}
+
+export function elmPackageSearchEndpoint(): URL {
+  return new URL(ELM_PACKAGE_SEARCH_ENDPOINT);
 }
