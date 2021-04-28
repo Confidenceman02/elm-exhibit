@@ -16,7 +16,7 @@ describe("elmLangPackagesToAuthor", () => {
   it("should filter elm lang packages to a specific author", () => {
     const packages: ElmLangPackage[] = [
       { name: "elm-explorations/test" },
-      { name: "lukewestby/http-extra" },
+      { name: "lukewestbyConfidenceman02/http-extra" },
       { name: "Confidenceman02/elm-animate-height" },
       { name: "Confidenceman02/elm-select" },
     ];

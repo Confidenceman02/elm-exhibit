@@ -13,7 +13,7 @@ export function elmLangPackagesToAuthor(
       0,
       p.name.lastIndexOf("/")
     );
-    return packageAuthorSubString.match(author);
+    return packageAuthorSubString === author;
   });
   return filteredPackages;
 }

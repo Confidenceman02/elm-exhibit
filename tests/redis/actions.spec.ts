@@ -434,10 +434,10 @@ describe("actions", () => {
       expect(elmPackagesCache).to.deep.eq({
         Status: Status.Ok,
         data: [
-          "Confidenceman02/elm-exhibit",
-          "Confidenceman02/elm-animate-height",
-          "Confidenceman02/elm-select",
-          "Someone/elm-something",
+          { name: "Confidenceman02/elm-exhibit" },
+          { name: "Confidenceman02/elm-animate-height" },
+          { name: "Confidenceman02/elm-select" },
+          { name: "Someone/elm-something" },
         ],
       });
     });

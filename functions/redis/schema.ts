@@ -1,4 +1,5 @@
 import { Result, ResultType } from "../../lib/result";
+import { ElmLangPackage } from "../types";
 
 export const UserSchemaKey = {
   username: "username",
@@ -71,6 +72,17 @@ export function redisUserIdToUserId(
       return Result<null>().Err;
     }
     return Result<number>().Ok(parsedId);
+  }
+  return Result().Err;
+}
+
+export function redisElmPackagesCacheToElmLangPackages(
+  redisValue: RedisReturnType<string[]>
+): ResultType<ElmLangPackage[]> {
+  if (redisValue !== null) {
+    return Result<ElmLangPackage[]>().Ok(
+      redisValue.map((authorName) => ({ name: authorName }))
+    );
   }
   return Result().Err;
 }

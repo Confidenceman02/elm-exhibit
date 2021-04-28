@@ -5,6 +5,7 @@ import {
   User,
   UserSession,
   redisUserIdToUserId,
+  redisElmPackagesCacheToElmLangPackages,
 } from "../../functions/redis/schema";
 import { expect } from "chai";
 import { Status } from "../../lib/result";
@@ -84,6 +85,25 @@ describe("schema", () => {
       const username = "NaN";
       expect(redisUserIdToUserId(username)).to.deep.eq({
         Status: Status.Err,
+      });
+    });
+  });
+
+  describe("redisElmPackagesCacheToElmLangPackages", () => {
+    it("should return elm lang packages", () => {
+      const redisElmPackages: string[] = [
+        "Confidenceman02/elm-animate-height",
+        "Confidenceman02/elm-exhibit",
+      ];
+
+      expect(
+        redisElmPackagesCacheToElmLangPackages(redisElmPackages)
+      ).to.deep.eq({
+        Status: Status.Ok,
+        data: [
+          { name: "Confidenceman02/elm-animate-height" },
+          { name: "Confidenceman02/elm-exhibit" },
+        ],
       });
     });
   });

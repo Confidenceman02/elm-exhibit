@@ -14,6 +14,7 @@ import {
 } from "./types";
 import { ElmLangPackage, GithubLoginData, GithubUserData } from "../types";
 import {
+  redisElmPackagesCacheToElmLangPackages,
   RedisHValue,
   RedisReturnType,
   redisUserIdToUserId,
@@ -247,7 +248,7 @@ export async function setElmPackagesCache(
 
 export async function getElmPackagesCache(
   client: IPromisifiedRedis
-): Promise<ResultType<string[]>> {
+): Promise<ResultType<ElmLangPackage[]>> {
   const dbKey = generateElmPackagesCacheKey();
   const cacheExists: number = await client.EXISTSAsync(dbKey);
   if (cacheExists === 0) return Result().Err;
@@ -256,7 +257,7 @@ export async function getElmPackagesCache(
     0,
     -1
   );
-  return redisValueToValueResult<string[]>(elmPackages);
+  return redisElmPackagesCacheToElmLangPackages(elmPackages);
 }
 
 // export async function getExhibitsByUsername(
