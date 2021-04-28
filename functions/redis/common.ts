@@ -1,14 +1,17 @@
-import { ExpirableDBTag, PermanentDBTag, Seconds } from "./types";
+import { ExpirableDBKey, PermanentDBTag, Seconds } from "./types";
+import { Table } from "./schema";
 
 function generateExpirableDBKey(
-  tag: ExpirableDBTag,
+  key: ExpirableDBKey,
   uniqueKey: string
 ): string {
-  switch (tag) {
-    case ExpirableDBTag.TempSession:
+  switch (key) {
+    case ExpirableDBKey.TempSession:
       return `${uniqueKey}.tempSession`;
-    case ExpirableDBTag.Session:
+    case ExpirableDBKey.Session:
       return `${uniqueKey}.session`;
+    case ExpirableDBKey.ElmPackages:
+      return `${uniqueKey}.cache`;
   }
 }
 
@@ -24,12 +27,19 @@ function generatePermanentDBKey(
   }
 }
 
+export function generateElmPackagesCacheKey() {
+  return generateExpirableDBKey(
+    ExpirableDBKey.ElmPackages,
+    Table.elmLangPackages
+  );
+}
+
 export function generateSessionKey(uniqueKey: string) {
-  return generateExpirableDBKey(ExpirableDBTag.Session, uniqueKey);
+  return generateExpirableDBKey(ExpirableDBKey.Session, uniqueKey);
 }
 
 export function generateTempSessionKey(uniqueKey: string) {
-  return generateExpirableDBKey(ExpirableDBTag.TempSession, uniqueKey);
+  return generateExpirableDBKey(ExpirableDBKey.TempSession, uniqueKey);
 }
 
 export function generateExhibitKey(
@@ -46,11 +56,13 @@ export function generateUserKey(userId: number) {
   return generatePermanentDBKey(PermanentDBTag.User, userId.toString());
 }
 
-export function resolveExpiration(tag: ExpirableDBTag): Seconds {
+export function resolveExpiration(tag: ExpirableDBKey): Seconds {
   switch (tag) {
-    case ExpirableDBTag.TempSession:
+    case ExpirableDBKey.TempSession:
       return 300;
-    case ExpirableDBTag.Session:
+    case ExpirableDBKey.Session:
       return 604800;
+    case ExpirableDBKey.ElmPackages:
+      return 600;
   }
 }
