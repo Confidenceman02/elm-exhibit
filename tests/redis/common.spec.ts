@@ -1,4 +1,5 @@
 import {
+  generateElmPackagesCacheKey,
   generateExhibitKey,
   generateSessionKey,
   generateTempSessionKey,
@@ -6,7 +7,7 @@ import {
   resolveExpiration,
 } from "../../functions/redis/common";
 import { expect } from "chai";
-import { ExpirableDBTag, PermanentDBTag } from "../../functions/redis/types";
+import { ExpirableDBKey, PermanentDBTag } from "../../functions/redis/types";
 
 describe("generateUserKey", () => {
   it("should generate a user key", () => {
@@ -37,12 +38,23 @@ describe("generateTempSessionKey", () => {
 describe("resolveExpiration", () => {
   context("TempSession", () => {
     it("returns the expiration", () => {
-      expect(resolveExpiration(ExpirableDBTag.TempSession)).to.eq(300);
+      expect(resolveExpiration(ExpirableDBKey.TempSession)).to.eq(300);
     });
   });
   context("Session", () => {
     it("returns the expiration", () => {
-      expect(resolveExpiration(ExpirableDBTag.Session)).to.eq(604800);
+      expect(resolveExpiration(ExpirableDBKey.Session)).to.eq(604800);
     });
+  });
+  context("ElmPackages", () => {
+    it("returns the expiration", () => {
+      expect(resolveExpiration(ExpirableDBKey.ElmPackages)).to.eq(600);
+    });
+  });
+});
+
+describe("generateElmPackagesCacheKey", () => {
+  it("returns a elm packages cache key", () => {
+    expect(generateElmPackagesCacheKey()).to.eq("elmLangPackages.cache");
   });
 });

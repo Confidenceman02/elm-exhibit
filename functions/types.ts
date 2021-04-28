@@ -5,6 +5,7 @@ export type NoIdea = { tag: "KeineAhnung" };
 
 export type AuthorExhibitsErrorBody =
   | { tag: "AuthorNotFound" }
+  | { tag: "AuthorNotFoundWithElmLangPackages"; packages: ElmLangPackage[] }
   | { tag: "MissingAuthorParam" };
 
 export type AuthorExhibitsSuccessBody = {

@@ -1,15 +1,16 @@
 import { Commands, Multi, RedisClient } from "redis";
 
-export type DBTag = PermanentDBTag | ExpirableDBTag;
+export type DBTag = PermanentDBTag | ExpirableDBKey;
 
 export enum PermanentDBTag {
   User,
   Exhibit,
 }
 
-export enum ExpirableDBTag {
+export enum ExpirableDBKey {
   TempSession,
   Session,
+  ElmPackages,
 }
 
 export type Seconds = number;

@@ -122,6 +122,21 @@ describe("AuthorExhibitsErrorBody", () => {
 
     expect(errorResponse(tag)).to.deep.eq(expected);
   });
+
+  it("AuthorNotFoundWithElmLangPackages should return NOT_FOUND", () => {
+    const tag: AuthorExhibitsErrorBody = {
+      tag: "AuthorNotFoundWithElmLangPackages",
+      packages: [{ name: "Confidenceman02/elm-animate-height" }],
+    };
+    const expected = {
+      statusCode: StatusCodes.NOT_FOUND,
+      body: JSON.stringify(tag),
+      headers: { "Content-Type": "application/json" },
+    };
+
+    expect(errorResponse(tag)).to.deep.eq(expected);
+  });
+
   it("MissingAuthorParam should return BAD_REQUEST", () => {
     const tag: AuthorExhibitsErrorBody = { tag: "MissingAuthorParam" };
     const expected = {

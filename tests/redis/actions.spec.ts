@@ -16,9 +16,15 @@ import {
   getUsernameByUserId,
   createExhibitReference,
   updateUserAccessToken,
+  getElmPackagesCache,
+  setElmPackagesCache,
 } from "../../functions/redis/actions";
 import { TempSession } from "../../functions/redis/types";
-import { GithubLoginData, GithubUserData } from "../../functions/types";
+import {
+  ElmLangPackage,
+  GithubLoginData,
+  GithubUserData,
+} from "../../functions/types";
 
 describe("actions", () => {
   if (redisClientResult.Status === Status.Err) {
@@ -246,6 +252,7 @@ describe("actions", () => {
       expect(sessionDestroyed).to.be.true;
     });
   });
+
   describe("getUserIdByUsername", () => {
     it("should return Ok userId result", async () => {
       const gitUserData: GithubUserData = {
@@ -271,6 +278,7 @@ describe("actions", () => {
       });
     });
   });
+
   describe("getExhibitReferencesByUserId", () => {
     it("should return exhibit references", async () => {
       const gitUserData: GithubUserData = {
@@ -310,6 +318,7 @@ describe("actions", () => {
       });
     });
   });
+
   describe("createExhibitReference", () => {
     it("should create a exhibit reference", async () => {
       const gitUserData: GithubUserData = {
@@ -340,6 +349,7 @@ describe("actions", () => {
       expect(userReferenceCreated).to.be.false;
     });
   });
+
   describe("getUsernameByUserId", () => {
     it("should get a user name", async () => {
       const gitUserData: GithubUserData = {
@@ -360,6 +370,7 @@ describe("actions", () => {
       });
     });
   });
+
   describe("updateUserAccessToken", () => {
     it("should update access token", async () => {
       const gitUserData: GithubUserData = {
@@ -380,6 +391,55 @@ describe("actions", () => {
       const updated = await updateUserAccessToken(2345, "token 1111", client);
 
       expect(updated).to.be.false;
+    });
+  });
+
+  describe("setElmPackagesCache", () => {
+    it("should set elm packages cache", async () => {
+      const packagesCache: ElmLangPackage[] = [
+        { name: "Confidenceman02/elm-exhibit" },
+        { name: "Confidenceman02/elm-animate-height" },
+        { name: "Confidenceman02/elm-select" },
+        { name: "Someone/elm-something" },
+      ];
+
+      const elmPackagesSet: boolean = await setElmPackagesCache(
+        packagesCache,
+        client
+      );
+
+      expect(elmPackagesSet).to.be.true;
+    });
+  });
+
+  describe("getElmPackagesCache", () => {
+    it("should return Err result when it doesnt exist", async () => {
+      const packagesCache = await getElmPackagesCache(client);
+
+      expect(packagesCache).to.deep.eq({
+        Status: Status.Err,
+      });
+    });
+    it("should return all elm packages", async () => {
+      const packagesCache: ElmLangPackage[] = [
+        { name: "Confidenceman02/elm-exhibit" },
+        { name: "Confidenceman02/elm-animate-height" },
+        { name: "Confidenceman02/elm-select" },
+        { name: "Someone/elm-something" },
+      ];
+
+      await setElmPackagesCache(packagesCache, client);
+      const elmPackagesCache = await getElmPackagesCache(client);
+
+      expect(elmPackagesCache).to.deep.eq({
+        Status: Status.Ok,
+        data: [
+          "Confidenceman02/elm-exhibit",
+          "Confidenceman02/elm-animate-height",
+          "Confidenceman02/elm-select",
+          "Someone/elm-something",
+        ],
+      });
     });
   });
 });
