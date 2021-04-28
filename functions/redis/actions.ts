@@ -231,6 +231,34 @@ export async function getExhibitsByUserId(
   return Result<[]>().Ok([]);
 }
 
+export async function setElmPackagesCache(
+  packages: ElmLangPackage[],
+  client: IPromisifiedRedis
+): Promise<boolean> {
+  const clientMulti = redisClientMulti(client);
+  const dbKey = generateElmPackagesCacheKey();
+  for (const pkg of packages) {
+    clientMulti.RPUSH(dbKey, pkg.name);
+  }
+  const multiReturn: number[] = await clientMulti.EXECAsync();
+  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBKey.ElmPackages));
+  return multiReturn[multiReturn.length - 1] === packages.length;
+}
+
+export async function getElmPackagesCache(
+  client: IPromisifiedRedis
+): Promise<ResultType<string[]>> {
+  const dbKey = generateElmPackagesCacheKey();
+  const cacheExists: number = await client.EXISTSAsync(dbKey);
+  if (cacheExists === 0) return Result().Err;
+  const elmPackages: RedisReturnType<string[]> = await client.LRANGEAsync(
+    dbKey,
+    0,
+    -1
+  );
+  return redisValueToValueResult<string[]>(elmPackages);
+}
+
 // export async function getExhibitsByUsername(
 //   username: string,
 //   client: IPromisifiedRedis
