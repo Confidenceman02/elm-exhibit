@@ -28,7 +28,11 @@ export type RedisHValue<T> = {
   [P in keyof T]: string;
 };
 
-export const Table = { users: "users", exhibits: "exhibits" };
+export const Table = {
+  users: "users",
+  exhibits: "exhibits",
+  elmLangPackages: "elmLangPackages",
+};
 
 export function redisUserToUser(
   redisReturnValue: RedisReturnType<RedisHValue<User>>
