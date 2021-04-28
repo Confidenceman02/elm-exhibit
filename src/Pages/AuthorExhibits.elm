@@ -16,8 +16,10 @@ import Html.Styled.Attributes as StyledAttribs
 import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
+import Session
 import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200)
 import Styles.Spacing exposing (exSpacingLg, exSpacingMd, exSpacingXxl)
+import Viewer
 
 
 type Msg
@@ -133,35 +135,47 @@ mainContentWrapper model =
                             ]
 
             Loaded exhibits ->
-                viewIf (List.isEmpty exhibits)
-                    (div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
-                        [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
-                            [ Heading.view
-                                (Heading.h2
-                                    |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
-                                    |> Heading.inline True
-                                )
-                                "Create your first exhibit to start sharing your elm package examples."
-                            ]
-                        , div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto ] ]
-                            [ Button.view
-                                (Button.wrapper
-                                    [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
-                                        [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
-                                            [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
-                                            , AddLogo.view
-                                            ]
+                if List.isEmpty exhibits then
+                    case model.context.session of
+                        Session.LoggedIn viewer ->
+                            if Viewer.isUsername (Author.toString model.author) viewer then
+                                div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
+                                    [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
+                                        [ Heading.view
+                                            (Heading.h2
+                                                |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
+                                                |> Heading.inline True
+                                            )
+                                            "Create your first exhibit to start sharing your elm package examples."
+                                        ]
+                                    , div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto ] ]
+                                        [ Button.view
+                                            (Button.wrapper
+                                                [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
+                                                    [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
+                                                        [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
+                                                        , AddLogo.view
+                                                        ]
+                                                    ]
+                                                ]
+                                                |> Button.padding False
+                                                |> Button.backgroundColor exColorBorder
+                                                |> Button.hoverColor (Css.hex "#CFCFCF")
+                                                |> Button.cursor Button.Pointer
+                                            )
+                                            "Create an exhibit"
                                         ]
                                     ]
-                                    |> Button.padding False
-                                    |> Button.backgroundColor exColorBorder
-                                    |> Button.hoverColor (Css.hex "#CFCFCF")
-                                    |> Button.cursor Button.Pointer
-                                )
-                                "Create an exhibit"
-                            ]
-                        ]
-                    )
+
+                            else
+                                -- TODO: Show interstitial page
+                                text "not the author"
+
+                        _ ->
+                            text ""
+
+                else
+                    text "not empty"
 
             _ ->
                 text "NOIDEA"
