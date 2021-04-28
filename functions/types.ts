@@ -72,6 +72,8 @@ export type GithubUserData = {
   avatar_url: string;
 };
 
+export type ElmLangPackage = { name: string };
+
 export type GithubLoginData = {
   access_token: string;
 };
