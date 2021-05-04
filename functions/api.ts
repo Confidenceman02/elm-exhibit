@@ -14,8 +14,10 @@ export async function getElmPackages(
 ): Promise<ResultType<ElmLangPackage[]>> {
   //  try fetch from cache first
   const cache: ResultType<ElmLangPackage[]> = await getElmPackagesCache(client);
-  if (cache.Status === Status.Ok) return cache;
-  //  get from elm-lang
+  if (cache.Status === Status.Ok) {
+    return cache;
+  }
+  //  get from elm-lang.org
   const fetchedPackages = await fetchElmPackages();
   if (fetchedPackages.Status === Status.Ok) {
     await setElmPackagesCache(fetchedPackages.data, client);

@@ -1,16 +1,11 @@
 import { APIGatewayEvent, Context } from "aws-lambda";
 import { ElmLangPackage, ResponseBody } from "./types";
 import redisClient from "./redis/client";
-import { ResultType, Status } from "../lib/result";
+import { Status } from "../lib/result";
 import { errorResponse, noIdea, successResponse } from "./response";
-import {
-  getElmPackagesCache,
-  getExhibitsByUserId,
-  getUserIdByUsername,
-  setElmPackagesCache,
-} from "./redis/actions";
+import { getExhibitsByUserId, getUserIdByUsername } from "./redis/actions";
 import { elmLangPackagesToAuthor } from "./common";
-import { fetchElmPackages } from "./fetch";
+import { getElmPackages } from "./api";
 
 export async function handler(
   event: APIGatewayEvent,
@@ -26,43 +21,24 @@ export async function handler(
   }
   const client = redisClient.data;
   const userIdResult = await getUserIdByUsername(author, client);
+  // Author isn't registered with elm-exhibit but maybe they are elm package authors?
   if (userIdResult.Status === Status.Err) {
-    // check elm packages cache
-    const elmPackagesCache = await getElmPackagesCache(client);
-    if (elmPackagesCache.Status === Status.Ok) {
-      //  resolve from cache
+    const elmPackagesResult = await getElmPackages(client);
+    if (elmPackagesResult.Status === Status.Ok) {
       const authorPackages: ElmLangPackage[] = elmLangPackagesToAuthor(
         author,
-        elmPackagesCache.data
+        elmPackagesResult.data
       );
 
       if (authorPackages.length === 0)
+        // not an elm package author
         return errorResponse({ tag: "AuthorNotFound" });
       return errorResponse({
         tag: "AuthorNotFoundWithElmLangPackages",
         packages: authorPackages,
       });
     }
-    // No cache at this point so retrieve packages from elm-lang
-    const elmPackagesResult: ResultType<
-      ElmLangPackage[]
-    > = await fetchElmPackages();
-    if (elmPackagesResult.Status === Status.Err)
-      return errorResponse({ tag: "AuthorNotFound" });
-    // cache result, we dont care if it actually works
-    await setElmPackagesCache(elmPackagesResult.data, client);
-    const authorPackages: ElmLangPackage[] = elmLangPackagesToAuthor(
-      author,
-      elmPackagesResult.data
-    );
-
-    if (authorPackages.length === 0)
-      return errorResponse({ tag: "AuthorNotFound" });
-    // TODO: get user exhibits
-    return errorResponse({
-      tag: "AuthorNotFoundWithElmLangPackages",
-      packages: authorPackages,
-    });
+    return errorResponse(noIdea);
   }
 
   const userExhibits = await getExhibitsByUserId(userIdResult.data, client);
