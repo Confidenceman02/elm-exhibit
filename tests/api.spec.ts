@@ -8,6 +8,7 @@ import { getElmPackages } from "../functions/api";
 import redisClientResult from "../functions/redis/client";
 import { IPromisifiedRedis } from "../functions/redis/types";
 import { afterEach } from "mocha";
+import { getElmPackagesCache } from "../functions/redis/actions";
 
 describe("api", () => {
   if (redisClientResult.Status === Status.Err) {
@@ -23,15 +24,23 @@ describe("api", () => {
     [],
     Promise<ResultType<ElmLangPackage[]>>
   >;
+  let setElmPackagesCacheStub: SinonStub<
+    [packages: ElmLangPackage[], client: IPromisifiedRedis],
+    Promise<boolean>
+  >;
 
   beforeEach(() => {
     elmPackagesCacheStub = sinon.stub(redisActions, "getElmPackagesCache");
     fetchElmPackagesStub = sinon.stub(getters, "fetchElmPackages");
+    setElmPackagesCacheStub = sinon.stub(redisActions, "setElmPackagesCache");
+    client.FLUSHALL();
   });
 
   afterEach(() => {
     elmPackagesCacheStub.restore();
     fetchElmPackagesStub.restore();
+    setElmPackagesCacheStub.restore();
+    client.FLUSHALL();
   });
 
   describe("getElmPackages", () => {
@@ -61,7 +70,7 @@ describe("api", () => {
       });
     });
 
-    it("fetches elm packages from elm-lang", async () => {
+    it("fetches elm packages from elm-lang and caches the result", async () => {
       elmPackagesCacheStub.returns(Promise.resolve(Result().Err));
       fetchElmPackagesStub.returns(
         Promise.resolve(
@@ -78,6 +87,7 @@ describe("api", () => {
         Status: Status.Ok,
         data: [{ name: "Confidenceman02/elm-animate-height" }],
       });
+      expect(setElmPackagesCacheStub.called);
     });
   });
 });
