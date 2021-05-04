@@ -242,7 +242,7 @@ export async function setElmPackagesCache(
     clientMulti.RPUSH(dbKey, pkg.name);
   }
   const multiReturn: number[] = await clientMulti.EXECAsync();
-  clientMulti.EXPIRE(dbKey, resolveExpiration(ExpirableDBKey.ElmPackages));
+  client.EXPIREAsync(dbKey, resolveExpiration(ExpirableDBKey.ElmPackages));
   return multiReturn[multiReturn.length - 1] === packages.length;
 }
 
