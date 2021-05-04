@@ -1,18 +1,16 @@
-import fetch, { Response } from "node-fetch";
-import { elmPackageSearchEndpoint } from "./endpoint";
-import { acceptJson } from "./headers";
-import { Result, ResultType } from "../lib/result";
+import { ResultType, Status } from "../lib/result";
 import { ElmLangPackage } from "./types";
+import { getElmPackagesCache } from "./redis/actions";
+import { IPromisifiedRedis } from "./redis/types";
+import { fetchElmPackages } from "./fetch";
 
-export async function getElmPackages(): Promise<ResultType<ElmLangPackage[]>> {
-  const elmPackageSearchResponse: Response = await fetch(
-    elmPackageSearchEndpoint().href,
-    {
-      method: "GET",
-      headers: { ...acceptJson },
-    }
-  );
-  if (!elmPackageSearchResponse.ok) return Result().Err;
-  const elmPackages: ElmLangPackage[] = await elmPackageSearchResponse.json();
-  return Result<ElmLangPackage[]>().Ok(elmPackages);
+export async function getElmPackages(
+  client: IPromisifiedRedis
+): Promise<ResultType<ElmLangPackage[]>> {
+  //  try fetch from cache first
+  const cache: ResultType<ElmLangPackage[]> = await getElmPackagesCache(client);
+  if (cache.Status === Status.Ok) return cache;
+  //  get from elm-lang
+  const packages = await fetchElmPackages();
+  return packages;
 }

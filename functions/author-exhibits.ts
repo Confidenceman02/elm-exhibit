@@ -9,8 +9,8 @@ import {
   getUserIdByUsername,
   setElmPackagesCache,
 } from "./redis/actions";
-import { getElmPackages } from "./api";
 import { elmLangPackagesToAuthor } from "./common";
+import { fetchElmPackages } from "./fetch";
 
 export async function handler(
   event: APIGatewayEvent,
@@ -46,7 +46,7 @@ export async function handler(
     // No cache at this point so retrieve packages from elm-lang
     const elmPackagesResult: ResultType<
       ElmLangPackage[]
-    > = await getElmPackages();
+    > = await fetchElmPackages();
     if (elmPackagesResult.Status === Status.Err)
       return errorResponse({ tag: "AuthorNotFound" });
     // cache result, we dont care if it actually works

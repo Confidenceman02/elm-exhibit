@@ -55,6 +55,7 @@
     "@types/cookie": "^0.4.0",
     "@types/node-fetch": "^2.5.10",
     "@types/redis": "^2.8.28",
+    "@types/sinon": "^10.0.0",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
@@ -63,6 +64,7 @@
     "elm-test": "^0.19.1-revision6",
     "eslint": "^7.24.0",
     "node-elm-compiler": "^5.0.6",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "sinon": "^10.0.0"
   }
 }
