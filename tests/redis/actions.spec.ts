@@ -25,6 +25,7 @@ import {
   GithubLoginData,
   GithubUserData,
 } from "../../functions/types";
+import { generateElmPackagesCacheKey } from "../../functions/redis/common";
 
 describe("actions", () => {
   if (redisClientResult.Status === Status.Err) {
@@ -395,7 +396,7 @@ describe("actions", () => {
   });
 
   describe("setElmPackagesCache", () => {
-    it("should set elm packages cache", async () => {
+    it("should set elm packages cache with a key expiry", async () => {
       const packagesCache: ElmLangPackage[] = [
         { name: "Confidenceman02/elm-exhibit" },
         { name: "Confidenceman02/elm-animate-height" },
@@ -408,7 +409,12 @@ describe("actions", () => {
         client
       );
 
+      const expiryTimeRemaining: number = await client.TTLAsync(
+        generateElmPackagesCacheKey()
+      );
+
       expect(elmPackagesSet).to.be.true;
+      expect(expiryTimeRemaining).to.not.eq(-1);
     });
   });
 
