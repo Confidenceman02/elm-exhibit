@@ -138,8 +138,21 @@ mainContentWrapper model =
                     case model.context.session of
                         Session.LoggedIn viewer ->
                             if Viewer.isUsername (Author.toString model.author) viewer then
-                                div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto, Css.displayFlex, Css.flexDirection Css.column ] ]
-                                    [ div [ StyledAttribs.css [ Css.width (Css.pct 53), Css.margin2 (Css.px 0) Css.auto, Css.textAlign Css.center, Css.marginBottom exSpacingLg ] ]
+                                div
+                                    [ StyledAttribs.css
+                                        [ Css.margin2 (Css.px 0) Css.auto
+                                        , Css.displayFlex
+                                        , Css.flexDirection Css.column
+                                        ]
+                                    ]
+                                    [ div
+                                        [ StyledAttribs.css
+                                            [ Css.width (Css.pct 53)
+                                            , Css.margin2 (Css.px 0) Css.auto
+                                            , Css.textAlign Css.center
+                                            , Css.marginBottom exSpacingLg
+                                            ]
+                                        ]
                                         [ Heading.view
                                             (Heading.h2
                                                 |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
@@ -151,8 +164,20 @@ mainContentWrapper model =
                                         [ Button.view
                                             (Button.wrapper
                                                 [ div [ StyledAttribs.css [ Css.width (Css.px exhibitButtonWidth), Css.height (Css.px exhibitButtonHeight) ] ]
-                                                    [ div [ StyledAttribs.css [ Css.height (Css.pct 100), Css.displayFlex, Css.flexDirection Css.column, Css.alignItems Css.center, Css.justifyContent Css.center ] ]
-                                                        [ Heading.view (Heading.h2 |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]) "Create an exhibit"
+                                                    [ div
+                                                        [ StyledAttribs.css
+                                                            [ Css.height (Css.pct 100)
+                                                            , Css.displayFlex
+                                                            , Css.flexDirection Css.column
+                                                            , Css.alignItems Css.center
+                                                            , Css.justifyContent Css.center
+                                                            ]
+                                                        ]
+                                                        [ Heading.view
+                                                            (Heading.h2
+                                                                |> Heading.overrides [ StyledAttribs.css [ Css.margin (Css.px 0), Css.marginBottom exSpacingMd ] ]
+                                                            )
+                                                            "Create an exhibit"
                                                         , AddLogo.view
                                                         ]
                                                     ]
@@ -212,30 +237,58 @@ loadingView =
                 |> LoadingPlaceholder.height LoadingPlaceholder.TallXl
                 |> LoadingPlaceholder.marginBottom (LoadingPlaceholder.Custom 60)
             )
-        , div [ StyledAttribs.css [ Css.property "display" "grid", Css.property "grid-template-columns" "repeat(auto-fill, 300px)", Css.property "grid-gap" "10px", Css.justifyContent Css.spaceBetween ] ]
+        , div
+            [ StyledAttribs.css
+                [ Css.property "display" "grid"
+                , Css.property "grid-template-columns" "repeat(auto-fill, 300px)"
+                , Css.property "grid-gap" "10px"
+                , Css.justifyContent Css.spaceBetween
+                ]
+            ]
             [ exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6)
+                        |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300)
+                        |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385)
+                    )
                 ]
             , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                    (LoadingPlaceholder.block
+                        (LoadingPlaceholder.defaultBlock
+                            |> LoadingPlaceholder.borderRadius 6
+                        )
+                        |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300)
+                        |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385)
+                    )
                 ]
             , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                    (LoadingPlaceholder.block
+                        (LoadingPlaceholder.defaultBlock
+                            |> LoadingPlaceholder.borderRadius 6
+                        )
+                        |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300)
+                        |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385)
+                    )
                 ]
             , exhibitContainer
                 [ LoadingPlaceholder.view
                     (LoadingPlaceholder.block LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.width (LoadingPlaceholder.Pct 50))
                 , LoadingPlaceholder.view
-                    (LoadingPlaceholder.block (LoadingPlaceholder.defaultBlock |> LoadingPlaceholder.borderRadius 6) |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300) |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385))
+                    (LoadingPlaceholder.block
+                        (LoadingPlaceholder.defaultBlock
+                            |> LoadingPlaceholder.borderRadius 6
+                        )
+                        |> LoadingPlaceholder.width (LoadingPlaceholder.Px 300)
+                        |> LoadingPlaceholder.height (LoadingPlaceholder.CustomHeight 385)
+                    )
                 ]
             ]
         ]
