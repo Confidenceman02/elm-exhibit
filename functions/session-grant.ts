@@ -10,7 +10,7 @@ import { parseCookie, resolveReferer } from "./request";
 
 export async function handler(
   event: APIGatewayEvent,
-  context: Context
+  _context: Context
 ): Promise<ResponseBody> {
   const { referer, cookie } = event.headers;
   const sessionId = uuidv4();

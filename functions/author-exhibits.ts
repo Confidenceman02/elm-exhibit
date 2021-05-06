@@ -9,7 +9,7 @@ import { getElmPackages } from "./api";
 
 export async function handler(
   event: APIGatewayEvent,
-  context: Context
+  _context: Context
 ): Promise<ResponseBody> {
   const params = event.queryStringParameters;
   if (!params || !params.author) {

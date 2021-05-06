@@ -9,7 +9,7 @@ import redisClient from "./redis/client";
 
 export async function handler(
   event: APIGatewayEvent,
-  context: Context
+  _context: Context
 ): Promise<ResponseBody> {
   const { cookie } = event.headers;
   const cookieResult = parseCookie(cookie);
