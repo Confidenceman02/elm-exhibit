@@ -13,11 +13,10 @@ import Effect
 import Header
 import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
-import Html.Styled.Extra exposing (viewIf)
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
 import Session
-import Styles.Color exposing (exColorBorder, exColorColt100, exColorColt200)
+import Styles.Color exposing (exColorBorder, exColorColt100)
 import Styles.Spacing exposing (exSpacingLg, exSpacingMd, exSpacingXxl)
 import Viewer
 
