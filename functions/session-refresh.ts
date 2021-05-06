@@ -11,7 +11,7 @@ import { parseCookie } from "./request";
 // by user action.
 export async function handler(
   event: APIGatewayEvent,
-  context: Context
+  _context: Context
 ): Promise<ResponseBody> {
   const { cookie } = event.headers;
 

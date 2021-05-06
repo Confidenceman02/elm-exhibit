@@ -20,7 +20,7 @@ import { URL } from "url";
 
 export async function handler(
   event: APIGatewayEvent,
-  context: Context
+  _context: Context
 ): Promise<ResponseBody> {
   const params = event.queryStringParameters;
 
