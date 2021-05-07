@@ -9,6 +9,7 @@
     "build:lambda": "yarn netlify-lambda build functions",
     "ts:compile": "bin/ts-check.sh",
     "watch": "parcel watch index.html",
+    "ts:watch": "tsc-watch --noEmit",
     "ts:test": "bin/test-ts.sh",
     "elm:test": "bin/test-elm.sh"
   },
