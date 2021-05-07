@@ -3,8 +3,10 @@ module AuthorExhibits exposing (AuthorExhibit, AuthorExhibitsError(..), fetch)
 import Api.Api as Api
 import Api.Endpoint as Endpoint
 import Author exposing (Author)
+import ElmLangPackage
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (required)
 
 
 type AuthorExhibit
@@ -13,6 +15,7 @@ type AuthorExhibit
 
 type AuthorExhibitsError
     = AuthorNotFound Author
+    | AuthorNotRegisteredIsElmLangPackageAuthor Author (List ElmLangPackage.ElmLangPackage)
     | MissingAuthorParam
     | KeineAhnung
 
@@ -27,11 +30,19 @@ exhibitsDecoder =
     Decode.field "exhibits" (Decode.list exhibitDecoder)
 
 
+elmLangPackageDecoder : Deocoder { name : string }
+elmLangPackageDecoder =
+    Decode.at [ "packages" ] (Decode.list ElmLangPackage.decoder)
+
+
 mapTagToExhibitError : Author -> String -> Decoder AuthorExhibitsError
 mapTagToExhibitError author tag =
     case tag of
         "AuthorNotFound" ->
             Decode.succeed (AuthorNotFound author)
+
+        "AuthorNotFoundWithElmLangPackages" ->
+            Decode.map (AuthorNotRegisteredIsElmLangPackageAuthor author) elmLangPackageDecoder
 
         _ ->
             Decode.succeed KeineAhnung
