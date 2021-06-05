@@ -3,11 +3,11 @@ export namespace Elm {
     export interface App {
       ports: {
         decodeRefererFromStateParam: {
-          subscribe(callback: (data: string) => void): void
-        }
+          subscribe(callback: (data: string) => void): void;
+        };
         decodedRefererFromStateParam: {
-          send(data: string)
-        }
+          send(callback: (data: string) => void): void;
+        };
       };
     }
     export function init(options: {
@@ -16,3 +16,4 @@ export namespace Elm {
     }): Elm.Main.App;
   }
 }
+
