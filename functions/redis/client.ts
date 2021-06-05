@@ -17,7 +17,7 @@ const client: () => ResultType<IPromisifiedRedis> = (): ResultType<IPromisifiedR
     const redisClient: RedisClient = createClient({
       host: redisIP,
       port: parseInt(redisPort),
-      password: redisPass
+      password: redisPass,
     });
     const redis = Promise.promisifyAll<IPromisifiedRedis>(redisClient);
     return Result<IPromisifiedRedis>().Ok(redis);

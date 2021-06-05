@@ -9,7 +9,7 @@ type alias ElmLangPackage =
     }
 
 
-decoder : Decoder ElmLangPackage
+decoder : Decode.Decoder ElmLangPackage
 decoder =
-    Deocde.succeed ElmLangPackage
+    Decode.succeed ElmLangPackage
         |> required "name" Decode.string

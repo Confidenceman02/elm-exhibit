@@ -6,7 +6,6 @@ import Author exposing (Author)
 import ElmLangPackage
 import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (required)
 
 
 type AuthorExhibit
@@ -30,7 +29,7 @@ exhibitsDecoder =
     Decode.field "exhibits" (Decode.list exhibitDecoder)
 
 
-elmLangPackageDecoder : Deocoder { name : string }
+elmLangPackageDecoder : Decoder (List ElmLangPackage.ElmLangPackage)
 elmLangPackageDecoder =
     Decode.at [ "packages" ] (Decode.list ElmLangPackage.decoder)
 
@@ -70,7 +69,7 @@ decodeResponseToString author goodStatusDecoder response =
                 Ok decodedBody ->
                     Ok decodedBody
 
-                Err err ->
+                Err _ ->
                     Err KeineAhnung
 
         _ ->
