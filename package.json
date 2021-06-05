@@ -62,7 +62,7 @@
     "@typescript-eslint/parser": "^4.22.0",
     "cssnano": "^5.0.1",
     "elm-hot": "^1.1.6",
-    "elm-test": "^0.19.1-revision6",
+    "elm-test": "^0.19.1-revision7",
     "eslint": "^7.24.0",
     "node-elm-compiler": "^5.0.6",
     "prettier": "^2.2.1",
