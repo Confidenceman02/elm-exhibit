@@ -95,7 +95,7 @@ view (Config config) =
                     "Our bad.."
 
                 Oops ->
-                    "Oops.."
+                    "Oops!"
 
                 SigningIn ->
                     "Signing you in"

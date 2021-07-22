@@ -6,10 +6,12 @@ import Components.AddLogo as AddLogo
 import Components.Button as Button
 import Components.ExhibitPane as ExhibitPane
 import Components.Heading as Heading
+import Components.Link as Link
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
 import Effect
+import ElmLangPackage
 import Header
 import Html.Styled as Styled exposing (div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
@@ -118,7 +120,17 @@ mainContentWrapper model =
                             [ ExhibitPane.view ExhibitPane.default
                                 [ Interstitial.view
                                     (Interstitial.bummer
-                                        |> Interstitial.content (authorNotFoundView model.author)
+                                        |> Interstitial.content (authorNotFoundView a)
+                                    )
+                                ]
+                            ]
+
+                    AuthorExhibits.AuthorNotFoundHasElmLangPackages a packages ->
+                        errorContainer
+                            [ ExhibitPane.view ExhibitPane.default
+                                [ Interstitial.view
+                                    (Interstitial.oops
+                                        |> Interstitial.content (authorNotFoundHasElmPackagesView a packages)
                                     )
                                 ]
                             ]
@@ -294,6 +306,10 @@ loadingView =
         ]
 
 
+
+-- ERROR VIEWS
+
+
 authorNotFoundView : Author -> List (Styled.Html msg)
 authorNotFoundView author =
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
@@ -304,10 +320,27 @@ authorNotFoundView author =
     ]
 
 
+authorNotFoundHasElmPackagesView : Author -> List ElmLangPackage.ElmLangPackage -> List (Styled.Html msg)
+authorNotFoundHasElmPackagesView author packages =
+    [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
+        [ text "We can't seem to find the elm-exhibit author "
+        , text <| Author.toString author
+        , text "."
+        ]
+    , Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Body)
+        [ text "Looks like "
+        , text <| Author.toString author
+        , text " has authored some packages on "
+        , Link.view (Link.default |> Link.href "https://package.elm-lang.org") (Link.stringBody "package.elm-lang.org ")
+        , text "you can check out though."
+        ]
+    ]
+
+
 keineAhnungErrorView : List (Styled.Html msg)
 keineAhnungErrorView =
     [ Paragraph.view (Paragraph.default |> Paragraph.style Paragraph.Intro)
-        [ text "We aren't exactly sure what happened but we're really sorry!."
+        [ text "We aren't exactly sure what happened but we're really sorry!"
         ]
     ]
 
