@@ -128,6 +128,7 @@ pane content =
     div
         [ StyledAttribs.css
             [ Css.position Css.absolute
+            , Css.marginLeft (Css.px -(ExhibitPane.defaultContentWidth / 2))
             , Css.transform (Css.translate2 (Css.pct -50) (Css.pct 0))
             , Css.marginTop (Grid.calc Grid.grid Grid.multiply 1.5)
             , Css.left (Css.pct 50)
