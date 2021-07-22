@@ -11,7 +11,10 @@ export function parseCookie(
     return Result().Err;
   }
   const parsedCookie = parse(cookie);
-  if (sessionIdCookieKey in parsedCookie) {
+  if (
+    sessionIdCookieKey in parsedCookie &&
+    parsedCookie[sessionIdCookieKey] !== ""
+  ) {
     return Result<SessionCookie>().Ok({
       session_id: parsedCookie[sessionIdCookieKey],
     });
