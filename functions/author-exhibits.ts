@@ -34,7 +34,7 @@ export async function handler(
         // not an elm package author
         return errorResponse({ tag: "AuthorNotFound" });
       return errorResponse({
-        tag: "AuthorNotFoundWithElmLangPackages",
+        tag: "AuthorNotFoundHasElmLangPackages",
         packages: authorPackages,
       });
     }

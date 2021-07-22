@@ -38,7 +38,7 @@ function resolveStatusCodeFromErrorBody(error: ErrorBody): StatusCodes {
   switch (error.tag) {
     case "AuthorNotFound":
       return StatusCodes.NOT_FOUND;
-    case "AuthorNotFoundWithElmLangPackages":
+    case "AuthorNotFoundHasElmLangPackages":
       return StatusCodes.NOT_FOUND;
     case "ExhibitNotFound":
       return StatusCodes.NOT_FOUND;

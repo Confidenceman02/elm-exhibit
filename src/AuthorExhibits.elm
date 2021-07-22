@@ -14,7 +14,7 @@ type AuthorExhibit
 
 type AuthorExhibitsError
     = AuthorNotFound Author
-    | AuthorNotRegisteredIsElmLangPackageAuthor Author (List ElmLangPackage.ElmLangPackage)
+    | AuthorNotFoundHasElmLangPackages Author (List ElmLangPackage.ElmLangPackage)
     | MissingAuthorParam
     | KeineAhnung
 
@@ -40,8 +40,8 @@ mapTagToExhibitError author tag =
         "AuthorNotFound" ->
             Decode.succeed (AuthorNotFound author)
 
-        "AuthorNotFoundWithElmLangPackages" ->
-            Decode.map (AuthorNotRegisteredIsElmLangPackageAuthor author) elmLangPackageDecoder
+        "AuthorNotFoundHasElmLangPackages" ->
+            Decode.map (AuthorNotFoundHasElmLangPackages author) elmLangPackageDecoder
 
         _ ->
             Decode.succeed KeineAhnung

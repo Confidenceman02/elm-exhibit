@@ -125,7 +125,7 @@ describe("AuthorExhibitsErrorBody", () => {
 
   it("AuthorNotFoundWithElmLangPackages should return NOT_FOUND", () => {
     const tag: AuthorExhibitsErrorBody = {
-      tag: "AuthorNotFoundWithElmLangPackages",
+      tag: "AuthorNotFoundHasElmLangPackages",
       packages: [{ name: "Confidenceman02/elm-animate-height" }],
     };
     const expected = {
