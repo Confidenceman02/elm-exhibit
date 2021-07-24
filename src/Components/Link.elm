@@ -1,13 +1,22 @@
-module Components.Link exposing (default, href, htmlBody, stringBody, view)
+module Components.Link exposing (default, href, htmlBody, onHoverEffect, stringBody, stringBodyDefault, view)
 
 import Css
 import Html.Styled as Styled exposing (a, text)
 import Html.Styled.Attributes as StyledAttribs
-import Styles.Color exposing (exColorSky700)
+import Styles.Color exposing (exColorSky700, exColorSky800)
 
 
 type Config
     = Config Configuration
+
+
+type StringBodyConfig
+    = StringBodyConfig StringBodyConfiguration
+
+
+type alias StringBodyConfiguration =
+    { onHoverEffect : Bool
+    }
 
 
 type alias Configuration =
@@ -17,8 +26,19 @@ type alias Configuration =
 
 
 type Content msg
-    = StringBody String
+    = StringBody String StringBodyConfig
     | HtmlBody (List (Styled.Html msg))
+
+
+stringBodyDefaults : StringBodyConfiguration
+stringBodyDefaults =
+    { onHoverEffect = False
+    }
+
+
+stringBodyDefault : StringBodyConfig
+stringBodyDefault =
+    StringBodyConfig stringBodyDefaults
 
 
 defaults : Configuration
@@ -42,6 +62,15 @@ type Variant
 
 
 
+-- STRINGBODY MODIFIERS
+
+
+onHoverEffect : Bool -> StringBodyConfig -> StringBodyConfig
+onHoverEffect pred (StringBodyConfig config) =
+    StringBodyConfig { config | onHoverEffect = pred }
+
+
+
 -- MODIFIERS
 
 
@@ -50,9 +79,9 @@ htmlBody content =
     HtmlBody content
 
 
-stringBody : String -> Content msg
-stringBody content =
-    StringBody content
+stringBody : String -> StringBodyConfig -> Content msg
+stringBody content config =
+    StringBody content config
 
 
 href : String -> Config -> Config
@@ -66,10 +95,21 @@ view (Config config) content =
         HtmlBody htmlContent ->
             a [ StyledAttribs.href config.href, StyledAttribs.css [ Css.color Css.inherit, Css.textDecoration Css.none ] ] htmlContent
 
-        StringBody stringContent ->
+        StringBody stringContent (StringBodyConfig strConfig) ->
+            let
+                hoverStyles =
+                    if strConfig.onHoverEffect then
+                        [ Css.color exColorSky800 ]
+
+                    else
+                        []
+            in
             a
                 [ StyledAttribs.href config.href
                 , StyledAttribs.css
-                    [ Css.textDecoration Css.none, Css.color exColorSky700 ]
+                    [ Css.textDecoration Css.none
+                    , Css.color exColorSky700
+                    , Css.hover hoverStyles
+                    ]
                 ]
                 [ text stringContent ]
