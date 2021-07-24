@@ -8,6 +8,10 @@ import Http exposing (Response)
 import Json.Decode as Decode exposing (Decoder)
 
 
+
+-- TODO: Extend this to include more data to render an exhibit
+
+
 type AuthorExhibit
     = AuthorExhibit String
 

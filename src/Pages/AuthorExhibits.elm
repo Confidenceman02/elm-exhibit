@@ -1,4 +1,14 @@
-module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
+module Pages.AuthorExhibits exposing
+    ( Effect(..)
+    , Model
+    , Msg
+    , calculateNextExhibitsViewContext
+    , init
+    , subscriptions
+    , toHeaderMsg
+    , update
+    , view
+    )
 
 import Api.Endpoint exposing (elmPackageUrl)
 import Author exposing (Author)
@@ -56,13 +66,13 @@ exhibitCardHeight =
 type alias Model =
     { context : Context
     , author : Author
-    , exhibits : Status AuthorExhibitsError ExhibitView
+    , exhibits : Status AuthorExhibitsError ExhibitsViewContext
     , headerState : Header.State
     }
 
 
 type
-    ExhibitView
+    ExhibitsViewContext
     -- The signed in user is the author of these exhibits
     = ViewerAuthor (List AuthorExhibit)
       -- These exhibits are not authored by whomever is visiting this page
@@ -376,19 +386,6 @@ exhibitContainer content =
 
 update : Msg -> Model -> ( Model, Cmd Msg, Effect.Effect Effect )
 update msg model =
-    let
-        viewerIsAuthor =
-            case model.context.session of
-                Session.LoggedIn viewer ->
-                    if Viewer.isUsername (Author.toString model.author) viewer then
-                        True
-
-                    else
-                        False
-
-                _ ->
-                    False
-    in
     case msg of
         HeaderMsg headerMsg ->
             let
@@ -400,7 +397,7 @@ update msg model =
         CompletedLoadExhibits (Ok exhibits) ->
             let
                 resolveExhibitView =
-                    if viewerIsAuthor then
+                    if viewerIsAuthor model.context.session model.author then
                         ViewerAuthor exhibits
 
                     else
@@ -415,3 +412,42 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions m =
     Sub.map HeaderMsg (Header.subscriptions m.headerState m.context.session)
+
+
+
+-- HELPERS
+
+
+viewerIsAuthor : Session.Session -> Author -> Bool
+viewerIsAuthor session author =
+    case session of
+        Session.LoggedIn viewer ->
+            if Viewer.isUsername (Author.toString author) viewer then
+                True
+
+            else
+                False
+
+        _ ->
+            False
+
+
+calculateNextExhibitsViewContext : Context -> Author -> Status AuthorExhibitsError ExhibitsViewContext -> Status AuthorExhibitsError ExhibitsViewContext
+calculateNextExhibitsViewContext context author viewContext =
+    case viewContext of
+        (Loaded (ViewerAuthor exhibits)) as viewerAuthor ->
+            if viewerIsAuthor context.session author then
+                viewerAuthor
+
+            else
+                Loaded (Visitor exhibits)
+
+        (Loaded (Visitor exhibits)) as viewerVisitor ->
+            if viewerIsAuthor context.session author then
+                Loaded (ViewerAuthor exhibits)
+
+            else
+                viewerVisitor
+
+        _ ->
+            viewContext

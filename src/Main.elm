@@ -9,7 +9,7 @@ import Html.Styled as Styled
 import Json.Encode as Encode
 import Page
 import Pages.AuthRedirect as AuthRedirectPage
-import Pages.AuthorExhibits as AuthorExhibitsPage
+import Pages.AuthorExhibits as AuthorExhibitsPage exposing (calculateNextExhibitsViewContext)
 import Pages.Exhibit as ExhibitPage
 import Pages.Home as HomePage
 import Pages.NotFound as NotFoundPage
@@ -300,8 +300,14 @@ authorExhibitsEffectHandler model effect =
             let
                 ( updatedContext, cmds ) =
                     headerEffectHandler model.context headerEffect
+
+                withUpdatedContext mdl =
+                    { mdl | context = updatedContext }
+
+                withUpdatedExhibitsViewContext mdl =
+                    { mdl | exhibits = calculateNextExhibitsViewContext mdl.context mdl.author mdl.exhibits }
             in
-            ( { model | context = updatedContext }, cmds )
+            ( (withUpdatedContext >> withUpdatedExhibitsViewContext) model, cmds )
 
 
 headerEffectHandler : Effect.Handler Context Header.HeaderEffect Msg
@@ -325,7 +331,9 @@ headerEffectHandler context effect =
                 ( sessionCmd, session ) =
                     case viewer of
                         Just v ->
-                            Session.logOut SessionDestroying (Viewer.credentials v)
+                            Session.logOut
+                                SessionDestroying
+                                (Viewer.credentials v)
 
                         _ ->
                             ( Cmd.none, context.session )
