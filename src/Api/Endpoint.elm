@@ -1,5 +1,6 @@
-module Api.Endpoint exposing (Endpoint, lambdaEndpoint, lambdaUrl, unwrap)
+module Api.Endpoint exposing (Endpoint, elmPackageUrl, lambdaEndpoint, lambdaUrl, unwrap)
 
+import ElmLangPackage exposing (ElmLangPackage)
 import Url.Builder exposing (QueryParameter)
 
 
@@ -15,6 +16,16 @@ unwrap (Endpoint ep) =
 lambdaEndpoint : String
 lambdaEndpoint =
     "/.netlify/functions"
+
+
+elmLangPackagesPath : String
+elmLangPackagesPath =
+    "https://package.elm-lang.org/packages"
+
+
+elmPackageUrl : ElmLangPackage -> String
+elmPackageUrl package =
+    Url.Builder.crossOrigin elmLangPackagesPath [ package.name, "latest" ] []
 
 
 lambdaUrl : List String -> List QueryParameter -> Endpoint
