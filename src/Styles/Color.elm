@@ -11,6 +11,7 @@ module Styles.Color exposing
     , exColorOfficialYellow
     , exColorSky600
     , exColorSky700
+    , exColorSky800
     , exColorWhite
     )
 
@@ -80,3 +81,8 @@ exColorSky600 =
 exColorSky700 : Color
 exColorSky700 =
     Css.hex "#5599C6"
+
+
+exColorSky800 : Color
+exColorSky800 =
+    Css.hex "447a9e"
