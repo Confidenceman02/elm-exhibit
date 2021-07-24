@@ -229,6 +229,7 @@ export async function getExhibitsByUserId(
   userId: number,
   client: IPromisifiedRedis
 ): Promise<ResultType<[]>> {
+  // TODO: Create data structure for exhibits
   return Result<[]>().Ok([]);
 }
 

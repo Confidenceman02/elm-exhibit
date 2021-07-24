@@ -42,6 +42,7 @@ export function generateTempSessionKey(uniqueKey: string) {
   return generateExpirableDBKey(ExpirableDBKey.TempSession, uniqueKey);
 }
 
+// Confidenceman02.Confidenceman02/elm-select.exhibit
 export function generateExhibitKey(
   userName: string,
   exhibitName: string
@@ -52,6 +53,7 @@ export function generateExhibitKey(
   );
 }
 
+// 1234.user
 export function generateUserKey(userId: number) {
   return generatePermanentDBKey(PermanentDBTag.User, userId.toString());
 }

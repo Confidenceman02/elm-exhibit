@@ -13,6 +13,7 @@ export async function handler(
 ): Promise<ResponseBody> {
   const params = event.queryStringParameters;
   if (!params || !params.author) {
+    // TODO: Throw custom error
     return errorResponse({ tag: "MissingAuthorParam" });
   }
   const author: string = params.author;
