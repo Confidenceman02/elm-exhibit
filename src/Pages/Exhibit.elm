@@ -219,7 +219,7 @@ packageNotFoundView author package =
                 (Link.default
                     |> Link.href "/"
                 )
-                (Link.stringBody "here")
+                (Link.stringBody "here" Link.stringBodyDefault)
             , text "."
             ]
         ]
@@ -250,7 +250,7 @@ authorNotFoundView author exhibit foundAuthor =
                 (Link.default
                     |> Link.href resolvedExhibitHref
                 )
-                (Link.stringBody "here")
+                (Link.stringBody "here" Link.stringBodyDefault)
             ]
         ]
     ]
@@ -277,7 +277,7 @@ authorAndPackageNotFoundErrorView author package =
         ]
     , Paragraph.view Paragraph.default
         [ text "You can search for other exhibits "
-        , Link.view Link.default (Link.stringBody "here")
+        , Link.view Link.default (Link.stringBody "here" Link.stringBodyDefault)
         , text " or check out some of our personal favourites below."
         ]
     ]

@@ -1,5 +1,6 @@
 module Pages.AuthorExhibits exposing (Effect(..), Model, Msg, init, subscriptions, toHeaderMsg, update, view)
 
+import Api.Endpoint exposing (elmPackageUrl)
 import Author exposing (Author)
 import AuthorExhibits as AuthorExhibits exposing (AuthorExhibit, AuthorExhibitsError)
 import Components.AddLogo as AddLogo
@@ -7,13 +8,14 @@ import Components.Button as Button
 import Components.ExhibitPane as ExhibitPane
 import Components.Heading as Heading
 import Components.Link as Link
+import Components.List as PackageList
 import Components.Paragraph as Paragraph
 import Context exposing (Context)
 import Css
 import Effect
 import ElmLangPackage
 import Header
-import Html.Styled as Styled exposing (div, main_, text)
+import Html.Styled as Styled exposing (a, div, main_, text)
 import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
@@ -331,9 +333,24 @@ authorNotFoundHasElmPackagesView author packages =
         [ text "Looks like "
         , text <| Author.toString author
         , text " has authored some packages on "
-        , Link.view (Link.default |> Link.href "https://package.elm-lang.org") (Link.stringBody "package.elm-lang.org ")
+        , Link.view (Link.default |> Link.href "https://package.elm-lang.org")
+            (Link.stringBody "package.elm-lang.org " (Link.stringBodyDefault |> Link.onHoverEffect True))
         , text "you can check out though."
         ]
+    , PackageList.view
+        (PackageList.default
+            |> PackageList.items
+                (List.map
+                    (\p ->
+                        Link.view
+                            (Link.default
+                                |> Link.href (elmPackageUrl p)
+                            )
+                            (Link.stringBody p.name (Link.stringBodyDefault |> Link.onHoverEffect True))
+                    )
+                    packages
+                )
+        )
     ]
 
 

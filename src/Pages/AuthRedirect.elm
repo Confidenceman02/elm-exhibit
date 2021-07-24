@@ -85,7 +85,7 @@ loginFailedContent =
             )
             [ text "We couldn't seem to log you in, please try again later." ]
         ]
-    , Link.view (Link.default |> Link.href "/") (Link.stringBody "Back to home")
+    , Link.view (Link.default |> Link.href "/") (Link.stringBody "Back to home" Link.stringBodyDefault)
     ]
 
 
