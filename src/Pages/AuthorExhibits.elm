@@ -38,6 +38,7 @@ import Viewer
 type Msg
     = HeaderMsg Header.Msg
     | CompletedLoadExhibits (Result AuthorExhibitsError (List AuthorExhibit))
+    | InitCreateExhibit
 
 
 toHeaderMsg : Header.Msg -> Msg
@@ -189,7 +190,7 @@ mainContentWrapper model =
                                             |> Heading.overrides [ StyledAttribs.css [ Css.fontWeight (Css.int 600) ] ]
                                             |> Heading.inline True
                                         )
-                                        "Create your first exhibit from one of your Elm packages."
+                                        "Create your first exhibit from one of your elm-lang packages."
                                     ]
                                 , div [ StyledAttribs.css [ Css.margin2 (Css.px 0) Css.auto ] ]
                                     [ Button.view
@@ -213,6 +214,7 @@ mainContentWrapper model =
                                                     ]
                                                 ]
                                             ]
+                                            |> Button.onClick InitCreateExhibit
                                             |> Button.padding False
                                             |> Button.backgroundColor exColorSoftStone100
                                             |> Button.hoverColor exColorSoftStone200
@@ -407,6 +409,9 @@ update msg model =
 
         CompletedLoadExhibits (Err err) ->
             ( { model | exhibits = Failed err }, Cmd.none, Effect.none )
+
+        InitCreateExhibit ->
+            ( model, Cmd.none, Effect.none )
 
 
 subscriptions : Model -> Sub Msg

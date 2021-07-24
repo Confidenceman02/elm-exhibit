@@ -22,7 +22,7 @@ export async function handler(
   }
   const client = redisClient.data;
   const userIdResult = await getUserIdByUsername(author, client);
-  // Author isn't registered with elm-exhibit but maybe they are elm package authors?
+  // Author isn't registered with elm-exhibit but maybe they are an elm-lang package author?
   if (userIdResult.Status === Status.Err) {
     const elmPackagesResult = await getElmPackages(client);
     if (elmPackagesResult.Status === Status.Ok) {
@@ -32,7 +32,7 @@ export async function handler(
       );
 
       if (authorPackages.length === 0)
-        // not an elm package author
+        // not an elm-lang package author
         return errorResponse({ tag: "AuthorNotFound" });
       return errorResponse({
         tag: "AuthorNotFoundHasElmLangPackages",

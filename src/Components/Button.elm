@@ -95,6 +95,15 @@ secondary =
     Config { defaults | variant = Secondary }
 
 
+
+-- MODIFIERS
+
+
+onClick : msg -> Config msg -> Config msg
+onClick msg (Config config) =
+    Config { config | onClick = Just msg }
+
+
 backgroundColor : Css.Color -> Config msg -> Config msg
 backgroundColor c (Config config) =
     Config { config | backgroundColor = Just c }
@@ -304,12 +313,3 @@ wrapperStyles config =
     ]
         ++ resolveBackgroundColor
         ++ resolveHoverColor
-
-
-
--- MODIFIERS
-
-
-onClick : msg -> Config msg -> Config msg
-onClick msg (Config config) =
-    Config { config | onClick = Just msg }
