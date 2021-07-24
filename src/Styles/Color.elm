@@ -12,6 +12,8 @@ module Styles.Color exposing
     , exColorSky600
     , exColorSky700
     , exColorSky800
+    , exColorSoftStone100
+    , exColorSoftStone200
     , exColorWhite
     )
 
@@ -41,6 +43,16 @@ exColorOfficialYellow =
 exColorWhite : Color
 exColorWhite =
     Css.hex "#FFFFFF"
+
+
+exColorSoftStone100 : Color
+exColorSoftStone100 =
+    Css.hex "#EEEEEE"
+
+
+exColorSoftStone200 : Color
+exColorSoftStone200 =
+    Css.hex "#EBEBEB"
 
 
 exColorBorder : Color

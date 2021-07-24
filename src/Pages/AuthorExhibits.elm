@@ -20,7 +20,7 @@ import Html.Styled.Attributes as StyledAttribs
 import LoadingPlaceholder.LoadingPlaceholder as LoadingPlaceholder
 import Pages.Interstitial.Interstitial as Interstitial
 import Session
-import Styles.Color exposing (exColorBorder, exColorColt100)
+import Styles.Color exposing (exColorColt100, exColorSoftStone100, exColorSoftStone200)
 import Styles.Spacing exposing (exSpacingLg, exSpacingMd, exSpacingXxl)
 import Viewer
 
