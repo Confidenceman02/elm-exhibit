@@ -78,9 +78,8 @@ export async function getSession(
   const redisUserSession: RedisHValue<UserSession> = await client.HGETALLAsync(
     key
   );
-  const userSession: ResultType<UserSession> = redisUserSessionUserSession(
-    redisUserSession
-  );
+  const userSession: ResultType<UserSession> =
+    redisUserSessionUserSession(redisUserSession);
   return userSession;
 }
 
@@ -151,9 +150,8 @@ export async function getUser(
   client: IPromisifiedRedis
 ): Promise<ResultType<User>> {
   const userReferenceKey = generateUserKey(gitUserId);
-  const redisUser: RedisReturnType<
-    RedisHValue<User>
-  > = await client.HGETALLAsync(userReferenceKey);
+  const redisUser: RedisReturnType<RedisHValue<User>> =
+    await client.HGETALLAsync(userReferenceKey);
   return redisUserToUser(redisUser);
 }
 
@@ -173,9 +171,8 @@ export async function getUsernameByUserId(
   userId: number,
   client: IPromisifiedRedis
 ): Promise<ResultType<string>> {
-  const redisUserName: RedisReturnType<
-    string[]
-  > = await client.ZRANGEBYSCOREAsync(Table.users, userId, userId);
+  const redisUserName: RedisReturnType<string[]> =
+    await client.ZRANGEBYSCOREAsync(Table.users, userId, userId);
   const resolvedResult = redisValueToValueResult<string[]>(redisUserName);
   if (resolvedResult.Status == Status.Err) return resolvedResult;
   if (resolvedResult.data.length === 0) return Result().Err;
@@ -187,9 +184,8 @@ export async function getExhibitReferencesByUserId(
   userId: number,
   client: IPromisifiedRedis
 ): Promise<ResultType<string[]>> {
-  const exhibitReferences: RedisReturnType<
-    string[]
-  > = await client.ZRANGEBYSCOREAsync(Table.exhibits, userId, userId);
+  const exhibitReferences: RedisReturnType<string[]> =
+    await client.ZRANGEBYSCOREAsync(Table.exhibits, userId, userId);
   return redisValueToValueResult<string[]>(exhibitReferences);
 }
 

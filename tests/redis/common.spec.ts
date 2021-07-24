@@ -17,9 +17,12 @@ describe("generateUserKey", () => {
 
 describe("generateExhibitKey", () => {
   it("generate exhibit keyp", () => {
-    expect(generateExhibitKey("Confidenceman02", "elm-animate-height")).to.eq(
-      "Confidenceman02.elm-animate-height.exhibit"
-    );
+    expect(
+      generateExhibitKey(
+        "Confidenceman02",
+        "Confidenceman02/elm-animate-height"
+      )
+    ).to.eq("Confidenceman02.Confidenceman02/elm-animate-height.exhibit");
   });
 });
 
