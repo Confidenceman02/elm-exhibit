@@ -7,6 +7,7 @@ describe("Result", () => {
       expect(Result().Err).to.deep.eq({ Status: Status.Err });
     });
   });
+
   describe("Ok", () => {
     it("should return Ok result", () => {
       expect(Result().Ok("something")).to.deep.eq({

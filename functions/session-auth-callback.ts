@@ -58,7 +58,8 @@ export async function handler(
       });
       if (!githubUserResponse.ok) return errorResponse(noIdea);
       // TODO: Validate data
-      const parsedGithubUserResponse: GithubUserData = await githubUserResponse.json();
+      const parsedGithubUserResponse: GithubUserData =
+        await githubUserResponse.json();
       // initiate a session
       const initiatedSession: boolean = await initSession(
         sessionId,
