@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
-import { Elm } from "./src/Main.elm";
+import { Elm } from "./src/Main";
 
 const app = Elm.Main.init({
   node: document.querySelector("main"),
