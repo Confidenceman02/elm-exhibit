@@ -9,28 +9,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      -
+    - uses: c-hive/gha-yarn-cache@v1
 
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+    - name: Install JS dependencies
+      # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install
 
-    - uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-
-    - name: Build packages
-      uses: borales/actions-yarn@v2.0.0
-      with:
-        cmd: install --ignore-engines
-
-    - name: typescript tests
-      uses: borales/actions-yarn@v2.0.0
-      with:
-        cmd: ts:test
+    - name: Run ts unit tests
+      run: yarn ts:test
 
     - name: elm-analyse
       uses: borales/actions-yarn@v2.0.0
